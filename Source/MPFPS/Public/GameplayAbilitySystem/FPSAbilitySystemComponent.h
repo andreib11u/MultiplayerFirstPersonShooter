@@ -13,5 +13,13 @@ UCLASS()
 class MPFPS_API UFPSAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
-	
+public:
+	template<typename AttributeSet>
+	const AttributeSet* GetAttributeSet(TSubclassOf<UAttributeSet> AttributeSetClass = AttributeSet::StaticClass());
 };
+
+template <typename AttributeSet>
+const AttributeSet* UFPSAbilitySystemComponent::GetAttributeSet(TSubclassOf<UAttributeSet> AttributeSetClass)
+{
+	return Cast<AttributeSet>(UAbilitySystemComponent::GetAttributeSet(AttributeSetClass));
+}

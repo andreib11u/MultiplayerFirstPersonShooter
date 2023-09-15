@@ -13,5 +13,12 @@ UCLASS()
 class MPFPS_API AFPSPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
+public:
+
+protected:
+	virtual void BeginPlay() override;
+	virtual void OnRep_PlayerState() override;
+
+private:
+	void InitializeHUD();
 };
