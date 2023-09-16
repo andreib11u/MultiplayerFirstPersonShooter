@@ -15,9 +15,6 @@ AFPSPlayerState::AFPSPlayerState()
 	AbilitySystemComponent->SetIsReplicated(true);
 
 	AttributeSet = CreateDefaultSubobject<UBaseAttributeSet>(TEXT("AttributeSet"));
-	AttributeSet->InitCurrentHealth(100.f);
-	AttributeSet->InitMaxHealth(100.f);
-	AttributeSet->InitWalkSpeed(600.f);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetCurrentHealthAttribute())
 		.AddUObject(this, &AFPSPlayerState::CurrentHealthChanged);

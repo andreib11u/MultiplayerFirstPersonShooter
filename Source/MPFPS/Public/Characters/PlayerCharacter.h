@@ -7,6 +7,7 @@
 #include "AbilitySystemInterface.h"
 #include "PlayerCharacter.generated.h"
 
+class UGameplayEffect;
 class UFPSAbilitySystemComponent;
 struct FInputActionValue;
 class UAbilitySystemComponent;
@@ -37,7 +38,11 @@ private:
 	UPROPERTY(EditAnywhere)
 	UFPSAbilitySystemComponent* AbilitySystemComponent;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UGameplayEffect> AttributeInitializationEffect;
+
 	void GrantAbilities();
+	void InitializeAttributes();
 
 	// Input callbacks
 

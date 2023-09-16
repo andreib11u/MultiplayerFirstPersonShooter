@@ -76,6 +76,8 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	AbilitySystemComponent->InitAbilityActorInfo(FPSPlayerState, this);
 
 	GrantAbilities();
+
+	InitializeAttributes();
 }
 
 void APlayerCharacter::GrantAbilities()
@@ -86,6 +88,26 @@ void APlayerCharacter::GrantAbilities()
 	if (ensure(AbilitySystemComponent))
 	{
 		AbilitySystemComponent->GiveAbility(Spec);
+	}
+}
+
+void APlayerCharacter::InitializeAttributes()
+{
+	if (!AttributeInitializationEffect)
+	{
+		UE_LOG(LogPlayerCharacter, Error, TEXT("%s missing AttributeInitializationEffect."), *GetName())
+		return;
+	}
+
+	check(AbilitySystemComponent);
+
+	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+
+	const FGameplayEffectSpecHandle EffectSpec = AbilitySystemComponent->MakeOutgoingSpec(AttributeInitializationEffect, 1.f, EffectContext);
+	if (EffectSpec.IsValid())
+	{
+		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
 	}
 }
 
@@ -105,6 +127,8 @@ void APlayerCharacter::OnRep_PlayerState()
 
 	// AI won't have PlayerControllers so we can init again here just to be sure. No harm in initing twice for heroes that have PlayerControllers.
 	AbilitySystemComponent->InitAbilityActorInfo(FPSPlayerState, this);
+
+	InitializeAttributes();
 }
 
 void APlayerCharacter::BeginPlay()

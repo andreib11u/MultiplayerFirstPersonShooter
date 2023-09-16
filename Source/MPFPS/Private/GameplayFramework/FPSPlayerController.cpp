@@ -20,21 +20,24 @@ void AFPSPlayerController::BeginPlay()
 
 void AFPSPlayerController::InitializeHUD()
 {
-	if (auto HUD = Cast<AFPSHUD>(GetHUD()))
+	if (IsLocalPlayerController())
 	{
-		HUD->AddHUDToScreen();
-		UHUDWidget* HUDWidget = HUD->GetHUDWidget();
-		auto FPSPlayerState = GetPlayerState<AFPSPlayerState>();
-		check(FPSPlayerState);
+		if (auto* HUD = Cast<AFPSHUD>(GetHUD()))
+		{
+			HUD->AddHUDToScreen();
+			UHUDWidget* HUDWidget = HUD->GetHUDWidget();
+			auto* FPSPlayerState = GetPlayerState<AFPSPlayerState>();
+			check(FPSPlayerState);
 
-		UFPSAbilitySystemComponent* AbilitySystemComponent = FPSPlayerState->GetFPSAbilitySystemComponent();
-		check(AbilitySystemComponent);
+			UFPSAbilitySystemComponent* AbilitySystemComponent = FPSPlayerState->GetFPSAbilitySystemComponent();
+			check(AbilitySystemComponent);
 
-		HUDWidget->Init(AbilitySystemComponent);
-	}
-	else
-	{
-		UE_LOG(LogFPSPlayerController, Error, TEXT("HUD class should be FPSHUD"))
+			HUDWidget->Init(AbilitySystemComponent);
+		}
+		else
+		{
+			UE_LOG(LogFPSPlayerController, Error, TEXT("HUD class should be FPSHUD"))
+		}
 	}
 }
 
