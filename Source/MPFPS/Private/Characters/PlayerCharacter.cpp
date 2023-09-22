@@ -3,13 +3,33 @@
 #include "Characters/PlayerCharacter.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Engine/DemoNetDriver.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
+#include "GameplayAbilitySystem/Abilities/GameplayAbility_FireOnce.h"
 #include "GameplayAbilitySystem/Abilities/PrintTextGameplayAbility.h"
 #include "GameplayFramework/FPSPlayerState.h"
 #include "Input/InputDataAsset.h"
+#include "Net/UnrealNetwork.h"
 #include "Types/FPSGameplayAbilityTypes.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogPlayerCharacter, All, All);
+
+APlayerCharacter::APlayerCharacter()
+{
+	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>("FirstPersonCamera");
+	FirstPersonCamera->bUsePawnControlRotation = true;
+	FirstPersonCamera->SetRelativeLocation(FVector{-10.f, 0.f, 60.f});
+	FirstPersonCamera->SetupAttachment(GetCapsuleComponent());
+
+	FirstPersonMesh = CreateDefaultSubobject<USkeletalMeshComponent>("FirstPersonMesh");
+	FirstPersonMesh->SetRelativeLocation(FVector{-30.f, 0.f, -151.32f});
+	FirstPersonMesh->SetCollisionProfileName("CharacterMesh");
+	FirstPersonMesh->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_Yes;
+	FirstPersonMesh->CastShadow = false;
+	FirstPersonMesh->SetupAttachment(FirstPersonCamera);
+}
 
 UAbilitySystemComponent* APlayerCharacter::GetAbilitySystemComponent() const
 {
@@ -56,6 +76,14 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(InputActions->PrimaryAction, ETriggerEvent::Started, this, &APlayerCharacter::PrimaryActionPressed);
 		EnhancedInputComponent->BindAction(InputActions->PrimaryAction, ETriggerEvent::Completed, this, &APlayerCharacter::PrimaryActionReleased);
 	}
+
+	if (InputActions->SecondaryAction)
+	{
+		EnhancedInputComponent->BindAction(InputActions->SecondaryAction, ETriggerEvent::Started, this,
+										   &APlayerCharacter::SecondaryActionActionPressed);
+		EnhancedInputComponent->BindAction(InputActions->SecondaryAction, ETriggerEvent::Completed, this,
+										   &APlayerCharacter::SecondaryActionActionReleased);
+	}
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -80,14 +108,24 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	InitializeAttributes();
 }
 
+//void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+//{
+//	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+//
+//	
+//}
+
 void APlayerCharacter::GrantAbilities()
 {
-	FGameplayAbilitySpec Spec =
-		FGameplayAbilitySpec(UPrintTextGameplayAbility::StaticClass(), 1, static_cast<int32>(EAbilityInput::PrimaryAction), this);
+	FGameplayAbilitySpec Spec = FGameplayAbilitySpec(FireAbility, 1, static_cast<int32>(EAbilityInput::PrimaryAction), this);
+
+	FGameplayAbilitySpec Spec1 =
+		FGameplayAbilitySpec(UPrintTextGameplayAbility::StaticClass(), 1, static_cast<int32>(EAbilityInput::SecondaryAction), this);
 
 	if (ensure(AbilitySystemComponent))
 	{
 		AbilitySystemComponent->GiveAbility(Spec);
+		AbilitySystemComponent->GiveAbility(Spec1);
 	}
 }
 
@@ -161,3 +199,14 @@ void APlayerCharacter::PrimaryActionReleased()
 {
 	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInput::PrimaryAction));
 }
+
+void APlayerCharacter::SecondaryActionActionPressed()
+{
+	AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityInput::SecondaryAction));
+}
+
+void APlayerCharacter::SecondaryActionActionReleased()
+{
+	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInput::SecondaryAction));
+}
+

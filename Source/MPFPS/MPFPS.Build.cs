@@ -10,7 +10,7 @@ public class MPFPS : ModuleRules
 
 		PublicDependencyModuleNames.AddRange(new string[]
 		{ "Core", "CoreUObject", "Engine", "InputCore", "GameplayAbilities", "GameplayTags", "GameplayTasks",
-		  "EnhancedInput" });
+		  "EnhancedInput", "AnimGraphRuntime" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
 
