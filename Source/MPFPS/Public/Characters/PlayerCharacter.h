@@ -7,10 +7,13 @@
 #include "AbilitySystemInterface.h"
 #include "PlayerCharacter.generated.h"
 
+class UGameplayAbility;
 class UGameplayEffect;
 class UFPSAbilitySystemComponent;
 struct FInputActionValue;
 class UAbilitySystemComponent;
+class UCameraComponent;
+class USkeletalMeshComponent;
 
 /**
  * 
@@ -21,7 +24,12 @@ class MPFPS_API APlayerCharacter : public ABaseCharacter, public IAbilitySystemI
 	GENERATED_BODY()
 
 public:
+	APlayerCharacter();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	UCameraComponent* GetFPCamera() const { return FirstPersonCamera; }
+	USkeletalMeshComponent* GetFirstPersonMesh() const { return FirstPersonMesh; }
+
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void PossessedBy(AController* NewController) override;
@@ -31,7 +39,6 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	class UInputDataAsset* InputActions;
-
 	UPROPERTY(EditAnywhere, Category = "Input")
 	class UInputMappingContext* InputMappingContext;
 
@@ -40,6 +47,14 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayEffect> AttributeInitializationEffect;
+
+	UPROPERTY(EditAnywhere)
+	USkeletalMeshComponent* FirstPersonMesh;
+	UPROPERTY(EditAnywhere)
+	UCameraComponent* FirstPersonCamera;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UGameplayAbility> FireAbility;
 
 	void GrantAbilities();
 	void InitializeAttributes();
@@ -51,4 +66,7 @@ private:
 
 	void PrimaryActionPressed();
 	void PrimaryActionReleased();
+	void SecondaryActionActionPressed();
+	void SecondaryActionActionReleased();
+
 };

@@ -1,33 +1,38 @@
 // Copyright Andrei Bondarenko 2023
 
-
 #include "GameplayAbilitySystem/Abilities/PrintTextGameplayAbility.h"
 
 bool UPrintTextGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-									const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags,
-									FGameplayTagContainer* OptionalRelevantTags) const
+												   const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags,
+												   FGameplayTagContainer* OptionalRelevantTags) const
 {
 	UE_LOG(LogTemp, Warning, TEXT("CanActivateAbility"));
 	return true;
 }
 
 bool UPrintTextGameplayAbility::CheckCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-						   FGameplayTagContainer* OptionalRelevantTags) const
+										  FGameplayTagContainer* OptionalRelevantTags) const
 {
 	UE_LOG(LogTemp, Warning, TEXT("CheckCost"));
 	return true;
 }
 
 void UPrintTextGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-								 const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+												const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	UE_LOG(LogTemp, Warning, TEXT("ActivateAbility"));
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 }
 
 void UPrintTextGameplayAbility::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-							  const FGameplayAbilityActivationInfo ActivationInfo)
+											 const FGameplayAbilityActivationInfo ActivationInfo)
 {
-	UE_LOG(LogTemp, Warning, TEXT("InputPressed"));
+	UE_LOG(LogTemp, Warning, TEXT("InputPressed, Respect: %i, ReplicateINputDirectly: %i"), bServerRespectsRemoteAbilityCancellation,
+		   bReplicateInputDirectly);
+
+	
+
 	Super::InputPressed(Handle, ActorInfo, ActivationInfo);
 }
