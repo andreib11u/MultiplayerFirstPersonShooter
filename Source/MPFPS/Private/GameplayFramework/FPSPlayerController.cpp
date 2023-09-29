@@ -47,3 +47,8 @@ void AFPSPlayerController::OnRep_PlayerState()
 
 	InitializeHUD();
 }
+
+void AFPSPlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+}

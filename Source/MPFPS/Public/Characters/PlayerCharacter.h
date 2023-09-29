@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 #include "Characters/BaseCharacter.h"
 #include "AbilitySystemInterface.h"
+#include "Weapons/Weapon.h"
 #include "PlayerCharacter.generated.h"
 
+class UWeaponComponent;
 class UGameplayAbility;
 class UGameplayEffect;
 class UFPSAbilitySystemComponent;
@@ -16,7 +18,7 @@ class UCameraComponent;
 class USkeletalMeshComponent;
 
 /**
- * 
+ *
  */
 UCLASS()
 class MPFPS_API APlayerCharacter : public ABaseCharacter, public IAbilitySystemInterface
@@ -29,12 +31,14 @@ public:
 
 	UCameraComponent* GetFPCamera() const { return FirstPersonCamera; }
 	USkeletalMeshComponent* GetFirstPersonMesh() const { return FirstPersonMesh; }
+	UWeaponComponent* GetWeaponComponent() const { return WeaponComponent; }
 
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -42,8 +46,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	class UInputMappingContext* InputMappingContext;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UFPSAbilitySystemComponent* AbilitySystemComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
+	UWeaponComponent* WeaponComponent;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayEffect> AttributeInitializationEffect;
@@ -52,12 +58,19 @@ private:
 	USkeletalMeshComponent* FirstPersonMesh;
 	UPROPERTY(EditAnywhere)
 	UCameraComponent* FirstPersonCamera;
+	UPROPERTY(EditAnywhere)
+	USkeletalMeshComponent* FirstPersonWeaponMeshComponent;
+	UPROPERTY(EditAnywhere)
+	USkeletalMeshComponent* ThirdPersonWeaponMeshComponent;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayAbility> FireAbility;
 
 	void GrantAbilities();
 	void InitializeAttributes();
+
+	UFUNCTION()
+	void OnWeaponChanged(UWeapon* CurrentWeapon);
 
 	// Input callbacks
 
@@ -68,5 +81,4 @@ private:
 	void PrimaryActionReleased();
 	void SecondaryActionActionPressed();
 	void SecondaryActionActionReleased();
-
 };

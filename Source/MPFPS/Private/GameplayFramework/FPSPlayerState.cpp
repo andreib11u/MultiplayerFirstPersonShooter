@@ -28,7 +28,6 @@ UAbilitySystemComponent* AFPSPlayerState::GetAbilitySystemComponent() const
 void AFPSPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 void AFPSPlayerState::CurrentHealthChanged(const FOnAttributeChangeData& OnAttributeChangeData)

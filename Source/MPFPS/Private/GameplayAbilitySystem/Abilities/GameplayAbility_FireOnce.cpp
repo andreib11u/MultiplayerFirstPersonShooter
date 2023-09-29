@@ -6,10 +6,13 @@
 #include "AbilitySystemInterface.h"
 #include "Abilities/Tasks/AbilityTask.h"
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
+#include "Characters/PlayerCharacter.h"
 #include "GameplayAbilitySystem/TargetActors/TargetActor_LineTrace.h"
+#include "Weapons/Weapon.h"
+#include "Weapons/WeaponComponent.h"
 
 void UGameplayAbility_FireOnce::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-												const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+                                                const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 

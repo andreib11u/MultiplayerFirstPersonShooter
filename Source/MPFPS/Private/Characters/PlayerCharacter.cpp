@@ -13,6 +13,8 @@
 #include "Input/InputDataAsset.h"
 #include "Net/UnrealNetwork.h"
 #include "Types/FPSGameplayAbilityTypes.h"
+#include "Weapons/Weapon.h"
+#include "Weapons/WeaponComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogPlayerCharacter, All, All);
 
@@ -29,6 +31,15 @@ APlayerCharacter::APlayerCharacter()
 	FirstPersonMesh->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_Yes;
 	FirstPersonMesh->CastShadow = false;
 	FirstPersonMesh->SetupAttachment(FirstPersonCamera);
+
+	WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("WeaponComponent");
+	WeaponComponent->OnCurrentWeaponChanged.AddDynamic(this, &APlayerCharacter::OnWeaponChanged);
+
+	FirstPersonWeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("FPWeaponMesh");
+	FirstPersonWeaponMeshComponent->SetupAttachment(FirstPersonMesh, "GripPoint");
+
+	ThirdPersonWeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("TPWeaponMesh");
+	ThirdPersonWeaponMeshComponent->SetupAttachment(GetMesh(), "weapon_r");
 }
 
 UAbilitySystemComponent* APlayerCharacter::GetAbilitySystemComponent() const
@@ -149,6 +160,28 @@ void APlayerCharacter::InitializeAttributes()
 	}
 }
 
+void APlayerCharacter::OnWeaponChanged(UWeapon* CurrentWeapon)
+{
+	if (CurrentWeapon)
+	{
+		if (IsLocallyControlled())
+		{
+			FirstPersonWeaponMeshComponent->SetVisibility(true, true);
+			FirstPersonWeaponMeshComponent->SetSkeletalMesh(CurrentWeapon->WeaponMesh);
+		}
+		else
+		{
+			ThirdPersonWeaponMeshComponent->SetVisibility(true, true);
+			ThirdPersonWeaponMeshComponent->SetSkeletalMesh(CurrentWeapon->WeaponMesh);
+		}
+	}
+	else
+	{
+		FirstPersonWeaponMeshComponent->SetVisibility(false, true);
+		ThirdPersonWeaponMeshComponent->SetVisibility(false, true);
+	}
+}
+
 void APlayerCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
@@ -172,6 +205,22 @@ void APlayerCharacter::OnRep_PlayerState()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (IsLocallyControlled())
+	{
+		GetMesh()->SetVisibility(false, true);
+		FirstPersonMesh->SetVisibility(true, true);
+	}
+	else
+	{
+		GetMesh()->SetVisibility(true, true);
+		FirstPersonMesh->SetVisibility(false, true);
+	}
+}
+
+void APlayerCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
 }
 
 void APlayerCharacter::Look(const FInputActionValue& InputActionValue)

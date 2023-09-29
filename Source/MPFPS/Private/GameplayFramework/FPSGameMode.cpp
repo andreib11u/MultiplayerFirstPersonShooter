@@ -30,5 +30,12 @@ AActor* AFPSGameMode::ChoosePlayerStart_Implementation(AController* Player)
 		PlayerStarts.Add(PlayerStart);
 	}
 
-	return PlayerStarts[PlayerIndex++ % 2];
+	return PlayerStarts[PlayerIndex++ % PlayerStarts.Num()];
+}
+
+void AFPSGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GetWorld()->SpawnActor<AActor>(*ActorToSpawn, FVector{1300.f, 1140.f, 70.f}, FRotator());
 }

@@ -16,4 +16,10 @@ class MPFPS_API AFPSGameMode : public AGameMode
 public:
 	virtual APawn* SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot) override;
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> ActorToSpawn;
+
 };
