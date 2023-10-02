@@ -18,6 +18,7 @@ void UWeaponComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(UWeaponComponent, CurrentWeapon);
 	DOREPLIFETIME_CONDITION(UWeaponComponent, Weapons, COND_OwnerOnly);
+	DOREPLIFETIME(UWeaponComponent, CurrentWeaponClass);
 }
 
 void UWeaponComponent::SetCurrentWeapon(const int32 WeaponIndex)
@@ -34,7 +35,14 @@ void UWeaponComponent::SetCurrentWeapon(UWeapon* Weapon)
 	{
 		RemoveReplicatedSubObject(CurrentWeapon);
 	}
+
 	CurrentWeapon = Weapon;
+
+	if (CurrentWeapon)
+	{
+		CurrentWeaponClass = CurrentWeapon->GetClass();
+	}
+
 	AddReplicatedSubObject(CurrentWeapon);
 	OnCurrentWeaponChanged.Broadcast(CurrentWeapon);
 }
@@ -55,12 +63,22 @@ void UWeaponComponent::AddWeapon(TSubclassOf<UWeapon> WeaponClass)
 void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	/*if (CurrentWeapon)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Ammo: %f"), CurrentWeapon->CurrentClipAmmo)
+	}*/
 }
 
 void UWeaponComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
+	if (CurrentWeaponClass)
+	{
+		CurrentWeapon = NewObject<UWeapon>(this, CurrentWeaponClass);
+	}
+
+	OnCurrentWeaponChanged.Broadcast(CurrentWeapon);
 }
 

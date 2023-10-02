@@ -28,6 +28,15 @@ TArray<FHitResult> ATargetActor_LineTrace::PerformTrace()
 		UKismetSystemLibrary::LineTraceMultiByProfile(GetWorld(), StartTrace, EndTrace, "Projectile", true, ActorsToIgnore,
 													  EDrawDebugTrace::Persistent, Results, true, FLinearColor::Yellow);
 
+		if (Results.IsEmpty())
+		{
+			FHitResult NoHitHappenedHitResult = FHitResult();
+			NoHitHappenedHitResult.TraceStart = StartTrace;
+			NoHitHappenedHitResult.TraceEnd = EndTrace;
+			NoHitHappenedHitResult.Location = EndTrace;
+			Results.Add(NoHitHappenedHitResult);
+		}
+
 		return Results;
 	}
 	return {};
@@ -36,15 +45,10 @@ TArray<FHitResult> ATargetActor_LineTrace::PerformTrace()
 void ATargetActor_LineTrace::StartTargeting(UGameplayAbility* Ability)
 {
 	Super::StartTargeting(Ability);
-	
-
-	UE_LOG(LogTemp, Warning, TEXT("TargetActor StartTargeting"))
 }
 
 bool ATargetActor_LineTrace::IsConfirmTargetingAllowed()
 {
-	UE_LOG(LogTemp, Warning, TEXT("TargetActor IsConfirmTargetingAllowed"))
-
 	return Super::IsConfirmTargetingAllowed();
 }
 
@@ -55,8 +59,6 @@ void ATargetActor_LineTrace::ConfirmTargetingAndContinue()
 		TArray<FHitResult> HitResults = PerformTrace();
 		FGameplayAbilityTargetDataHandle Handle = MakeTargetData(HitResults);
 		TargetDataReadyDelegate.Broadcast(Handle);
-
-		UE_LOG(LogTemp, Warning, TEXT("TargetActor ConfirmTargetingAndContinue"))
 	}
 }
 
@@ -78,39 +80,30 @@ FGameplayAbilityTargetDataHandle ATargetActor_LineTrace::MakeTargetData(const TA
 void ATargetActor_LineTrace::ConfirmTargeting()
 {
 	Super::ConfirmTargeting();
-
-	UE_LOG(LogTemp, Warning, TEXT("TargetActor ConfirmTargeting"))
 }
 
 void ATargetActor_LineTrace::CancelTargeting()
 {
 	Super::CancelTargeting();
 
-	UE_LOG(LogTemp, Warning, TEXT("TargetActor CancelTargeting"))
 }
 
 void ATargetActor_LineTrace::BindToConfirmCancelInputs()
 {
 	Super::BindToConfirmCancelInputs();
-
-	UE_LOG(LogTemp, Warning, TEXT("TargetActor BindToConfirmCancelInputs"))
 }
 
 bool ATargetActor_LineTrace::ShouldProduceTargetData() const
 {
-	UE_LOG(LogTemp, Warning, TEXT("TargetActor ShouldProduceTargetData"))
 	return Super::ShouldProduceTargetData();
 }
 
 bool ATargetActor_LineTrace::OnReplicatedTargetDataReceived(FGameplayAbilityTargetDataHandle& Data) const
 {
-	UE_LOG(LogTemp, Warning, TEXT("TargetActor OnReplicatedTargetDataReceived"))
 	return Super::OnReplicatedTargetDataReceived(Data);
 }
 
 void ATargetActor_LineTrace::BeginPlay()
 {
 	Super::BeginPlay();
-
-	UE_LOG(LogTemp, Warning, TEXT("TargetActor BeginPlay"));
 }

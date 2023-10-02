@@ -31,13 +31,16 @@ public:
 	void AddWeapon(UWeapon* Weapon);
 	void AddWeapon(TSubclassOf<UWeapon> WeaponClass);
 
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 protected:
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void BeginPlay() override;
 
 private:
 	UPROPERTY(VisibleInstanceOnly, Replicated)
 	UWeapon* CurrentWeapon;
+
+	UPROPERTY(Replicated)
+	TSubclassOf<UWeapon> CurrentWeaponClass;
 
 	UPROPERTY(EditAnywhere, Replicated)
 	TArray<UWeapon*> Weapons;

@@ -8,6 +8,5 @@ void UWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	//DOREPLIFETIME(UWeapon, WeaponMesh);
 	DOREPLIFETIME_CONDITION(UWeapon, CurrentClipAmmo, COND_OwnerOnly);
 }

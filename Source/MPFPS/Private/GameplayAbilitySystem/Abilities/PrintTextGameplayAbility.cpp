@@ -2,6 +2,8 @@
 
 #include "GameplayAbilitySystem/Abilities/PrintTextGameplayAbility.h"
 
+#include "AbilitySystemComponent.h"
+
 bool UPrintTextGameplayAbility::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 												   const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags,
 												   FGameplayTagContainer* OptionalRelevantTags) const
@@ -23,6 +25,10 @@ void UPrintTextGameplayAbility::ActivateAbility(const FGameplayAbilitySpecHandle
 	UE_LOG(LogTemp, Warning, TEXT("ActivateAbility"));
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
+	//const FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(DamageEffect);
+	//// ApplyGameplayEffectSpecToTarget(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), EffectSpec, Data);
+	//GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
+
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 }
 
@@ -31,8 +37,6 @@ void UPrintTextGameplayAbility::InputPressed(const FGameplayAbilitySpecHandle Ha
 {
 	UE_LOG(LogTemp, Warning, TEXT("InputPressed, Respect: %i, ReplicateINputDirectly: %i"), bServerRespectsRemoteAbilityCancellation,
 		   bReplicateInputDirectly);
-
-	
 
 	Super::InputPressed(Handle, ActorInfo, ActivationInfo);
 }

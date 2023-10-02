@@ -19,6 +19,7 @@ public:
 protected:
 	virtual bool IsNameStableForNetworking() const override { return true; }
 	virtual bool IsSupportedForNetworking() const override { return true; }
+
 public:
 	UPROPERTY(EditAnywhere)
 	USkeletalMesh* WeaponMesh;
@@ -29,10 +30,13 @@ public:
 	float CurrentClipAmmo;
 
 	UPROPERTY(EditAnywhere)
-	float MaxAmmo;
+	float MaxReserveAmmo;
 	UPROPERTY(EditAnywhere)
-	float CurrentAmmo;
+	float CurrentReserveAmmo;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayAbility> ShootAbility;
+
+	UPROPERTY(EditAnywhere)
+	FName MuzzleSocket = "MuzzleFlashSocket";
 };

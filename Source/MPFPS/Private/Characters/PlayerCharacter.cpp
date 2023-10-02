@@ -36,10 +36,12 @@ APlayerCharacter::APlayerCharacter()
 	WeaponComponent->OnCurrentWeaponChanged.AddDynamic(this, &APlayerCharacter::OnWeaponChanged);
 
 	FirstPersonWeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("FPWeaponMesh");
-	FirstPersonWeaponMeshComponent->SetupAttachment(FirstPersonMesh, "GripPoint");
+	FirstPersonWeaponMeshComponent->SetupAttachment(FirstPersonMesh, "WeaponPoint");
+	FirstPersonWeaponMeshComponent->SetRelativeRotation(FRotator(0, 0, -90.0f));
 
 	ThirdPersonWeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("TPWeaponMesh");
 	ThirdPersonWeaponMeshComponent->SetupAttachment(GetMesh(), "weapon_r");
+	
 }
 
 UAbilitySystemComponent* APlayerCharacter::GetAbilitySystemComponent() const
@@ -123,7 +125,7 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 //{
 //	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 //
-//	
+//	DOREPLIFETIME(APlayerCharacter, CharacterAmmo);
 //}
 
 void APlayerCharacter::GrantAbilities()

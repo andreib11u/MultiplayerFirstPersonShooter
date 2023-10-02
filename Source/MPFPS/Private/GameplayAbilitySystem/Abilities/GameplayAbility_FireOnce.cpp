@@ -12,12 +12,22 @@
 #include "Weapons/WeaponComponent.h"
 
 void UGameplayAbility_FireOnce::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-                                                const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+												const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	UE_LOG(LogTemp, Warning, TEXT("FireOnce Activate"))
 
+	// ammo
+	auto PlayerCharacter = Cast<APlayerCharacter>(ActorInfo->AvatarActor);
+	if (!(PlayerCharacter && PlayerCharacter->GetWeaponComponent()->GetCurrentWeapon()))
+	{
+		return;
+	}
+
+	PlayerCharacter->GetWeaponComponent()->GetCurrentWeapon()->CurrentClipAmmo--;
+
+	// line trace
 	WaitTargetDataTask =
 		UAbilityTask_WaitTargetData::WaitTargetData(this, NAME_None, EGameplayTargetingConfirmation::Instant, ATargetActor_LineTrace::StaticClass());
 
@@ -31,22 +41,29 @@ void UGameplayAbility_FireOnce::ActivateAbility(const FGameplayAbilitySpecHandle
 
 void UGameplayAbility_FireOnce::OnValidData(const FGameplayAbilityTargetDataHandle& Data)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Handle Data"))
-
 	WaitTargetDataTask->ValidData.RemoveDynamic(this, &UGameplayAbility_FireOnce::OnValidData);
 
 	const FGameplayAbilityTargetData* DataPtr = Data.Get(0);
-	if (ensure(DataPtr))
+	if (DataPtr)
 	{
+		FGameplayCueParameters Parameters;
+		Parameters.EffectCauser = GetAvatarActorFromActorInfo();
+		Parameters.Location = DataPtr->GetEndPoint();
+
+		const FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(DamageEffect);
+
 		auto AbilitySystemInterface = Cast<IAbilitySystemInterface>(DataPtr->GetHitResult()->GetActor());
 		if (AbilitySystemInterface)
 		{
-			const FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(DamageEffect);
-			//ApplyGameplayEffectSpecToTarget(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), EffectSpec, Data);
 			AbilitySystemInterface->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
 		}
-	}
 
+		Parameters.EffectContext = EffectSpec.Data.Get()->GetEffectContext();
+		Parameters.EffectContext.AddHitResult(*DataPtr->GetHitResult());
+
+		GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(FGameplayTag::RequestGameplayTag("GameplayCue.Shooting.BulletImpact"),
+																	 Parameters);
+	}
 
 	EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
 }
