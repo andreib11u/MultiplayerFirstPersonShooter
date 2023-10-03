@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "GameplayTags.h"
 #include "Weapon.generated.h"
 
 class UGameplayAbility;
@@ -35,8 +36,11 @@ public:
 	float CurrentReserveAmmo;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<UGameplayAbility> ShootAbility;
+	TSubclassOf<UGameplayAbility> ShootAbility; //todo remove
 
 	UPROPERTY(EditAnywhere)
 	FName MuzzleSocket = "MuzzleFlashSocket";
+
+	UPROPERTY(EditAnywhere, meta = (GameplayTagFilter = "Weapon.FireMode"))
+	FGameplayTag FireMode;
 };

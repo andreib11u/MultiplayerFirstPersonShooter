@@ -16,6 +16,10 @@ class MPFPS_API UFPSAbilitySystemComponent : public UAbilitySystemComponent
 public:
 	template<typename AttributeSet>
 	const AttributeSet* GetAttributeSet(TSubclassOf<UAttributeSet> AttributeSetClass = AttributeSet::StaticClass());
+
+	virtual bool ShouldDoServerAbilityRPCBatch() const override { return true; }
+
+	bool BatchRPCTryActivateAbility(FGameplayAbilitySpecHandle InAbilityHandle, bool bEndAbilityImmediately);
 };
 
 template <typename AttributeSet>

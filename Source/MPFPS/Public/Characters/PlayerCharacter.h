@@ -67,7 +67,7 @@ private:
 	USkeletalMeshComponent* ThirdPersonWeaponMeshComponent;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<UGameplayAbility> FireAbility;
+	TArray<TSubclassOf<UGameplayAbility>> Abilities;
 
 	void GrantAbilities();
 	void InitializeAttributes();

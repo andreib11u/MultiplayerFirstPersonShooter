@@ -8,6 +8,7 @@
 UENUM()
 enum class EAbilityInput
 {
+	None,
 	PrimaryAction,
 	SecondaryAction
 };

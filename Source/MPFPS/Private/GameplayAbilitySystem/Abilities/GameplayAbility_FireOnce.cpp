@@ -1,7 +1,6 @@
 // Copyright Andrei Bondarenko 2023
 
 #include "GameplayAbilitySystem/Abilities/GameplayAbility_FireOnce.h"
-
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 #include "Abilities/Tasks/AbilityTask.h"
@@ -11,15 +10,10 @@
 #include "Weapons/Weapon.h"
 #include "Weapons/WeaponComponent.h"
 
-void UGameplayAbility_FireOnce::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-												const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UGameplayAbility_FireOnce::FireShot()
 {
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	UE_LOG(LogTemp, Warning, TEXT("FireOnce Activate"))
-
 	// ammo
-	auto PlayerCharacter = Cast<APlayerCharacter>(ActorInfo->AvatarActor);
+	auto PlayerCharacter = Cast<APlayerCharacter>(GetCurrentActorInfo()->AvatarActor);
 	if (!(PlayerCharacter && PlayerCharacter->GetWeaponComponent()->GetCurrentWeapon()))
 	{
 		return;
@@ -31,7 +25,7 @@ void UGameplayAbility_FireOnce::ActivateAbility(const FGameplayAbilitySpecHandle
 	WaitTargetDataTask =
 		UAbilityTask_WaitTargetData::WaitTargetData(this, NAME_None, EGameplayTargetingConfirmation::Instant, ATargetActor_LineTrace::StaticClass());
 
-	WaitTargetDataTask->ValidData.AddDynamic(this, &UGameplayAbility_FireOnce::OnValidData);
+	WaitTargetDataTask->ValidData.AddUniqueDynamic(this, &UGameplayAbility_FireOnce::OnValidDataAcquired);
 	WaitTargetDataTask->ReadyForActivation();
 
 	AGameplayAbilityTargetActor* SpawnedActor;
@@ -39,10 +33,14 @@ void UGameplayAbility_FireOnce::ActivateAbility(const FGameplayAbilitySpecHandle
 	WaitTargetDataTask->FinishSpawningActor(this, SpawnedActor);
 }
 
-void UGameplayAbility_FireOnce::OnValidData(const FGameplayAbilityTargetDataHandle& Data)
+void UGameplayAbility_FireOnce::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+                                                const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	WaitTargetDataTask->ValidData.RemoveDynamic(this, &UGameplayAbility_FireOnce::OnValidData);
+	FireShot();
+}
 
+void UGameplayAbility_FireOnce::OnValidDataAcquired(const FGameplayAbilityTargetDataHandle& Data)
+{
 	const FGameplayAbilityTargetData* DataPtr = Data.Get(0);
 	if (DataPtr)
 	{
@@ -61,9 +59,6 @@ void UGameplayAbility_FireOnce::OnValidData(const FGameplayAbilityTargetDataHand
 		Parameters.EffectContext = EffectSpec.Data.Get()->GetEffectContext();
 		Parameters.EffectContext.AddHitResult(*DataPtr->GetHitResult());
 
-		GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(FGameplayTag::RequestGameplayTag("GameplayCue.Shooting.BulletImpact"),
-																	 Parameters);
+		GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(ShotGameplayCue, Parameters);
 	}
-
-	EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
 }

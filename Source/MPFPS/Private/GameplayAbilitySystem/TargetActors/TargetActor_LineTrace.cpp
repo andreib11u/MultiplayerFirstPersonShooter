@@ -26,7 +26,7 @@ TArray<FHitResult> ATargetActor_LineTrace::PerformTrace()
 		TArray<FHitResult> Results;
 
 		UKismetSystemLibrary::LineTraceMultiByProfile(GetWorld(), StartTrace, EndTrace, "Projectile", true, ActorsToIgnore,
-													  EDrawDebugTrace::Persistent, Results, true, FLinearColor::Yellow);
+													  EDrawDebugTrace::None, Results, true, FLinearColor::Yellow);
 
 		if (Results.IsEmpty())
 		{

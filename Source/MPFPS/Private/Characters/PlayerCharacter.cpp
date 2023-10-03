@@ -41,7 +41,6 @@ APlayerCharacter::APlayerCharacter()
 
 	ThirdPersonWeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("TPWeaponMesh");
 	ThirdPersonWeaponMeshComponent->SetupAttachment(GetMesh(), "weapon_r");
-	
 }
 
 UAbilitySystemComponent* APlayerCharacter::GetAbilitySystemComponent() const
@@ -121,24 +120,22 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	InitializeAttributes();
 }
 
-//void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+// void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 //{
 //	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 //
 //	DOREPLIFETIME(APlayerCharacter, CharacterAmmo);
-//}
+// }
 
 void APlayerCharacter::GrantAbilities()
 {
-	FGameplayAbilitySpec Spec = FGameplayAbilitySpec(FireAbility, 1, static_cast<int32>(EAbilityInput::PrimaryAction), this);
-
-	FGameplayAbilitySpec Spec1 =
-		FGameplayAbilitySpec(UPrintTextGameplayAbility::StaticClass(), 1, static_cast<int32>(EAbilityInput::SecondaryAction), this);
-
-	if (ensure(AbilitySystemComponent))
+	for (TSubclassOf<UGameplayAbility> Ability : Abilities)
 	{
-		AbilitySystemComponent->GiveAbility(Spec);
-		AbilitySystemComponent->GiveAbility(Spec1);
+		FGameplayAbilitySpec Spec = FGameplayAbilitySpec(Ability, 1, 0, this);
+		if (ensure(AbilitySystemComponent))
+		{
+			AbilitySystemComponent->GiveAbility(Spec);
+		}
 	}
 }
 
@@ -260,4 +257,3 @@ void APlayerCharacter::SecondaryActionActionReleased()
 {
 	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInput::SecondaryAction));
 }
-

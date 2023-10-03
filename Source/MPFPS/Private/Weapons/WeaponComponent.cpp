@@ -2,7 +2,11 @@
 
 
 #include "Weapons/WeaponComponent.h"
+
+#include "AbilitySystemInterface.h"
+#include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Types/FPSGameplayAbilityTypes.h"
 #include "Weapons/Weapon.h"
 
 UWeaponComponent::UWeaponComponent()
@@ -41,6 +45,14 @@ void UWeaponComponent::SetCurrentWeapon(UWeapon* Weapon)
 	if (CurrentWeapon)
 	{
 		CurrentWeaponClass = CurrentWeapon->GetClass();
+		if (auto AbilitySystemInterface = Cast<IAbilitySystemInterface>(GetOwner()))
+		{
+			if (auto AbilitySystemComponent = AbilitySystemInterface->GetAbilitySystemComponent())
+			{
+				FGameplayAbilitySpec Spec = FGameplayAbilitySpec(CurrentWeapon->ShootAbility, 1, static_cast<int32>(EAbilityInput::PrimaryAction), GetOwner());
+				AbilitySystemComponent->GiveAbility(Spec);
+			}
+		}
 	}
 
 	AddReplicatedSubObject(CurrentWeapon);
