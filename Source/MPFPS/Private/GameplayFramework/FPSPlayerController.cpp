@@ -1,7 +1,6 @@
 // Copyright Andrei Bondarenko 2023
 
 #include "GameplayFramework/FPSPlayerController.h"
-
 #include "GameplayFramework/FPSPlayerState.h"
 #include "UI/FPSHUD.h"
 #include "UI/HUDWidget.h"
@@ -11,6 +10,9 @@ DEFINE_LOG_CATEGORY_STATIC(LogFPSPlayerController, All, All);
 void AFPSPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SetShowMouseCursor(false);
+	SetInputMode(FInputModeGameOnly());
 
 	if (GetNetMode() == NM_ListenServer)
 	{
@@ -24,7 +26,7 @@ void AFPSPlayerController::InitializeHUD()
 	{
 		if (auto* HUD = Cast<AFPSHUD>(GetHUD()))
 		{
-			HUD->AddHUDToScreen();
+			HUD->CreateHUD();
 			UHUDWidget* HUDWidget = HUD->GetHUDWidget();
 			auto* FPSPlayerState = GetPlayerState<AFPSPlayerState>();
 			check(FPSPlayerState);

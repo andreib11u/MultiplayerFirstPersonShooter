@@ -9,8 +9,19 @@ public class MPFPS : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[]
-		{ "Core", "CoreUObject", "Engine", "InputCore", "GameplayAbilities", "GameplayTags", "GameplayTasks",
-		  "EnhancedInput", "AnimGraphRuntime" });
+		{
+			"Core",
+			"CoreUObject",
+			"Engine",
+			"InputCore",
+			"GameplayAbilities",
+			"GameplayTags",
+			"GameplayTasks",
+			"EnhancedInput",
+			"AnimGraphRuntime",
+			"OnlineSubsystem",
+			"OnlineSubsystemUtils"
+		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
 

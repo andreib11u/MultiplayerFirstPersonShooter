@@ -6,7 +6,7 @@
 #include "Types/UITypes.h"
 #include "UI/HUDWidget.h"
 
-void AFPSHUD::AddHUDToScreen()
+void AFPSHUD::CreateHUD()
 {
 	HUDWidget = CreateWidget<UHUDWidget>(GetOwningPlayerController(), *HUDWidgetClass);
 	check(HUDWidget)
@@ -14,7 +14,7 @@ void AFPSHUD::AddHUDToScreen()
 	HUDWidget->AddToViewport(HUD);
 }
 
-void AFPSHUD::RemoveHUDFromScreen()
+void AFPSHUD::DestroyHUD()
 {
 	if (HUDWidget)
 	{

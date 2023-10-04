@@ -17,9 +17,9 @@ class MPFPS_API AFPSHUD : public AHUD
 	GENERATED_BODY()
 public:
 	UFUNCTION(BlueprintCallable)
-	void AddHUDToScreen();
+	void CreateHUD();
 	UFUNCTION(BlueprintCallable)
-	void RemoveHUDFromScreen();
+	void DestroyHUD();
 
 
 	UHUDWidget* GetHUDWidget() const { return HUDWidget; }
