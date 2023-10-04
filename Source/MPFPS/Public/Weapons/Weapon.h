@@ -9,14 +9,13 @@
 
 class UGameplayAbility;
 /**
- * 
+ *
  */
 UCLASS(BlueprintType, Blueprintable, Abstract, EditInlineNew, DefaultToInstanced)
 class MPFPS_API UWeapon : public UObject
 {
 	GENERATED_BODY()
 public:
-
 protected:
 	virtual bool IsNameStableForNetworking() const override { return true; }
 	virtual bool IsSupportedForNetworking() const override { return true; }
@@ -36,11 +35,20 @@ public:
 	float CurrentReserveAmmo;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<UGameplayAbility> ShootAbility; //todo remove
+	TSubclassOf<UGameplayAbility> ShootAbility;
 
 	UPROPERTY(EditAnywhere)
 	FName MuzzleSocket = "MuzzleFlashSocket";
 
 	UPROPERTY(EditAnywhere, meta = (GameplayTagFilter = "Weapon.FireMode"))
 	FGameplayTag FireMode;
+
+	UPROPERTY(EditAnywhere)
+	FVector ThirdPersonLocation;
+	UPROPERTY(EditAnywhere)
+	FRotator ThirdPersonRotation;
+	UPROPERTY(EditAnywhere)
+	FVector FirstPersonLocation;
+	UPROPERTY(EditAnywhere)
+	FRotator FirstPersonRotation;
 };

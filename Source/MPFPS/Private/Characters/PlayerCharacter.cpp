@@ -37,7 +37,6 @@ APlayerCharacter::APlayerCharacter()
 
 	FirstPersonWeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("FPWeaponMesh");
 	FirstPersonWeaponMeshComponent->SetupAttachment(FirstPersonMesh, "WeaponPoint");
-	FirstPersonWeaponMeshComponent->SetRelativeRotation(FRotator(0, 0, -90.0f));
 
 	ThirdPersonWeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("TPWeaponMesh");
 	ThirdPersonWeaponMeshComponent->SetupAttachment(GetMesh(), "weapon_r");
@@ -167,11 +166,15 @@ void APlayerCharacter::OnWeaponChanged(UWeapon* CurrentWeapon)
 		{
 			FirstPersonWeaponMeshComponent->SetVisibility(true, true);
 			FirstPersonWeaponMeshComponent->SetSkeletalMesh(CurrentWeapon->WeaponMesh);
+			FirstPersonWeaponMeshComponent->SetRelativeLocation(CurrentWeapon->FirstPersonLocation);
+			FirstPersonWeaponMeshComponent->SetRelativeRotation(CurrentWeapon->FirstPersonRotation);
 		}
 		else
 		{
 			ThirdPersonWeaponMeshComponent->SetVisibility(true, true);
 			ThirdPersonWeaponMeshComponent->SetSkeletalMesh(CurrentWeapon->WeaponMesh);
+			ThirdPersonWeaponMeshComponent->SetRelativeLocation(CurrentWeapon->ThirdPersonLocation);
+			ThirdPersonWeaponMeshComponent->SetRelativeRotation(CurrentWeapon->ThirdPersonRotation);
 		}
 	}
 	else
