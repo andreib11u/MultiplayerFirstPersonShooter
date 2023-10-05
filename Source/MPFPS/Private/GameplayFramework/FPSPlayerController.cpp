@@ -14,7 +14,7 @@ void AFPSPlayerController::BeginPlay()
 	SetShowMouseCursor(false);
 	SetInputMode(FInputModeGameOnly());
 
-	if (GetNetMode() == NM_ListenServer)
+	if (HasAuthority() && IsLocalController())
 	{
 		InitializeHUD();
 	}
@@ -47,6 +47,7 @@ void AFPSPlayerController::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 
+	// initialize hud for clients in here, because for the hud we need PlayerState
 	InitializeHUD();
 }
 
