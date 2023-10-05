@@ -8,7 +8,7 @@
 #include "Weapons/Weapon.h"
 #include "PlayerCharacter.generated.h"
 
-class UWeaponComponent;
+class UEquipmentComponent;
 class UGameplayAbility;
 class UGameplayEffect;
 class UFPSAbilitySystemComponent;
@@ -31,7 +31,7 @@ public:
 
 	UCameraComponent* GetFPCamera() const { return FirstPersonCamera; }
 	USkeletalMeshComponent* GetFirstPersonMesh() const { return FirstPersonMesh; }
-	UWeaponComponent* GetWeaponComponent() const { return WeaponComponent; }
+	UEquipmentComponent* GetWeaponComponent() const { return EquipmentComponent; }
 
 	USkeletalMeshComponent* GetFirstPersonWeaponMesh() const { return FirstPersonWeaponMeshComponent; }
 	USkeletalMeshComponent* GetThirdPersonWeaponMesh() const { return ThirdPersonWeaponMeshComponent; }
@@ -52,7 +52,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UFPSAbilitySystemComponent* AbilitySystemComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
-	UWeaponComponent* WeaponComponent;
+	UEquipmentComponent* EquipmentComponent;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayEffect> AttributeInitializationEffect;
@@ -73,7 +73,7 @@ private:
 	void InitializeAttributes();
 
 	UFUNCTION()
-	void OnWeaponChanged(UWeapon* CurrentWeapon);
+	void OnItemChanged(UEquippableItem* Item);
 
 	// Input callbacks
 

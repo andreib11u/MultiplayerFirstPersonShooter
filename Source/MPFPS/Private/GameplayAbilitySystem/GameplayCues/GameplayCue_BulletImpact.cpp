@@ -4,7 +4,7 @@
 #include "Characters/PlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
-#include "Weapons/WeaponComponent.h"
+#include "Weapons/EquipmentComponent.h"
 
 bool UGameplayCue_BulletImpact::OnExecute_Implementation(AActor* MyTarget, const FGameplayCueParameters& Parameters) const
 {
@@ -14,13 +14,14 @@ bool UGameplayCue_BulletImpact::OnExecute_Implementation(AActor* MyTarget, const
 	auto PlayerCharacter = Cast<APlayerCharacter>(Parameters.GetEffectCauser());
 	if (PlayerCharacter)
 	{
-		check(PlayerCharacter->GetWeaponComponent()->GetCurrentWeapon());
-		const FName SocketName = PlayerCharacter->GetWeaponComponent()->GetCurrentWeapon()->MuzzleSocket;
+		auto Weapon = Cast<UWeapon>(PlayerCharacter->GetWeaponComponent()->GetCurrentItem());
+		check(Weapon);
+		const FName SocketName = Weapon->GetMuzzleSocketName();
 
 		USkeletalMeshComponent* WeaponMesh =
 			PlayerCharacter->IsLocallyControlled() ? PlayerCharacter->GetFirstPersonWeaponMesh() : PlayerCharacter->GetThirdPersonWeaponMesh();
 
-		UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, WeaponMesh, PlayerCharacter->GetWeaponComponent()->GetCurrentWeapon()->MuzzleSocket);
+		UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, WeaponMesh, Weapon->GetMuzzleSocketName());
 
 		UParticleSystemComponent* SpawnedParticle =
 			UGameplayStatics::SpawnEmitterAtLocation(PlayerCharacter->GetWorld(), ShotTrail, WeaponMesh->GetSocketLocation(SocketName));

@@ -1,10 +1,9 @@
 // Copyright Andrei Bondarenko 2023
 
 #include "GameplayAbilitySystem/Abilities/GA_Shoot.h"
-
 #include "AbilitySystemComponent.h"
 #include "Characters/PlayerCharacter.h"
-#include "Weapons/WeaponComponent.h"
+#include "Weapons/EquipmentComponent.h"
 #include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
 #include "Abilities/Tasks/AbilityTask_WaitDelay.h"
 #include "GameplayAbilitySystem/Abilities/GameplayAbility_FireOnce.h"
@@ -16,7 +15,7 @@ void UGA_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 {
 	if (auto PlayerCharacter = Cast<APlayerCharacter>(ActorInfo->AvatarActor))
 	{
-		auto Weapon = PlayerCharacter->GetWeaponComponent()->GetCurrentWeapon();
+		auto Weapon = Cast<UWeapon>(PlayerCharacter->GetWeaponComponent()->GetCurrentItem());
 		if (!Weapon)
 		{
 			return;
@@ -25,7 +24,7 @@ void UGA_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 		FGameplayAbilitySpec* SingleShotAbilitySpec = GetAbilitySystemComponentFromActorInfo()->FindAbilitySpecFromClass(SingleShotAbilityClass);
 		if (!SingleShotAbilitySpec)
 		{
-			UE_LOG(LogShootAbility, Error, TEXT("AbilityOwner doesn't have %s ability"), *SingleShotAbilityClass->GetName());
+			UE_LOG(LogShootAbility, Error, TEXT("AbilityOwner doesn't have SingleShotAbility set"));
 			CancelAbility(Handle, ActorInfo, ActivationInfo, true);
 			return;
 		}
@@ -33,12 +32,12 @@ void UGA_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 		SingleShotAbilityInstance = Cast<UGameplayAbility_FireOnce>(SingleShotAbilitySpec->GetPrimaryInstance());
 		SingleShotAbilitySpecHandle = SingleShotAbilitySpec->Handle;
 
-		if (Weapon->FireMode.MatchesTag(SemiAutoTag))
+		if (Weapon->GetFireModeTag().MatchesTag(SemiAutoTag))
 		{
 			BatchRPCTryActivateAbility(SingleShotAbilitySpecHandle, true);
 		}
 
-		if (Weapon->FireMode.MatchesTag(FullAutoTag))
+		if (Weapon->GetFireModeTag().MatchesTag(FullAutoTag))
 		{
 			const bool bAbilityActivated = BatchRPCTryActivateAbility(SingleShotAbilitySpecHandle, false);
 			if (!bAbilityActivated)
@@ -80,6 +79,14 @@ void UGA_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 	}
 }
 
+bool UGA_Shoot::CheckCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+						  FGameplayTagContainer* OptionalRelevantTags) const
+{
+	auto PlayerCharacter = Cast<APlayerCharacter>(ActorInfo->AvatarActor);
+	auto Weapon = Cast<UWeapon>(PlayerCharacter->GetWeaponComponent()->GetCurrentItem());
+	return Weapon->GetCurrentClipAmmo() > 0.f;
+}
+
 void UGA_Shoot::OnInputRelease(float TimeHeld)
 {
 	EndBothAbilities();
@@ -95,7 +102,7 @@ void UGA_Shoot::EndBothAbilities()
 
 void UGA_Shoot::OnShotCooldownExpired()
 {
-	if (CheckCost(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))
+	if (CheckCost(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), nullptr))
 	{
 		SingleShotAbilityInstance->FireShot();
 		UAbilityTask_WaitDelay* WaitDelayTask = UAbilityTask_WaitDelay::WaitDelay(this, ShotCooldown);

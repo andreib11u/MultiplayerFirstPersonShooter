@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "EquippableItems/EquippableItem.h"
 #include "UI/FPSUserWidget.h"
 #include "HUDWidget.generated.h"
 
+class UAmmoWidget;
 class UHealthBarWidget;
 class UFPSAbilitySystemComponent;
 
@@ -22,4 +24,9 @@ public:
 private:
 	UPROPERTY(meta = (BindWidget))
 	UHealthBarWidget* HealthBarWidget;
+	UPROPERTY(meta = (BindWidget))
+	UAmmoWidget* AmmoWidget;
+
+	UFUNCTION()
+	void OnItemChanged(UEquippableItem* CurrentItem);
 };

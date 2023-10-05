@@ -18,9 +18,6 @@ public:
 	virtual void OnPickup(APlayerCharacter* PlayerCharacter) override;
 
 private:
-	UPROPERTY(EditAnywhere, Instanced)
-	UWeapon* Weapon;
-
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UWeapon> WeaponClass;
 

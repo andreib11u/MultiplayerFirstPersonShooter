@@ -14,7 +14,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Types/FPSGameplayAbilityTypes.h"
 #include "Weapons/Weapon.h"
-#include "Weapons/WeaponComponent.h"
+#include "Weapons/EquipmentComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogPlayerCharacter, All, All);
 
@@ -32,8 +32,8 @@ APlayerCharacter::APlayerCharacter()
 	FirstPersonMesh->CastShadow = false;
 	FirstPersonMesh->SetupAttachment(FirstPersonCamera);
 
-	WeaponComponent = CreateDefaultSubobject<UWeaponComponent>("WeaponComponent");
-	WeaponComponent->OnCurrentWeaponChanged.AddDynamic(this, &APlayerCharacter::OnWeaponChanged);
+	EquipmentComponent = CreateDefaultSubobject<UEquipmentComponent>("EquipmentComponent");
+	EquipmentComponent->OnCurrentItemChanged.AddDynamic(this, &APlayerCharacter::OnItemChanged);
 
 	FirstPersonWeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("FPWeaponMesh");
 	FirstPersonWeaponMeshComponent->SetupAttachment(FirstPersonMesh, "WeaponPoint");
@@ -158,23 +158,23 @@ void APlayerCharacter::InitializeAttributes()
 	}
 }
 
-void APlayerCharacter::OnWeaponChanged(UWeapon* CurrentWeapon)
+void APlayerCharacter::OnItemChanged(UEquippableItem* Item)
 {
-	if (CurrentWeapon)
+	if (Item)
 	{
 		if (IsLocallyControlled())
 		{
 			FirstPersonWeaponMeshComponent->SetVisibility(true, true);
-			FirstPersonWeaponMeshComponent->SetSkeletalMesh(CurrentWeapon->WeaponMesh);
-			FirstPersonWeaponMeshComponent->SetRelativeLocation(CurrentWeapon->FirstPersonLocation);
-			FirstPersonWeaponMeshComponent->SetRelativeRotation(CurrentWeapon->FirstPersonRotation);
+			FirstPersonWeaponMeshComponent->SetSkeletalMesh(Item->GetItemMesh());
+			FirstPersonWeaponMeshComponent->SetRelativeLocation(Item->FirstPersonLocation);
+			FirstPersonWeaponMeshComponent->SetRelativeRotation(Item->FirstPersonRotation);
 		}
 		else
 		{
 			ThirdPersonWeaponMeshComponent->SetVisibility(true, true);
-			ThirdPersonWeaponMeshComponent->SetSkeletalMesh(CurrentWeapon->WeaponMesh);
-			ThirdPersonWeaponMeshComponent->SetRelativeLocation(CurrentWeapon->ThirdPersonLocation);
-			ThirdPersonWeaponMeshComponent->SetRelativeRotation(CurrentWeapon->ThirdPersonRotation);
+			ThirdPersonWeaponMeshComponent->SetSkeletalMesh(Item->GetItemMesh());
+			ThirdPersonWeaponMeshComponent->SetRelativeLocation(Item->ThirdPersonLocation);
+			ThirdPersonWeaponMeshComponent->SetRelativeRotation(Item->ThirdPersonRotation);
 		}
 	}
 	else

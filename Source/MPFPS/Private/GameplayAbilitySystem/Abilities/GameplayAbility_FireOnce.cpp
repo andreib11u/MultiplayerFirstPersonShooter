@@ -8,18 +8,12 @@
 #include "Characters/PlayerCharacter.h"
 #include "GameplayAbilitySystem/TargetActors/TargetActor_LineTrace.h"
 #include "Weapons/Weapon.h"
-#include "Weapons/WeaponComponent.h"
+#include "Weapons/EquipmentComponent.h"
 
 void UGameplayAbility_FireOnce::FireShot()
 {
 	// ammo
-	auto PlayerCharacter = Cast<APlayerCharacter>(GetCurrentActorInfo()->AvatarActor);
-	if (!(PlayerCharacter && PlayerCharacter->GetWeaponComponent()->GetCurrentWeapon()))
-	{
-		return;
-	}
-
-	PlayerCharacter->GetWeaponComponent()->GetCurrentWeapon()->CurrentClipAmmo--;
+	CommitAbilityCost(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), nullptr);
 
 	// line trace
 	WaitTargetDataTask =
@@ -37,6 +31,27 @@ void UGameplayAbility_FireOnce::ActivateAbility(const FGameplayAbilitySpecHandle
                                                 const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	FireShot();
+}
+
+bool UGameplayAbility_FireOnce::CheckCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, FGameplayTagContainer* OptionalRelevantTags) const
+{
+	// todo: cache weapon pointer
+	auto PlayerCharacter = Cast<APlayerCharacter>(GetCurrentActorInfo()->AvatarActor);
+	auto Weapon = Cast<UWeapon>(PlayerCharacter->GetWeaponComponent()->GetCurrentItem());
+	return Weapon->GetCurrentClipAmmo() > 0.f;
+}
+
+bool UGameplayAbility_FireOnce::CommitAbilityCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo, FGameplayTagContainer* OptionalRelevantTags)
+{
+	auto PlayerCharacter = Cast<APlayerCharacter>(GetCurrentActorInfo()->AvatarActor);
+	auto Weapon = Cast<UWeapon>(PlayerCharacter->GetWeaponComponent()->GetCurrentItem());
+	if (Weapon)
+	{
+		Weapon->SpendAmmo(1.f);
+	}
+
+	return true;
 }
 
 void UGameplayAbility_FireOnce::OnValidDataAcquired(const FGameplayAbilityTargetDataHandle& Data)

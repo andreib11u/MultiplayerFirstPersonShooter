@@ -3,7 +3,7 @@
 
 #include "Pickups/WeaponPickup.h"
 #include "Characters/PlayerCharacter.h"
-#include "Weapons/WeaponComponent.h"
+#include "Weapons/EquipmentComponent.h"
 
 void AWeaponPickup::OnPickup(APlayerCharacter* PlayerCharacter)
 {

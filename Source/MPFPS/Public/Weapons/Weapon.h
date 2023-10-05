@@ -3,30 +3,47 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "GameplayTags.h"
+#include "EquippableItems/EquippableItem.h"
 #include "Weapon.generated.h"
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCurrentClipAmmoChanged, float, CurrentClipAmmo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCurrentReserveAmmoChanged, float, CurrentReserveAmmo);
 
 class UGameplayAbility;
 /**
  *
  */
-UCLASS(BlueprintType, Blueprintable, Abstract, EditInlineNew, DefaultToInstanced)
-class MPFPS_API UWeapon : public UObject
+UCLASS(BlueprintType, Blueprintable, Abstract)
+class MPFPS_API UWeapon : public UEquippableItem
 {
 	GENERATED_BODY()
 public:
+	UPROPERTY(BlueprintAssignable)
+	FOnCurrentClipAmmoChanged OnCurrentClipAmmoChanged;
+	UPROPERTY(BlueprintAssignable)
+	FOnCurrentReserveAmmoChanged OnCurrentReserveAmmoChanged;
+
+	void SpendAmmo(float Ammo);
+	void ReloadAmmo();
+
+	void SetCurrentClipAmmo(float Ammo);
+	void SetCurrentReserveAmmo(float Ammo);
+	float GetCurrentClipAmmo() const { return CurrentClipAmmo; }
+	float GetCurrentReserveAmmo() const { return CurrentReserveAmmo; }
+	FName GetMuzzleSocketName() const { return MuzzleSocket; }
+	FGameplayTag GetFireModeTag() const { return FireMode; }
+
 protected:
-	virtual bool IsNameStableForNetworking() const override { return true; }
+	virtual bool IsNameStableForNetworking() const override { return true; } // todo: remove
 	virtual bool IsSupportedForNetworking() const override { return true; }
 
-public:
-	UPROPERTY(EditAnywhere)
-	USkeletalMesh* WeaponMesh;
+	virtual void PostLoad() override;
 
+private:
 	UPROPERTY(EditAnywhere)
 	float MaxClipAmmo;
-	UPROPERTY(EditAnywhere, Replicated)
+	UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_CurrentClipAmmo)
 	float CurrentClipAmmo;
 
 	UPROPERTY(EditAnywhere)
@@ -35,20 +52,11 @@ public:
 	float CurrentReserveAmmo;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<UGameplayAbility> ShootAbility;
-
-	UPROPERTY(EditAnywhere)
 	FName MuzzleSocket = "MuzzleFlashSocket";
 
 	UPROPERTY(EditAnywhere, meta = (GameplayTagFilter = "Weapon.FireMode"))
 	FGameplayTag FireMode;
 
-	UPROPERTY(EditAnywhere)
-	FVector ThirdPersonLocation;
-	UPROPERTY(EditAnywhere)
-	FRotator ThirdPersonRotation;
-	UPROPERTY(EditAnywhere)
-	FVector FirstPersonLocation;
-	UPROPERTY(EditAnywhere)
-	FRotator FirstPersonRotation;
+	UFUNCTION()
+	void OnRep_CurrentClipAmmo();
 };
