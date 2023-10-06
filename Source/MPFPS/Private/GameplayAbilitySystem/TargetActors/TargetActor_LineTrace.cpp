@@ -1,11 +1,9 @@
 // Copyright Andrei Bondarenko 2023
 
 #include "GameplayAbilitySystem/TargetActors/TargetActor_LineTrace.h"
-
 #include "Abilities/GameplayAbility.h"
 #include "Camera/CameraComponent.h"
 #include "Characters/PlayerCharacter.h"
-#include "GameplayFramework/FPSPlayerController.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 ATargetActor_LineTrace::ATargetActor_LineTrace()
@@ -19,7 +17,7 @@ TArray<FHitResult> ATargetActor_LineTrace::PerformTrace()
 	if (ensure(Character))
 	{
 		const FVector StartTrace = Character->GetFPCamera()->GetComponentLocation();
-		const FVector EndTrace = StartTrace + Character->GetFPCamera()->GetForwardVector() * 9999.f;
+		const FVector EndTrace = StartTrace + Character->GetBaseAimRotation().Vector() * 9999.f;
 
 		TArray<AActor*> ActorsToIgnore;
 		ActorsToIgnore.Add(Character);
