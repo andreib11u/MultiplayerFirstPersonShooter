@@ -2,4 +2,9 @@
 
 
 #include "EquippableItems/EquippableItem.h"
+#include "Weapons/EquipmentComponent.h"
 
+void UEquippableItem::OnEquip(UEquipmentComponent* EquipmentComponent)
+{
+
+}

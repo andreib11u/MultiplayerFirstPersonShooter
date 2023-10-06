@@ -14,27 +14,21 @@ void UHUDWidget::Init(UFPSAbilitySystemComponent* AbilitySystemComponent)
 
 	if (auto EquipmentComponent = AbilitySystemComponent->GetAvatarActor()->FindComponentByClass<UEquipmentComponent>())
 	{
-		if (auto Weapon = Cast<UWeapon>(EquipmentComponent->GetCurrentItem()))
-		{
-			AmmoWidget->Bind(Weapon);
-			AmmoWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
-		}
+		AmmoWidget->Bind(EquipmentComponent);
+		OnItemChanged(EquipmentComponent->GetCurrentItem());
 
 		EquipmentComponent->OnCurrentItemChanged.AddDynamic(this, &UHUDWidget::OnItemChanged);
 	}
-	
 }
 
 void UHUDWidget::OnItemChanged(UEquippableItem* CurrentItem)
 {
-	if (auto Weapon = Cast<UWeapon>(CurrentItem))
+	if (CurrentItem && CurrentItem->IsA<UWeapon>())
 	{
-		AmmoWidget->Bind(Weapon);
 		AmmoWidget->SetVisibility(ESlateVisibility::HitTestInvisible);
 	}
 	else
 	{
-		AmmoWidget->Unbind();
 		AmmoWidget->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }

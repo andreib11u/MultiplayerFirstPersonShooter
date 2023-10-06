@@ -6,17 +6,17 @@
 #include "UI/FPSUserWidget.h"
 #include "AmmoWidget.generated.h"
 
-class UWeapon;
+class UEquipmentComponent;
 class UTextBlock;
 /**
- * 
+ *
  */
 UCLASS()
 class MPFPS_API UAmmoWidget : public UFPSUserWidget
 {
 	GENERATED_BODY()
 public:
-	void Bind(UWeapon* Weapon);
+	void Bind(UEquipmentComponent* EquipmentComponent);
 	void Unbind();
 	void SetAmmoText(float InCurrentAmmo, float InReserveAmmo);
 
@@ -33,5 +33,5 @@ private:
 	float ReserveAmmo;
 
 	UPROPERTY()
-	UWeapon* BoundWeapon; 
+	UEquipmentComponent* BoundEquipment;
 };

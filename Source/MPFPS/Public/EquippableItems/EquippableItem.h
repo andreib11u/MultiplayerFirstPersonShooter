@@ -6,6 +6,7 @@
 #include "UObject/NoExportTypes.h"
 #include "EquippableItem.generated.h"
 
+class UEquipmentComponent;
 class UGameplayAbility;
 /**
  *
@@ -15,9 +16,11 @@ class MPFPS_API UEquippableItem : public UObject
 {
 	GENERATED_BODY()
 public:
+	virtual void OnEquip(UEquipmentComponent* EquipmentComponent);
 
-	TSubclassOf<UGameplayAbility> GetAbility()const { return UseAbility; }
+	TSubclassOf<UGameplayAbility> GetAbility() const { return UseAbility; }
 	USkeletalMesh* GetItemMesh() const { return EquipMesh; }
+
 private:
 	UPROPERTY(EditAnywhere)
 	USkeletalMesh* EquipMesh;

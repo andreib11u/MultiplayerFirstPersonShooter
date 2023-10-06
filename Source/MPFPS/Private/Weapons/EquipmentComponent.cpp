@@ -2,8 +2,6 @@
 
 
 #include "Weapons/EquipmentComponent.h"
-
-#include "AbilitySystemInterface.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Types/FPSGameplayAbilityTypes.h"
@@ -22,18 +20,40 @@ void UEquipmentComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 	DOREPLIFETIME(UEquipmentComponent, CurrentItem);
 	DOREPLIFETIME_CONDITION(UEquipmentComponent, Items, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(UEquipmentComponent, CurrentClipAmmo, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(UEquipmentComponent, CurrentReserveAmmo, COND_OwnerOnly);
 	DOREPLIFETIME(UEquipmentComponent, CurrentItemClass);
 }
 
-void UEquipmentComponent::SetCurrentItem(const int32 ItemIndex)
+void UEquipmentComponent::PreReplication(IRepChangedPropertyTracker& ChangedPropertyTracker)
+{
+	Super::PreReplication(ChangedPropertyTracker);
+
+	DOREPLIFETIME_ACTIVE_OVERRIDE(UEquipmentComponent, CurrentClipAmmo,
+								  (IsValid(AbilitySystemComponent) && !AbilitySystemComponent->HasMatchingGameplayTag(WeaponIsFiringTag)));
+	DOREPLIFETIME_ACTIVE_OVERRIDE(UEquipmentComponent, CurrentReserveAmmo,
+								  (IsValid(AbilitySystemComponent) && !AbilitySystemComponent->HasMatchingGameplayTag(WeaponIsFiringTag)));
+}
+
+void UEquipmentComponent::OnRep_CurrentClipAmmo()
+{
+	OnCurrentClipAmmoChanged.Broadcast(CurrentClipAmmo);
+}
+
+void UEquipmentComponent::OnRep_CurrentReserveAmmo()
+{
+	OnCurrentReserveAmmoChanged.Broadcast(CurrentReserveAmmo);
+}
+
+void UEquipmentComponent::EquipItem(const int32 ItemIndex)
 {
 	if (Items.IsValidIndex(ItemIndex))
 	{
-		SetCurrentItem(Items[ItemIndex]);
+		EquipItem(Items[ItemIndex]);
 	}
 }
 
-void UEquipmentComponent::SetCurrentItem(UEquippableItem* Item)
+void UEquipmentComponent::EquipItem(UEquippableItem* Item)
 {
 	if (CurrentItem)
 	{
@@ -44,12 +64,15 @@ void UEquipmentComponent::SetCurrentItem(UEquippableItem* Item)
 
 	if (CurrentItem)
 	{
+		CurrentItem->OnEquip(this);
 		CurrentItemClass = CurrentItem->GetClass();
-		if (auto AbilitySystemInterface = Cast<IAbilitySystemInterface>(GetOwner()))
+
+		if (GetOwner()->HasAuthority())
 		{
-			if (auto AbilitySystemComponent = AbilitySystemInterface->GetAbilitySystemComponent())
+			if (AbilitySystemComponent)
 			{
-				FGameplayAbilitySpec Spec = FGameplayAbilitySpec(CurrentItem->GetAbility(), 1, static_cast<int32>(EAbilityInput::PrimaryAction), GetOwner());
+				FGameplayAbilitySpec Spec =
+					FGameplayAbilitySpec(CurrentItem->GetAbility(), 1, static_cast<int32>(EAbilityInput::PrimaryAction), GetOwner());
 				AbilitySystemComponent->GiveAbility(Spec);
 			}
 		}
@@ -63,13 +86,18 @@ void UEquipmentComponent::AddWeapon(TSubclassOf<UEquippableItem> ItemClass)
 {
 	auto Item = NewObject<UEquippableItem>(this, *ItemClass);
 	const int32 Index = Items.Add(Item);
-	SetCurrentItem(Index);
+	EquipItem(Index);
 }
 
-void UEquipmentComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UEquipmentComponent::SetAmmoFrom(UWeapon* Weapon)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	CurrentClipAmmo = Weapon->CurrentClipAmmo;
+	CurrentReserveAmmo = Weapon->CurrentReserveAmmo;
+	MaxClipAmmo = Weapon->MaxClipAmmo;
+	MaxReserveAmmo = Weapon->MaxReserveAmmo;
 
+	OnCurrentReserveAmmoChanged.Broadcast(CurrentReserveAmmo);
+	OnCurrentClipAmmoChanged.Broadcast(CurrentClipAmmo);
 }
 
 void UEquipmentComponent::BeginPlay()
@@ -82,5 +110,47 @@ void UEquipmentComponent::BeginPlay()
 	}
 
 	OnCurrentItemChanged.Broadcast(CurrentItem);
+}
+
+void UEquipmentComponent::SpendAmmo(float Ammo)
+{
+	check(CurrentClipAmmo >= Ammo);
+
+	CurrentClipAmmo -= Ammo;
+
+	OnCurrentClipAmmoChanged.Broadcast(CurrentClipAmmo);
+}
+
+void UEquipmentComponent::ReloadAmmo()
+{
+	check(CurrentReserveAmmo > 0.f);
+	check(CurrentClipAmmo < MaxClipAmmo);
+
+	const float AmmoNeededToFull = CurrentClipAmmo - MaxClipAmmo;
+	if (AmmoNeededToFull >= CurrentReserveAmmo)
+	{
+		CurrentClipAmmo += CurrentReserveAmmo;
+		CurrentReserveAmmo = 0.f;
+	}
+	else
+	{
+		CurrentClipAmmo += AmmoNeededToFull;
+		CurrentReserveAmmo -= AmmoNeededToFull;
+	}
+
+	OnCurrentClipAmmoChanged.Broadcast(CurrentClipAmmo);
+	OnCurrentReserveAmmoChanged.Broadcast(CurrentReserveAmmo);
+}
+
+void UEquipmentComponent::SetCurrentClipAmmo(float Ammo)
+{
+	CurrentClipAmmo = Ammo;
+	OnCurrentClipAmmoChanged.Broadcast(CurrentClipAmmo);
+}
+
+void UEquipmentComponent::SetCurrentReserveAmmo(float Ammo)
+{
+	CurrentReserveAmmo = Ammo;
+	OnCurrentReserveAmmoChanged.Broadcast(CurrentReserveAmmo);
 }
 

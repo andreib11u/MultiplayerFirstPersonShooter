@@ -28,27 +28,28 @@ void UGameplayAbility_FireOnce::FireShot()
 }
 
 void UGameplayAbility_FireOnce::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-                                                const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+												const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	FireShot();
 }
 
-bool UGameplayAbility_FireOnce::CheckCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, FGameplayTagContainer* OptionalRelevantTags) const
+bool UGameplayAbility_FireOnce::CheckCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+										  FGameplayTagContainer* OptionalRelevantTags) const
 {
-	// todo: cache weapon pointer
-	auto PlayerCharacter = Cast<APlayerCharacter>(GetCurrentActorInfo()->AvatarActor);
-	auto Weapon = Cast<UWeapon>(PlayerCharacter->GetWeaponComponent()->GetCurrentItem());
-	return Weapon->GetCurrentClipAmmo() > 0.f;
+	if (auto EquipmentComponent = GetCurrentActorInfo()->AvatarActor->FindComponentByClass<UEquipmentComponent>())
+	{
+		return EquipmentComponent->GetCurrentClipAmmo() > 0.f;
+	}
+
+	return false;
 }
 
 bool UGameplayAbility_FireOnce::CommitAbilityCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo, FGameplayTagContainer* OptionalRelevantTags)
+												  const FGameplayAbilityActivationInfo ActivationInfo, FGameplayTagContainer* OptionalRelevantTags)
 {
-	auto PlayerCharacter = Cast<APlayerCharacter>(GetCurrentActorInfo()->AvatarActor);
-	auto Weapon = Cast<UWeapon>(PlayerCharacter->GetWeaponComponent()->GetCurrentItem());
-	if (Weapon)
+	if (auto EquipmentComponent = GetCurrentActorInfo()->AvatarActor->FindComponentByClass<UEquipmentComponent>())
 	{
-		Weapon->SpendAmmo(1.f);
+		EquipmentComponent->SpendAmmo(1.f);
 	}
 
 	return true;

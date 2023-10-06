@@ -20,7 +20,8 @@ public class MPFPS : ModuleRules
 			"EnhancedInput",
 			"AnimGraphRuntime",
 			"OnlineSubsystem",
-			"OnlineSubsystemUtils"
+			"OnlineSubsystemUtils",
+			"NetCore"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

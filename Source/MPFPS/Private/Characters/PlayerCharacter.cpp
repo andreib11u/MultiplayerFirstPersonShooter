@@ -114,6 +114,8 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	// AI won't have PlayerControllers so we can init again here just to be sure. No harm in initing twice for heroes that have PlayerControllers.
 	AbilitySystemComponent->InitAbilityActorInfo(FPSPlayerState, this);
 
+	EquipmentComponent->SetAbilitySystemComponent(AbilitySystemComponent);
+
 	GrantAbilities();
 
 	InitializeAttributes();
@@ -200,6 +202,8 @@ void APlayerCharacter::OnRep_PlayerState()
 
 	// AI won't have PlayerControllers so we can init again here just to be sure. No harm in initing twice for heroes that have PlayerControllers.
 	AbilitySystemComponent->InitAbilityActorInfo(FPSPlayerState, this);
+
+	EquipmentComponent->SetAbilitySystemComponent(AbilitySystemComponent);
 
 	InitializeAttributes();
 }
