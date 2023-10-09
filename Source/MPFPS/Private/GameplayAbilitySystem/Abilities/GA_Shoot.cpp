@@ -82,7 +82,6 @@ void UGA_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 bool UGA_Shoot::CheckCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 						  FGameplayTagContainer* OptionalRelevantTags) const
 {
-	UE_LOG(LogTemp, Warning, TEXT("Shoot::CheckCost"))
 	if (auto EquipmentComponent = ActorInfo->AvatarActor->FindComponentByClass<UEquipmentComponent>())
 	{
 		return EquipmentComponent->GetCurrentClipAmmo() > 0.f;

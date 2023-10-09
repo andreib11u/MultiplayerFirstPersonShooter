@@ -34,4 +34,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	UInputAction* Ability2;
 
+	UPROPERTY(EditAnywhere)
+	UInputAction* Reload;
 };

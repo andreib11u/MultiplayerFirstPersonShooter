@@ -48,10 +48,12 @@ public:
 	void SetCurrentReserveAmmo(float Ammo);
 	float GetCurrentClipAmmo() const { return CurrentClipAmmo; }
 	float GetCurrentReserveAmmo() const { return CurrentReserveAmmo; }
+	bool IsMaxClipAmmo() const;
 
 	void SetAmmoFrom(UWeapon* Weapon);
 
 	void SetAbilitySystemComponent(UAbilitySystemComponent* InAbilitySystemComponent) { AbilitySystemComponent = InAbilitySystemComponent; }
+	UAbilitySystemComponent* GetAbilitySystemComponent() const { return AbilitySystemComponent; }
 
 protected:
 	virtual void BeginPlay() override;

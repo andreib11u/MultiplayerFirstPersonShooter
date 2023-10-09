@@ -10,5 +10,6 @@ enum class EAbilityInput
 {
 	None,
 	PrimaryAction,
-	SecondaryAction
+	SecondaryAction,
+	Reload
 };

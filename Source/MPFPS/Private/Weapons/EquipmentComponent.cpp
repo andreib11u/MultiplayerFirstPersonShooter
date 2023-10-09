@@ -89,6 +89,11 @@ void UEquipmentComponent::AddWeapon(TSubclassOf<UEquippableItem> ItemClass)
 	EquipItem(Index);
 }
 
+bool UEquipmentComponent::IsMaxClipAmmo() const
+{
+	return CurrentClipAmmo == MaxClipAmmo;
+}
+
 void UEquipmentComponent::SetAmmoFrom(UWeapon* Weapon)
 {
 	CurrentClipAmmo = Weapon->CurrentClipAmmo;
@@ -117,7 +122,6 @@ void UEquipmentComponent::SpendAmmo(float Ammo)
 	check(CurrentClipAmmo >= Ammo);
 
 	CurrentClipAmmo -= Ammo;
-
 	OnCurrentClipAmmoChanged.Broadcast(CurrentClipAmmo);
 }
 
@@ -126,7 +130,7 @@ void UEquipmentComponent::ReloadAmmo()
 	check(CurrentReserveAmmo > 0.f);
 	check(CurrentClipAmmo < MaxClipAmmo);
 
-	const float AmmoNeededToFull = CurrentClipAmmo - MaxClipAmmo;
+	const float AmmoNeededToFull = MaxClipAmmo - CurrentClipAmmo;
 	if (AmmoNeededToFull >= CurrentReserveAmmo)
 	{
 		CurrentClipAmmo += CurrentReserveAmmo;

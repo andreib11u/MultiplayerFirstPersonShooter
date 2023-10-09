@@ -7,6 +7,7 @@
 #include "EquippableItems/EquippableItem.h"
 #include "Weapon.generated.h"
 
+class UFPSGameplayAbility;
 class UGameplayAbility;
 /**
  *
@@ -42,4 +43,7 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (GameplayTagFilter = "Weapon.FireMode"))
 	FGameplayTag FireMode;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UFPSGameplayAbility> ReloadAbility;
 };

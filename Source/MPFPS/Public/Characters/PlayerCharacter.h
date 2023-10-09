@@ -8,6 +8,7 @@
 #include "Weapons/Weapon.h"
 #include "PlayerCharacter.generated.h"
 
+class UFPSGameplayAbility;
 class UEquipmentComponent;
 class UGameplayAbility;
 class UGameplayEffect;
@@ -67,7 +68,7 @@ private:
 	USkeletalMeshComponent* ThirdPersonWeaponMeshComponent;
 
 	UPROPERTY(EditAnywhere)
-	TArray<TSubclassOf<UGameplayAbility>> Abilities;
+	TArray<TSubclassOf<UFPSGameplayAbility>> Abilities;
 
 	void GrantAbilities();
 	void InitializeAttributes();
@@ -84,4 +85,6 @@ private:
 	void PrimaryActionReleased();
 	void SecondaryActionActionPressed();
 	void SecondaryActionActionReleased();
+	void ReloadPressed();
+	void ReloadReleased();
 };

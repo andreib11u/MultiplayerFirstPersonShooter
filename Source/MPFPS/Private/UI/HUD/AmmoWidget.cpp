@@ -43,3 +43,4 @@ void UAmmoWidget::OnCurrentAmmoChanged(float CurrentClipAmmo)
 	CurrentAmmo = CurrentClipAmmo;
 	SetAmmoText(CurrentAmmo, ReserveAmmo);
 }
+

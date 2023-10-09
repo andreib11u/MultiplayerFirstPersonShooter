@@ -95,6 +95,12 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(InputActions->SecondaryAction, ETriggerEvent::Completed, this,
 										   &APlayerCharacter::SecondaryActionActionReleased);
 	}
+
+	if (InputActions->Reload)
+	{
+		EnhancedInputComponent->BindAction(InputActions->Reload, ETriggerEvent::Started, this, &APlayerCharacter::ReloadPressed);
+		EnhancedInputComponent->BindAction(InputActions->Reload, ETriggerEvent::Completed, this, &APlayerCharacter::ReloadReleased);
+	}
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -130,7 +136,7 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 
 void APlayerCharacter::GrantAbilities()
 {
-	for (TSubclassOf<UGameplayAbility> Ability : Abilities)
+	for (TSubclassOf<UFPSGameplayAbility> Ability : Abilities)
 	{
 		FGameplayAbilitySpec Spec = FGameplayAbilitySpec(Ability, 1, 0, this);
 		if (ensure(AbilitySystemComponent))
@@ -263,4 +269,14 @@ void APlayerCharacter::SecondaryActionActionPressed()
 void APlayerCharacter::SecondaryActionActionReleased()
 {
 	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInput::SecondaryAction));
+}
+
+void APlayerCharacter::ReloadPressed()
+{
+	AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityInput::Reload));
+}
+
+void APlayerCharacter::ReloadReleased()
+{
+	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInput::Reload));
 }
