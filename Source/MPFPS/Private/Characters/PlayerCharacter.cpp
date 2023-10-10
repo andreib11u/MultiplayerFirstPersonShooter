@@ -62,7 +62,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	// Bind the actions
 	if (!InputActions || !InputMappingContext)
 	{
-		UE_LOG(LogTemp, Error, TEXT("InputActions and/or InputMappingContext is null. Character input isn't setup"))
+		UE_LOG(LogPlayerCharacter, Error, TEXT("InputActions and/or InputMappingContext is null. Character input isn't setup"))
 		return;
 	}
 

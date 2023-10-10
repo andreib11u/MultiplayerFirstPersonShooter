@@ -43,7 +43,6 @@ void UFoundSessionEntryWidget::JoinSessionComplete(EOnJoinSessionCompleteResult:
 	else
 	{
 		bool bTravelSuccess = GetSessionsSubsystem()->TryTravelToCurrentSession();
-		UE_LOG(LogTemp, Warning, TEXT("bTravelSuccess: %i"), bTravelSuccess)
 	}
 
 	if (GEngine)

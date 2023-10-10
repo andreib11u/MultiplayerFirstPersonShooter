@@ -6,30 +6,56 @@
 #include "Abilities/Tasks/AbilityTask.h"
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
 #include "Characters/PlayerCharacter.h"
+#include "GameplayAbilitySystem/AbilityTasks/AbilityTask_ServerWaitForClientData.h"
+#include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitTargetDataUsingActor.h"
 #include "GameplayAbilitySystem/TargetActors/TargetActor_LineTrace.h"
 #include "Weapons/Weapon.h"
 #include "Weapons/EquipmentComponent.h"
 
 void UGameplayAbility_FireOnce::FireShot()
 {
-	// ammo
-	CommitAbilityCost(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), nullptr);
+	if (GetActorInfo().IsLocallyControlledPlayer())
+	{
+		const float ShotTime = GetWorld()->GetTimeSeconds();
+		const float ShotTimeDifference = ShotTime - LastShotTime;
 
-	// line trace
-	WaitTargetDataTask =
+		if (ShotTimeDifference > TimeBetweenShots)
+		{
+			if (!TargetActor)
+			{
+				SpawnTargetActor();
+			}
+
+			WaitTargetDataTask = UAbilityTask_WaitTargetDataUsingActor::WaitTargetDataWithReusableActor(
+				this, NAME_None, EGameplayTargetingConfirmation::Instant, TargetActor, true);
+
+			WaitTargetDataTask->ValidData.AddDynamic(this, &UGameplayAbility_FireOnce::OnValidDataAcquired);
+			WaitTargetDataTask->Activate();
+		}
+	}
+}
+
+void UGameplayAbility_FireOnce::SpawnTargetActor()
+{
+	UAbilityTask_WaitTargetData* SpawnTargetActorTask =
 		UAbilityTask_WaitTargetData::WaitTargetData(this, NAME_None, EGameplayTargetingConfirmation::Instant, ATargetActor_LineTrace::StaticClass());
 
-	WaitTargetDataTask->ValidData.AddUniqueDynamic(this, &UGameplayAbility_FireOnce::OnValidDataAcquired);
-	WaitTargetDataTask->ReadyForActivation();
-
 	AGameplayAbilityTargetActor* SpawnedActor;
-	WaitTargetDataTask->BeginSpawningActor(this, ATargetActor_LineTrace::StaticClass(), SpawnedActor);
-	WaitTargetDataTask->FinishSpawningActor(this, SpawnedActor);
+	SpawnTargetActorTask->BeginSpawningActor(this, ATargetActor_LineTrace::StaticClass(), SpawnedActor);
+	SpawnTargetActorTask->FinishSpawningActor(this, SpawnedActor);
+
+	TargetActor = SpawnedActor;
 }
 
 void UGameplayAbility_FireOnce::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 												const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
+	SpawnTargetActor();
+
+	ServerWaitForClientDataTask = UAbilityTask_ServerWaitForClientData::ServerWaitForClientTargetData(this, NAME_None, false);
+	ServerWaitForClientDataTask->ValidData.AddDynamic(this, &UGameplayAbility_FireOnce::OnValidDataAcquired);
+	ServerWaitForClientDataTask->Activate();
+
 	FireShot();
 }
 
@@ -55,8 +81,21 @@ bool UGameplayAbility_FireOnce::CommitAbilityCost(const FGameplayAbilitySpecHand
 	return true;
 }
 
+void UGameplayAbility_FireOnce::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility, bool bWasCancelled)
+{
+	if (ServerWaitForClientDataTask)
+	{
+		ServerWaitForClientDataTask->EndTask();
+	}
+
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
 void UGameplayAbility_FireOnce::OnValidDataAcquired(const FGameplayAbilityTargetDataHandle& Data)
 {
+	CommitAbilityCost(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), nullptr);
+
 	const FGameplayAbilityTargetData* DataPtr = Data.Get(0);
 	if (DataPtr)
 	{
@@ -76,5 +115,7 @@ void UGameplayAbility_FireOnce::OnValidDataAcquired(const FGameplayAbilityTarget
 		Parameters.EffectContext.AddHitResult(*DataPtr->GetHitResult());
 
 		GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(ShotGameplayCue, Parameters);
+
+		LastShotTime = GetWorld()->GetTimeSeconds();
 	}
 }

@@ -8,7 +8,7 @@
 
 ATargetActor_LineTrace::ATargetActor_LineTrace()
 {
-	ShouldProduceTargetDataOnServer = true;
+	ShouldProduceTargetDataOnServer = false;
 }
 
 TArray<FHitResult> ATargetActor_LineTrace::PerformTrace()
