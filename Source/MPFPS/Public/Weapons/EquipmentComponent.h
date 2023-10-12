@@ -60,7 +60,7 @@ protected:
 	virtual void PreReplication(IRepChangedPropertyTracker& ChangedPropertyTracker) override;
 
 private:
-	UPROPERTY(VisibleInstanceOnly, Replicated)
+	UPROPERTY(VisibleInstanceOnly)
 	UEquippableItem* CurrentItem;
 
 	UPROPERTY(Replicated)

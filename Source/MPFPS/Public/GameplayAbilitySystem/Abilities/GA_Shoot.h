@@ -20,6 +20,9 @@ public:
 	virtual bool CheckCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 						   FGameplayTagContainer* OptionalRelevantTags) const override;
 
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+							const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
+
 private:
 	UPROPERTY(EditAnywhere, meta = (GameplayTagFilter = "Weapon.FireMode"))
 	FGameplayTag SemiAutoTag = FGameplayTag::RequestGameplayTag("Weapon.FireMode.SemiAuto");

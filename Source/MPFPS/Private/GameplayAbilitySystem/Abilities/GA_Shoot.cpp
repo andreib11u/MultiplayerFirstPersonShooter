@@ -90,6 +90,12 @@ bool UGA_Shoot::CheckCost(const FGameplayAbilitySpecHandle Handle, const FGamepl
 	return false;
 }
 
+void UGA_Shoot::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility, bool bWasCancelled)
+{
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
 void UGA_Shoot::OnInputRelease(float TimeHeld)
 {
 	EndBothAbilities();

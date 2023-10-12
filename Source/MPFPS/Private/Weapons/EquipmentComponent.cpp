@@ -11,14 +11,12 @@ UEquipmentComponent::UEquipmentComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	SetIsReplicatedByDefault(true);
-	bReplicateUsingRegisteredSubObjectList = true;
 }
 
 void UEquipmentComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(UEquipmentComponent, CurrentItem);
 	DOREPLIFETIME_CONDITION(UEquipmentComponent, Items, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(UEquipmentComponent, CurrentClipAmmo, COND_OwnerOnly);
 	DOREPLIFETIME_CONDITION(UEquipmentComponent, CurrentReserveAmmo, COND_OwnerOnly);
@@ -55,11 +53,6 @@ void UEquipmentComponent::EquipItem(const int32 ItemIndex)
 
 void UEquipmentComponent::EquipItem(UEquippableItem* Item)
 {
-	if (CurrentItem)
-	{
-		RemoveReplicatedSubObject(CurrentItem);
-	}
-
 	CurrentItem = Item;
 
 	if (CurrentItem)
@@ -78,7 +71,6 @@ void UEquipmentComponent::EquipItem(UEquippableItem* Item)
 		}
 	}
 
-	AddReplicatedSubObject(CurrentItem);
 	OnCurrentItemChanged.Broadcast(CurrentItem);
 }
 
@@ -127,23 +119,26 @@ void UEquipmentComponent::SpendAmmo(float Ammo)
 
 void UEquipmentComponent::ReloadAmmo()
 {
-	check(CurrentReserveAmmo > 0.f);
-	check(CurrentClipAmmo < MaxClipAmmo);
+	const bool bHasReserveAmmo = CurrentReserveAmmo > 0.f;
+	const bool bNeedsReload = CurrentClipAmmo < MaxClipAmmo;
 
-	const float AmmoNeededToFull = MaxClipAmmo - CurrentClipAmmo;
-	if (AmmoNeededToFull >= CurrentReserveAmmo)
+	if (bHasReserveAmmo && bNeedsReload)
 	{
-		CurrentClipAmmo += CurrentReserveAmmo;
-		CurrentReserveAmmo = 0.f;
-	}
-	else
-	{
-		CurrentClipAmmo += AmmoNeededToFull;
-		CurrentReserveAmmo -= AmmoNeededToFull;
-	}
+		const float AmmoNeededToFull = MaxClipAmmo - CurrentClipAmmo;
+		if (AmmoNeededToFull >= CurrentReserveAmmo)
+		{
+			CurrentClipAmmo += CurrentReserveAmmo;
+			CurrentReserveAmmo = 0.f;
+		}
+		else
+		{
+			CurrentClipAmmo += AmmoNeededToFull;
+			CurrentReserveAmmo -= AmmoNeededToFull;
+		}
 
-	OnCurrentClipAmmoChanged.Broadcast(CurrentClipAmmo);
-	OnCurrentReserveAmmoChanged.Broadcast(CurrentReserveAmmo);
+		OnCurrentClipAmmoChanged.Broadcast(CurrentClipAmmo);
+		OnCurrentReserveAmmoChanged.Broadcast(CurrentReserveAmmo);
+	}
 }
 
 void UEquipmentComponent::SetCurrentClipAmmo(float Ammo)
