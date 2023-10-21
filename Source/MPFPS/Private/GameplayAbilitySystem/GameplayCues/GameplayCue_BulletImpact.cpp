@@ -38,7 +38,7 @@ bool UGameplayCue_BulletImpact::OnExecute_Implementation(AActor* MyTarget, const
 		{
 			UParticleSystem* ParticleSystem = nullptr;
 			USoundBase* Sound;
-			if (auto Character = Cast<APlayerCharacter>(Parameters.EffectContext.GetHitResult()->GetActor()))
+			if (auto Character = Cast<ABaseCharacter>(Parameters.EffectContext.GetHitResult()->GetActor()))
 			{
 				if (GetWorld()->GetFirstPlayerController() != Character->GetController())
 				{

@@ -3,7 +3,6 @@
 #include "GameplayFramework/FPSPlayerState.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 #include "GameplayAbilitySystem/AttributeSets/BaseAttributeSet.h"
-#include "UI/FPSHUD.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogFPSPlayerState, All, All);
 
@@ -18,6 +17,8 @@ AFPSPlayerState::AFPSPlayerState()
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetCurrentHealthAttribute())
 		.AddUObject(this, &AFPSPlayerState::CurrentHealthChanged);
+
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 }
 
 UAbilitySystemComponent* AFPSPlayerState::GetAbilitySystemComponent() const

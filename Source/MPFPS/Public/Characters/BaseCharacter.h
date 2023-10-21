@@ -3,11 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystemInterface.h"
+#include "GameplayEffectTypes.h"
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
 
-UCLASS()
+class UGameplayEffect;
+
+UCLASS(Abstract)
 class MPFPS_API ABaseCharacter : public ACharacter
 {
 	GENERATED_BODY()
@@ -15,8 +17,19 @@ class MPFPS_API ABaseCharacter : public ACharacter
 public:
 	ABaseCharacter();
 
+	virtual void InitializeAttributes();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UGameplayEffect> AttributeInitializationEffect;
+
+	// attribute callbacks
+
+	void OnWalkSpeedChanged(const FOnAttributeChangeData& OnAttributeChangeData);
+	void OnCurrentHealthChanged(const FOnAttributeChangeData& OnAttributeChangeData);
+
+	void Death();
 };

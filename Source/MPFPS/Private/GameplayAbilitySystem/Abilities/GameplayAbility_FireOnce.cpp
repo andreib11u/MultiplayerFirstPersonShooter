@@ -37,14 +37,17 @@ void UGameplayAbility_FireOnce::FireShot()
 
 void UGameplayAbility_FireOnce::SpawnTargetActor()
 {
-	UAbilityTask_WaitTargetData* SpawnTargetActorTask =
-		UAbilityTask_WaitTargetData::WaitTargetData(this, NAME_None, EGameplayTargetingConfirmation::Instant, ATargetActor_LineTrace::StaticClass());
+	if (!TargetActor)
+	{
+		UAbilityTask_WaitTargetData* SpawnTargetActorTask =
+			UAbilityTask_WaitTargetData::WaitTargetData(this, NAME_None, EGameplayTargetingConfirmation::Instant, ATargetActor_LineTrace::StaticClass());
 
-	AGameplayAbilityTargetActor* SpawnedActor;
-	SpawnTargetActorTask->BeginSpawningActor(this, ATargetActor_LineTrace::StaticClass(), SpawnedActor);
-	SpawnTargetActorTask->FinishSpawningActor(this, SpawnedActor);
+		AGameplayAbilityTargetActor* SpawnedActor;
+		SpawnTargetActorTask->BeginSpawningActor(this, ATargetActor_LineTrace::StaticClass(), SpawnedActor);
+		SpawnTargetActorTask->FinishSpawningActor(this, SpawnedActor);
 
-	TargetActor = SpawnedActor;
+		TargetActor = SpawnedActor;
+	}
 }
 
 void UGameplayAbility_FireOnce::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,

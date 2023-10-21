@@ -30,7 +30,7 @@ public:
 	APlayerCharacter();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	UCameraComponent* GetFPCamera() const { return FirstPersonCamera; }
+	UCameraComponent* GetFirstPersonCamera() const { return FirstPersonCamera; }
 	USkeletalMeshComponent* GetFirstPersonMesh() const { return FirstPersonMesh; }
 	UEquipmentComponent* GetWeaponComponent() const { return EquipmentComponent; }
 
@@ -55,8 +55,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UEquipmentComponent* EquipmentComponent;
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<UGameplayEffect> AttributeInitializationEffect;
 
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* FirstPersonMesh;
@@ -71,7 +69,6 @@ private:
 	TArray<TSubclassOf<UFPSGameplayAbility>> Abilities;
 
 	void GrantAbilities();
-	void InitializeAttributes();
 
 	UFUNCTION()
 	void OnItemChanged(UEquippableItem* Item);

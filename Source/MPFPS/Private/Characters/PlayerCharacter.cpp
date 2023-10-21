@@ -5,7 +5,6 @@
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Engine/DemoNetDriver.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 #include "GameplayAbilitySystem/Abilities/GameplayAbility_FireOnce.h"
 #include "GameplayAbilitySystem/Abilities/PrintTextGameplayAbility.h"
@@ -143,26 +142,6 @@ void APlayerCharacter::GrantAbilities()
 		{
 			AbilitySystemComponent->GiveAbility(Spec);
 		}
-	}
-}
-
-void APlayerCharacter::InitializeAttributes()
-{
-	if (!AttributeInitializationEffect)
-	{
-		UE_LOG(LogPlayerCharacter, Error, TEXT("%s missing AttributeInitializationEffect."), *GetName())
-		return;
-	}
-
-	check(AbilitySystemComponent);
-
-	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
-	EffectContext.AddSourceObject(this);
-
-	const FGameplayEffectSpecHandle EffectSpec = AbilitySystemComponent->MakeOutgoingSpec(AttributeInitializationEffect, 1.f, EffectContext);
-	if (EffectSpec.IsValid())
-	{
-		AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
 	}
 }
 

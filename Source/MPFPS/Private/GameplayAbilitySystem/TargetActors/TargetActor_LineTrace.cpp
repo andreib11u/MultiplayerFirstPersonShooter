@@ -16,7 +16,7 @@ TArray<FHitResult> ATargetActor_LineTrace::PerformTrace()
 	auto Character = Cast<APlayerCharacter>(OwningAbility->GetCurrentSourceObject());
 	if (ensure(Character))
 	{
-		const FVector StartTrace = Character->GetFPCamera()->GetComponentLocation();
+		const FVector StartTrace = Character->GetFirstPersonCamera()->GetComponentLocation();
 		const FVector EndTrace = StartTrace + Character->GetBaseAimRotation().Vector() * 9999.f;
 
 		TArray<AActor*> ActorsToIgnore;
