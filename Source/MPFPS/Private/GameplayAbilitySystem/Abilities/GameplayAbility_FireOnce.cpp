@@ -3,13 +3,11 @@
 #include "GameplayAbilitySystem/Abilities/GameplayAbility_FireOnce.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
-#include "Abilities/Tasks/AbilityTask.h"
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
-#include "Characters/PlayerCharacter.h"
+#include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_ServerWaitForClientData.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitTargetDataUsingActor.h"
 #include "GameplayAbilitySystem/TargetActors/TargetActor_LineTrace.h"
-#include "Weapons/Weapon.h"
 #include "Weapons/EquipmentComponent.h"
 
 void UGameplayAbility_FireOnce::FireShot()
@@ -117,7 +115,11 @@ void UGameplayAbility_FireOnce::OnValidDataAcquired(const FGameplayAbilityTarget
 		Parameters.EffectContext = EffectSpec.Data.Get()->GetEffectContext();
 		Parameters.EffectContext.AddHitResult(*DataPtr->GetHitResult());
 
-		GetAbilitySystemComponentFromActorInfo()->ExecuteGameplayCue(ShotGameplayCue, Parameters);
+		auto AbilitySystemComponent = Cast<UFPSAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
+		if (AbilitySystemComponent)
+		{
+			AbilitySystemComponent->ExecuteGameplayCue(ShotGameplayCue, Parameters);
+		}
 
 		LastShotTime = GetWorld()->GetTimeSeconds();
 	}

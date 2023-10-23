@@ -24,7 +24,7 @@ void ABaseCharacter::InitializeAttributes()
 {
 	if (!AttributeInitializationEffect)
 	{
-		UE_LOG(LogBaseCharacter, Error, TEXT("%s missing AttributeInitializationEffect."), *GetName())
+		UE_LOG(LogBaseCharacter, Error, TEXT("%s missing AttributeInitializationEffect. Attributes are not initialized"), *GetName())
 		return;
 	}
 

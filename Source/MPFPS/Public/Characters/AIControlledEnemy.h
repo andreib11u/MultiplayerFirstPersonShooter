@@ -21,17 +21,26 @@ public:
 	AAIControlledEnemy();
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
+	virtual void Death() override;
 
 protected:
 	virtual void BeginPlay() override;
-
+	virtual void Tick(float DeltaSeconds) override;
 
 	/** Create in subclasses */
 	UPROPERTY()
 	UAttributeSet* DefaultAttributeSet;
+
 private:
 	UPROPERTY(EditAnywhere)
 	UFPSAbilitySystemComponent* AbilitySystemComponent;
 
+	void CreateDynamicMaterials();
+
+	UPROPERTY()
+	TArray<UMaterialInstanceDynamic*> DynamicMaterials;
+	TArray<float> DissolveValues;
+
+	UPROPERTY(EditAnywhere)
+	float DissolveSpeed = 0.5f;
 };

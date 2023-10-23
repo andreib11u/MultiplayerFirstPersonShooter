@@ -31,5 +31,7 @@ protected:
 	void OnWalkSpeedChanged(const FOnAttributeChangeData& OnAttributeChangeData);
 	void OnCurrentHealthChanged(const FOnAttributeChangeData& OnAttributeChangeData);
 
-	void Death();
+	virtual void Death();
+
+	bool bDissolve = false;
 };

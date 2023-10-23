@@ -1,7 +1,10 @@
 // Copyright Andrei Bondarenko 2023
 
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
+
+#include "AbilitySystemGlobals.h"
 #include "AbilitySystemLog.h"
+#include "GameplayCueManager.h"
 #include "GameplayAbilitySystem/Abilities/FPSGameplayAbility.h"
 #include "Net/UnrealNetwork.h"
 
@@ -166,8 +169,7 @@ UAnimMontage* UFPSAbilitySystemComponent::GetCurrentMontageForMesh(USkeletalMesh
 	UAnimInstance* AnimInstance = IsValid(InMesh) && InMesh->GetOwner() == AbilityActorInfo->AvatarActor ? InMesh->GetAnimInstance() : nullptr;
 	FGameplayAbilityLocalAnimMontageForMesh& AnimMontageInfo = GetLocalAnimMontageInfoForMesh(InMesh);
 
-	if (AnimMontageInfo.LocalMontageInfo.AnimMontage && AnimInstance
-		&& AnimInstance->Montage_IsActive(AnimMontageInfo.LocalMontageInfo.AnimMontage))
+	if (AnimMontageInfo.LocalMontageInfo.AnimMontage && AnimInstance && AnimInstance->Montage_IsActive(AnimMontageInfo.LocalMontageInfo.AnimMontage))
 	{
 		return AnimMontageInfo.LocalMontageInfo.AnimMontage;
 	}
@@ -256,6 +258,26 @@ void UFPSAbilitySystemComponent::OnPredictiveMontageRejectedForMesh(USkeletalMes
 			AnimInstance->Montage_Stop(MONTAGE_PREDICTION_REJECT_FADETIME, PredictiveMontage);
 		}
 	}
+}
+
+void UFPSAbilitySystemComponent::ExecuteGameplayCueLocal(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters)
+{
+	UAbilitySystemGlobals::Get().GetGameplayCueManager()->HandleGameplayCue(GetOwner(), GameplayCueTag, EGameplayCueEvent::Type::Executed,
+																			GameplayCueParameters);
+}
+
+void UFPSAbilitySystemComponent::AddGameplayCueLocal(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters)
+{
+	UAbilitySystemGlobals::Get().GetGameplayCueManager()->HandleGameplayCue(GetOwner(), GameplayCueTag, EGameplayCueEvent::Type::OnActive,
+																			GameplayCueParameters);
+	UAbilitySystemGlobals::Get().GetGameplayCueManager()->HandleGameplayCue(GetOwner(), GameplayCueTag, EGameplayCueEvent::Type::WhileActive,
+																			GameplayCueParameters);
+}
+
+void UFPSAbilitySystemComponent::RemoveGameplayCueLocal(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters)
+{
+	UAbilitySystemGlobals::Get().GetGameplayCueManager()->HandleGameplayCue(GetOwner(), GameplayCueTag, EGameplayCueEvent::Type::Removed,
+																			GameplayCueParameters);
 }
 
 UGameplayAbility* UFPSAbilitySystemComponent::GetAnimatingAbilityFromAnyMesh()
