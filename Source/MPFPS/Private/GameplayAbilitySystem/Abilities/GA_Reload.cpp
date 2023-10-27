@@ -71,12 +71,15 @@ void UGA_Reload::OnMontageCompleted(FGameplayTag EventTag, FGameplayEventData Ev
 
 void UGA_Reload::OnEventReceived(FGameplayTag EventTag, FGameplayEventData EventData)
 {
-	UEquipmentComponent* EquipmentComponent = GetCurrentActorInfo()->AvatarActor->FindComponentByClass<UEquipmentComponent>();
-	if (!EquipmentComponent)
+	if (EventTag.MatchesTag(FGameplayTag::RequestGameplayTag("Weapon.Event.Reload")))
 	{
-		EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, true);
-		return;
-	}
+		UEquipmentComponent* EquipmentComponent = GetCurrentActorInfo()->AvatarActor->FindComponentByClass<UEquipmentComponent>();
+		if (!EquipmentComponent)
+		{
+			EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, true);
+			return;
+		}
 
-	EquipmentComponent->ReloadAmmo();
+		EquipmentComponent->ReloadAmmo();
+	}
 }

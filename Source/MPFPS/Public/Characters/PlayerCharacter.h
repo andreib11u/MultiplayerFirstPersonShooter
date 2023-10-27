@@ -65,11 +65,6 @@ private:
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* ThirdPersonWeaponMeshComponent;
 
-	UPROPERTY(EditAnywhere)
-	TArray<TSubclassOf<UFPSGameplayAbility>> Abilities;
-
-	void GrantAbilities();
-
 	UFUNCTION()
 	void OnItemChanged(UEquippableItem* Item);
 

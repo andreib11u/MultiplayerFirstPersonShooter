@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "Characters/PlayerCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Types/CollisionTypes.h"
 
 ATargetActor_LineTrace::ATargetActor_LineTrace()
 {
@@ -23,8 +24,22 @@ TArray<FHitResult> ATargetActor_LineTrace::PerformTrace()
 		ActorsToIgnore.Add(Character);
 		TArray<FHitResult> Results;
 
-		UKismetSystemLibrary::LineTraceMultiByProfile(GetWorld(), StartTrace, EndTrace, "Projectile", true, ActorsToIgnore,
-													  EDrawDebugTrace::None, Results, true, FLinearColor::Yellow);
+		const ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(BULLET_TRACE_COLLISION);
+
+		TArray<FHitResult> LineTraceMultiResults;
+		UKismetSystemLibrary::LineTraceMulti(GetWorld(), StartTrace, EndTrace, TraceType, true, ActorsToIgnore,
+											 EDrawDebugTrace::None, LineTraceMultiResults, true, FLinearColor::Yellow);
+
+		// make hits from LineTraceMulti unique
+		TArray<AActor*> HitActors;
+		for (FHitResult MultiResult : LineTraceMultiResults)
+		{
+			if (!HitActors.Contains(MultiResult.GetActor()))
+			{
+				Results.Add(MultiResult);
+				HitActors.Add(MultiResult.GetActor());
+			}
+		}
 
 		if (Results.IsEmpty())
 		{

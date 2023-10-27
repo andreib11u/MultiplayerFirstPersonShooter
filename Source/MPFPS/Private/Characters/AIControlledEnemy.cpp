@@ -37,6 +37,7 @@ void AAIControlledEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	CreateDynamicMaterials();
+	GrantAbilities();
 
 	if (AbilitySystemComponent)
 	{

@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "BaseCharacter.generated.h"
 
+class UFPSGameplayAbility;
 class UGameplayEffect;
 
 UCLASS(Abstract)
@@ -18,6 +19,11 @@ public:
 	ABaseCharacter();
 
 	virtual void InitializeAttributes();
+
+	TArray<FName> GetHeadBones() const { return HeadBones; }
+	TArray<FName> GetLegBones() const { return LegBones; }
+
+	virtual void GrantAbilities();
 
 protected:
 	virtual void BeginPlay() override;
@@ -34,4 +40,12 @@ protected:
 	virtual void Death();
 
 	bool bDissolve = false;
+
+	UPROPERTY(EditAnywhere)
+	TArray<FName> HeadBones;
+	UPROPERTY(EditAnywhere)
+	TArray<FName> LegBones;
+
+	UPROPERTY(EditAnywhere)
+	TArray<TSubclassOf<UFPSGameplayAbility>> Abilities;
 };

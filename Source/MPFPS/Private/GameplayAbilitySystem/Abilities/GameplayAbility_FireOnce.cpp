@@ -51,6 +51,8 @@ void UGameplayAbility_FireOnce::SpawnTargetActor()
 void UGameplayAbility_FireOnce::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 												const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
+	UE_LOG(LogTemp, Warning, TEXT("FireOnce ActivateAbility"))
+
 	SpawnTargetActor();
 
 	ServerWaitForClientDataTask = UAbilityTask_ServerWaitForClientData::ServerWaitForClientTargetData(this, NAME_None, false);
@@ -65,6 +67,7 @@ bool UGameplayAbility_FireOnce::CheckCost(const FGameplayAbilitySpecHandle Handl
 {
 	if (auto EquipmentComponent = GetCurrentActorInfo()->AvatarActor->FindComponentByClass<UEquipmentComponent>())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("FireOnce CheckCost: %i"), EquipmentComponent->GetCurrentClipAmmo() > 0.f)
 		return EquipmentComponent->GetCurrentClipAmmo() > 0.f;
 	}
 
@@ -104,16 +107,21 @@ void UGameplayAbility_FireOnce::OnValidDataAcquired(const FGameplayAbilityTarget
 		Parameters.EffectCauser = GetAvatarActorFromActorInfo();
 		Parameters.Location = DataPtr->GetEndPoint();
 
-		const FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(DamageEffect);
-
+		
+		// apply damage
 		auto AbilitySystemInterface = Cast<IAbilitySystemInterface>(DataPtr->GetHitResult()->GetActor());
 		if (AbilitySystemInterface)
 		{
-			AbilitySystemInterface->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
-		}
+			UAbilitySystemComponent* AbilitySystemComponent = AbilitySystemInterface->GetAbilitySystemComponent();
 
-		Parameters.EffectContext = EffectSpec.Data.Get()->GetEffectContext();
-		Parameters.EffectContext.AddHitResult(*DataPtr->GetHitResult());
+			const FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(DamageEffect);
+
+			Parameters.EffectContext = EffectSpec.Data.Get()->GetEffectContext();
+			Parameters.EffectContext.AddHitResult(*DataPtr->GetHitResult());
+
+			EffectSpec.Data.Get()->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag("Value.Damage"), 15.f);
+			AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
+		}
 
 		auto AbilitySystemComponent = Cast<UFPSAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());
 		if (AbilitySystemComponent)

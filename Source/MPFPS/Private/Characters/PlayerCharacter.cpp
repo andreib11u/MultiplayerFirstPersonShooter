@@ -133,18 +133,6 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 //	DOREPLIFETIME(APlayerCharacter, CharacterAmmo);
 // }
 
-void APlayerCharacter::GrantAbilities()
-{
-	for (TSubclassOf<UFPSGameplayAbility> Ability : Abilities)
-	{
-		FGameplayAbilitySpec Spec = FGameplayAbilitySpec(Ability, 1, 0, this);
-		if (ensure(AbilitySystemComponent))
-		{
-			AbilitySystemComponent->GiveAbility(Spec);
-		}
-	}
-}
-
 void APlayerCharacter::OnItemChanged(UEquippableItem* Item)
 {
 	if (Item)

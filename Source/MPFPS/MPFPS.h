@@ -5,4 +5,4 @@
 #include "CoreMinimal.h"
 #include "Net/UnrealNetwork.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogUI, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogUI, All, All);

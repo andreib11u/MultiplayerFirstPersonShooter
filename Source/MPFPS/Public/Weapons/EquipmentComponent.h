@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
+#include "Types/FPSTypes.h"
 #include "EquipmentComponent.generated.h"
 
 class UAbilitySystemComponent;
@@ -49,6 +50,7 @@ public:
 	float GetCurrentClipAmmo() const { return CurrentClipAmmo; }
 	float GetCurrentReserveAmmo() const { return CurrentReserveAmmo; }
 	bool IsMaxClipAmmo() const;
+	FWeaponStats GetWeaponStats() const { return CurrentWeaponStats; }
 
 	void SetAmmoFrom(UWeapon* Weapon);
 
@@ -76,9 +78,7 @@ private:
 	float CurrentReserveAmmo;
 
 	UPROPERTY(EditAnywhere)
-	float MaxClipAmmo;
-	UPROPERTY(EditAnywhere)
-	float MaxReserveAmmo;
+	FWeaponStats CurrentWeaponStats;
 
 	UPROPERTY(EditAnywhere)
 	FGameplayTag WeaponIsFiringTag = FGameplayTag::RequestGameplayTag("Weapon.IsFiring");

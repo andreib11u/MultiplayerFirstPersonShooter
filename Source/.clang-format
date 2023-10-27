@@ -21,3 +21,4 @@ SortIncludes:                                   false
 AlwaysBreakTemplateDeclarations:                Yes
 BreakConstructorInitializers:                   BeforeComma
 PackConstructorInitializers:                    Never
+Cpp11BracedListStyle:                           false

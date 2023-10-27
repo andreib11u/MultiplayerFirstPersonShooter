@@ -11,6 +11,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 #include "GameplayAbilitySystem/AttributeSets/BaseAttributeSet.h"
+#include "GameplayAbilitySystem/Abilities/FPSGameplayAbility.h"
+#include "Types/CollisionTypes.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBaseCharacter, All, All);
 
@@ -18,6 +20,8 @@ ABaseCharacter::ABaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	GetCapsuleComponent()->SetCollisionResponseToChannel(BULLET_TRACE_COLLISION, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(BULLET_TRACE_COLLISION, ECR_Overlap);
 }
 
 void ABaseCharacter::InitializeAttributes()
@@ -54,6 +58,30 @@ void ABaseCharacter::InitializeAttributes()
 			AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
 		}
 	}
+}
+
+void ABaseCharacter::GrantAbilities()
+{
+	if (auto AbilitySystemInterface = Cast<IAbilitySystemInterface>(this))
+	{
+		auto AbilitySystemComponent = Cast<UFPSAbilitySystemComponent>(AbilitySystemInterface->GetAbilitySystemComponent());
+		if (!AbilitySystemComponent)
+		{
+			return;
+		}
+
+		for (TSubclassOf<UFPSGameplayAbility> Ability : Abilities)
+		{
+			FGameplayAbilitySpec Spec = FGameplayAbilitySpec(Ability, 1, 0, this);
+
+			if (ensure(AbilitySystemComponent))
+			{
+				AbilitySystemComponent->GiveAbility(Spec);
+			}
+		}
+	}
+
+	
 }
 
 void ABaseCharacter::BeginPlay()

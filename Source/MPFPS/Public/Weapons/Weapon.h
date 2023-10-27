@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTags.h"
 #include "EquippableItems/EquippableItem.h"
+#include "Types/FPSTypes.h"
 #include "Weapon.generated.h"
 
 class UFPSGameplayAbility;
@@ -28,14 +29,7 @@ protected:
 
 public:
 	UPROPERTY(EditAnywhere)
-	float MaxClipAmmo;
-	UPROPERTY(EditAnywhere)
-	float CurrentClipAmmo;
-
-	UPROPERTY(EditAnywhere)
-	float MaxReserveAmmo;
-	UPROPERTY(EditAnywhere)
-	float CurrentReserveAmmo;
+	FWeaponStats WeaponStats;
 
 private:
 	UPROPERTY(EditAnywhere)

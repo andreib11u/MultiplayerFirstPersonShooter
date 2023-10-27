@@ -1,6 +1,5 @@
 // Copyright Andrei Bondarenko 2023
 
-
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_PlayMontage.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemGlobals.h"
@@ -31,11 +30,11 @@ void UAbilityTask_PlayMontage::OnMontageBlendingOut(UAnimMontage* Montage, bool 
 			// Reset AnimRootMotionTranslationScale
 			ACharacter* Character = Cast<ACharacter>(GetAvatarActor());
 			if (Character && (Character->GetLocalRole() == ROLE_Authority ||
-				(Character->GetLocalRole() == ROLE_AutonomousProxy && Ability->GetNetExecutionPolicy() == EGameplayAbilityNetExecutionPolicy::LocalPredicted)))
+							  (Character->GetLocalRole() == ROLE_AutonomousProxy &&
+							   Ability->GetNetExecutionPolicy() == EGameplayAbilityNetExecutionPolicy::LocalPredicted)))
 			{
 				Character->SetAnimRootMotionTranslationScale(1.f);
 			}
-
 		}
 	}
 
@@ -93,8 +92,10 @@ void UAbilityTask_PlayMontage::OnGameplayEvent(FGameplayTag EventTag, const FGam
 	}
 }
 
-UAbilityTask_PlayMontage* UAbilityTask_PlayMontage::PlayMontageAndWaitForEvent(UGameplayAbility* OwningAbility,
-																							   FName TaskInstanceName, UAnimMontage* MontageToPlay, FGameplayTagContainer EventTags, float Rate, FName StartSection, bool bStopWhenAbilityEnds, float AnimRootMotionTranslationScale)
+UAbilityTask_PlayMontage* UAbilityTask_PlayMontage::PlayMontageAndWaitForEvent(UGameplayAbility* OwningAbility, FName TaskInstanceName,
+																			   UAnimMontage* MontageToPlay, FGameplayTagContainer EventTags,
+																			   float Rate, FName StartSection, bool bStopWhenAbilityEnds,
+																			   float AnimRootMotionTranslationScale)
 {
 	UAbilitySystemGlobals::NonShipping_ApplyGlobalAbilityScaler_Rate(Rate);
 
@@ -126,11 +127,13 @@ void UAbilityTask_PlayMontage::Activate()
 		if (AnimInstance != nullptr)
 		{
 			// Bind to event callback
-			EventHandle = GSAbilitySystemComponent->AddGameplayEventTagContainerDelegate(EventTags, FGameplayEventTagMulticastDelegate::FDelegate::CreateUObject(this, &UAbilityTask_PlayMontage::OnGameplayEvent));
+			EventHandle = GSAbilitySystemComponent->AddGameplayEventTagContainerDelegate(
+				EventTags, FGameplayEventTagMulticastDelegate::FDelegate::CreateUObject(this, &UAbilityTask_PlayMontage::OnGameplayEvent));
 
 			if (GSAbilitySystemComponent->PlayMontage(Ability, Ability->GetCurrentActivationInfo(), MontageToPlay, Rate, StartSection) > 0.f)
 			{
-				// Playing a montage could potentially fire off a callback into game code which could kill this ability! Early out if we are  pending kill.
+				// Playing a montage could potentially fire off a callback into game code which could kill this ability! Early out if we are  pending
+				// kill.
 				if (ShouldBroadcastAbilityTaskDelegates() == false)
 				{
 					return;
@@ -146,7 +149,8 @@ void UAbilityTask_PlayMontage::Activate()
 
 				ACharacter* Character = Cast<ACharacter>(GetAvatarActor());
 				if (Character && (Character->GetLocalRole() == ROLE_Authority ||
-					(Character->GetLocalRole() == ROLE_AutonomousProxy && Ability->GetNetExecutionPolicy() == EGameplayAbilityNetExecutionPolicy::LocalPredicted)))
+								  (Character->GetLocalRole() == ROLE_AutonomousProxy &&
+								   Ability->GetNetExecutionPolicy() == EGameplayAbilityNetExecutionPolicy::LocalPredicted)))
 				{
 					Character->SetAnimRootMotionTranslationScale(AnimRootMotionTranslationScale);
 				}
@@ -166,10 +170,12 @@ void UAbilityTask_PlayMontage::Activate()
 
 	if (!bPlayedMontage)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UGSAbilityTask_PlayMontageAndWaitForEvent called in Ability %s failed to play montage %s; Task Instance Name %s."), *Ability->GetName(), *GetNameSafe(MontageToPlay), *InstanceName.ToString());
+		UE_LOG(LogTemp, Warning,
+			   TEXT("UGSAbilityTask_PlayMontageAndWaitForEvent called in Ability %s failed to play montage %s; Task Instance Name %s."),
+			   *Ability->GetName(), *GetNameSafe(MontageToPlay), *InstanceName.ToString());
 		if (ShouldBroadcastAbilityTaskDelegates())
 		{
-			//ABILITY_LOG(Display, TEXT("%s: OnCancelled"), *GetName());
+			// ABILITY_LOG(Display, TEXT("%s: OnCancelled"), *GetName());
 			OnCancelled.Broadcast(FGameplayTag(), FGameplayEventData());
 		}
 	}
@@ -208,7 +214,6 @@ void UAbilityTask_PlayMontage::OnDestroy(bool AbilityEnded)
 	}
 
 	Super::OnDestroy(AbilityEnded);
-
 }
 
 bool UAbilityTask_PlayMontage::StopPlayingMontage()
@@ -229,8 +234,7 @@ bool UAbilityTask_PlayMontage::StopPlayingMontage()
 	// The ability would have been interrupted, in which case we should automatically stop the montage
 	if (AbilitySystemComponent.IsValid() && Ability)
 	{
-		if (AbilitySystemComponent->GetAnimatingAbility() == Ability
-			&& AbilitySystemComponent->GetCurrentMontage() == MontageToPlay)
+		if (AbilitySystemComponent->GetAnimatingAbility() == Ability && AbilitySystemComponent->GetCurrentMontage() == MontageToPlay)
 		{
 			// Unbind delegates so they don't get called as well
 			FAnimMontageInstance* MontageInstance = AnimInstance->GetActiveInstanceForMontage(MontageToPlay);
@@ -262,5 +266,6 @@ FString UAbilityTask_PlayMontage::GetDebugString() const
 		}
 	}
 
-	return FString::Printf(TEXT("PlayMontageAndWaitForEvent. MontageToPlay: %s  (Currently Playing): %s"), *GetNameSafe(MontageToPlay), *GetNameSafe(PlayingMontage));
+	return FString::Printf(TEXT("PlayMontageAndWaitForEvent. MontageToPlay: %s  (Currently Playing): %s"), *GetNameSafe(MontageToPlay),
+						   *GetNameSafe(PlayingMontage));
 }
