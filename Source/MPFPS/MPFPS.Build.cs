@@ -1,6 +1,7 @@
 // Copyright Andrei Bondarenko 2023
 
 using UnrealBuildTool;
+using UnrealBuildTool.Rules;
 
 public class MPFPS : ModuleRules
 {
@@ -21,7 +22,8 @@ public class MPFPS : ModuleRules
 			"AnimGraphRuntime",
 			"OnlineSubsystem",
 			"OnlineSubsystemUtils",
-			"NetCore"
+			"NetCore",
+			"NavigationSystem"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

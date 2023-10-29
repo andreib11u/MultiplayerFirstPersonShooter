@@ -28,7 +28,7 @@ void UGA_ZombieAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 	int32 RandomIndex = 0;
 	if (AttackMontages.Num() != 1)
 	{
-		RandomIndex = FMath::Rand() % (AttackMontages.Num() - 1);
+		RandomIndex = FMath::Rand() % AttackMontages.Num();
 	}
 
 	UAnimMontage* AttackMontageToPlay = AttackMontages[RandomIndex];
@@ -41,7 +41,8 @@ void UGA_ZombieAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 
 	FGameplayTagContainer EventTags;
 	EventTags.AddTag(AttackEventTag);
-	UAbilityTask_PlayMontage* PlayMontageTask = UAbilityTask_PlayMontage::PlayMontageAndWaitForEvent(this, NAME_None, AttackMontageToPlay, EventTags);
+	UAbilityTask_PlayMontage* PlayMontageTask =
+		UAbilityTask_PlayMontage::PlayMontageAndWaitForEvent(this, NAME_None, AttackMontageToPlay, EventTags, AttackSpeed);
 	if (!PlayMontageTask)
 	{
 		UE_LOG(LogZombieBiteAbility, Error, TEXT("Couldn't create UAbilityTask_PlayMontage"))
@@ -88,7 +89,7 @@ void UGA_ZombieAttack::OnValidDataAcquired(const FGameplayAbilityTargetDataHandl
 		}
 	}
 
-	EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
+	//EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
 }
 
 void UGA_ZombieAttack::OnMontageCompleted(FGameplayTag EventTag, FGameplayEventData EventData)

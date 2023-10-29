@@ -6,6 +6,8 @@
 #include "GameFramework/GameMode.h"
 #include "FPSGameMode.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerPawnSpawned, APawn*);
+
 /**
  * 
  */
@@ -21,5 +23,11 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> ActorToSpawn;
+
+	FOnPlayerPawnSpawned OnPlayerPawnSpawned;
+
+private:
+	UPROPERTY()
+	TArray<APawn*> AlivePlayerPawns;
 
 };

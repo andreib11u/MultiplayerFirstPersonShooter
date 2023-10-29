@@ -25,6 +25,8 @@ private:
 	TArray<UAnimMontage*> AttackMontages;
 	UPROPERTY(EditAnywhere)
 	FGameplayTag AttackEventTag = FGameplayTag::RequestGameplayTag("Zombie.Event.Attack");
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "0"))
+	float AttackSpeed = 1.f;
 
 	UFUNCTION()
 	void OnMontageCancelled(FGameplayTag EventTag, FGameplayEventData EventData);
@@ -42,7 +44,7 @@ private:
 	TEnumAsByte<ECollisionChannel> CollisionChannel;
 	UPROPERTY(EditAnywhere)
 	FVector HalfSize = FVector{ 40.f, 30.f, 30.f };
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta = (ClampMin = "1"))
 	float AttackRange = 50.f;
 
 	UPROPERTY(EditAnywhere)

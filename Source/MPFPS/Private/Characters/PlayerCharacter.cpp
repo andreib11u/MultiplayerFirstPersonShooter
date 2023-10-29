@@ -11,6 +11,7 @@
 #include "GameplayFramework/FPSPlayerState.h"
 #include "Input/InputDataAsset.h"
 #include "Net/UnrealNetwork.h"
+#include "Subsystems/FindActorsOfClassSubsystem.h"
 #include "Types/FPSGameplayAbilityTypes.h"
 #include "Weapons/Weapon.h"
 #include "Weapons/EquipmentComponent.h"
@@ -194,6 +195,23 @@ void APlayerCharacter::BeginPlay()
 	{
 		GetMesh()->SetVisibility(true, true);
 		FirstPersonMesh->SetVisibility(false, true);
+	}
+
+	auto FindActorsSubsystem = GetWorld()->GetSubsystem<UFindActorsOfClassSubsystem>();
+	if (FindActorsSubsystem)
+	{
+		FindActorsSubsystem->AddActor(APlayerCharacter::StaticClass(), this);
+	}
+}
+
+void APlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	auto FindActorsSubsystem = GetWorld()->GetSubsystem<UFindActorsOfClassSubsystem>();
+	if (FindActorsSubsystem)
+	{
+		FindActorsSubsystem->RemoveActor(APlayerCharacter::StaticClass(), this);
 	}
 }
 
