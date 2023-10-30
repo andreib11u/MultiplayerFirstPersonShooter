@@ -84,8 +84,14 @@ void UGA_ZombieAttack::OnValidDataAcquired(const FGameplayAbilityTargetDataHandl
 				return;
 			}
 
+			UAbilitySystemComponent* AbilitySystemComponent = AbilitySystemInterface->GetAbilitySystemComponent();
+
 			FGameplayEffectSpecHandle DamageEffectSpec = MakeOutgoingGameplayEffectSpec(DamageEffect);
-			AbilitySystemInterface->GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*DamageEffectSpec.Data.Get());
+			AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*DamageEffectSpec.Data.Get());
+
+			FGameplayCueParameters GameplayCueParameters;
+			GameplayCueParameters.EffectCauser = GetAvatarActorFromActorInfo();
+			AbilitySystemComponent->ExecuteGameplayCue(GameplayCueTag, GameplayCueParameters);
 		}
 	}
 

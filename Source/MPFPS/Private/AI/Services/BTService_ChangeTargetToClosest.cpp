@@ -25,6 +25,13 @@ void UBTService_ChangeTargetToClosest::TickNode(UBehaviorTreeComponent& OwnerCom
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
 	const TArray<AActor*> PlayerCharacters = FindActorsSubsystem->FindAllActors(APlayerCharacter::StaticClass());
+
+	if (PlayerCharacters.IsEmpty())
+	{
+		OwnerComp.GetBlackboardComponent()->SetValueAsObject(TargetEnemyKey.SelectedKeyName, nullptr);
+		return;
+	}
+
 	for (AActor* PlayerCharacter : PlayerCharacters)
 	{
 		auto AIController = OwnerComp.GetOwner<AAIController>();

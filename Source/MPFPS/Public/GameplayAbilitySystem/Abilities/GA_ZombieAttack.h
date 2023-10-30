@@ -28,6 +28,9 @@ private:
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "0"))
 	float AttackSpeed = 1.f;
 
+	UPROPERTY(EditAnywhere, meta = (Categories = "GameplayCue"))
+	FGameplayTag GameplayCueTag;
+
 	UFUNCTION()
 	void OnMontageCancelled(FGameplayTag EventTag, FGameplayEventData EventData);
 	UFUNCTION()

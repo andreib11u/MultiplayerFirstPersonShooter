@@ -41,7 +41,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayEffect> DamageEffect;
 
-	UPROPERTY(EditAnywhere, meta = (GameplayTagFilter = "GameplayCue"))
+	UPROPERTY(EditAnywhere, meta = (Categories = "GameplayCue"))
 	FGameplayTag ShotGameplayCue = FGameplayTag::RequestGameplayTag("GameplayCue.Shooting.BulletImpact");
 
 	UPROPERTY(EditAnywhere)
