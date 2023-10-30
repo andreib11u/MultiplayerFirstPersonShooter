@@ -33,4 +33,6 @@ private:
 	UParticleSystem* HumanImpactParticle;
 	UPROPERTY(EditAnywhere)
 	UParticleSystem* ObjectImpactParticle;
+	UPROPERTY(EditAnywhere)
+	USoundAttenuation* SoundAttenuation;
 };

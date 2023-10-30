@@ -19,4 +19,6 @@ public:
 private:
 	UPROPERTY(EditAnywhere)
 	USoundBase* HitSound;
+	UPROPERTY(EditAnywhere)
+	USoundAttenuation* SoundAttenuation;
 };

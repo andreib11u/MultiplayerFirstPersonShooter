@@ -52,7 +52,7 @@ bool UGameplayCue_BulletImpact::OnExecute_Implementation(AActor* MyTarget, const
 				Sound = ObjectImpactSound;
 			}
 
-			UGameplayStatics::PlaySoundAtLocation(PlayerCharacter->GetWorld(), Sound, Parameters.Location, FRotator());
+			UGameplayStatics::PlaySoundAtLocation(PlayerCharacter->GetWorld(), Sound, Parameters.Location, PlayerCharacter->GetActorRotation(), 1, 1, 0, SoundAttenuation);
 			UGameplayStatics::SpawnEmitterAtLocation(PlayerCharacter->GetWorld(), ParticleSystem, Parameters.Location,
 													 Parameters.EffectContext.GetHitResult()->ImpactNormal.Rotation());
 		}

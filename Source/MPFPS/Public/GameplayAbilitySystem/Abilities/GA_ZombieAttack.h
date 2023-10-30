@@ -48,7 +48,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	FVector HalfSize = FVector{ 40.f, 30.f, 30.f };
 	UPROPERTY(EditAnywhere, meta = (ClampMin = "1"))
-	float AttackRange = 50.f;
+	float AttackRange = 100.f;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayEffect> DamageEffect;

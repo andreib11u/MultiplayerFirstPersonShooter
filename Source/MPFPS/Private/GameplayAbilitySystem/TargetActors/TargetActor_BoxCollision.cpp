@@ -38,7 +38,7 @@ TArray<FHitResult> ATargetActor_BoxCollision::PerformTrace()
 
 	TArray<FHitResult> LineTraceMultiResults;
 	UKismetSystemLibrary::BoxTraceMulti(GetWorld(), EndTrace, EndTrace, HalfSize, Orientation,
-										TraceType, true, ActorsToIgnore, EDrawDebugTrace::ForDuration, LineTraceMultiResults, true,
+										TraceType, true, ActorsToIgnore, EDrawDebugTrace::None, LineTraceMultiResults, true,
 										FLinearColor::Yellow);
 
 	// make hits from LineTraceMulti unique

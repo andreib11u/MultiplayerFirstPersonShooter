@@ -1,6 +1,5 @@
 // Copyright Andrei Bondarenko 2023
 
-
 #include "GameplayAbilitySystem/GameplayCues/GameplayCue_ZombieHit.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -9,7 +8,8 @@ bool UGameplayCue_ZombieHit::OnExecute_Implementation(AActor* MyTarget, const FG
 	AActor* EffectCauser = Parameters.GetEffectCauser();
 	if (EffectCauser)
 	{
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, EffectCauser->GetActorLocation(), EffectCauser->GetActorRotation());
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), HitSound, EffectCauser->GetActorLocation(), EffectCauser->GetActorRotation(), 1, 1, 0,
+											  SoundAttenuation);
 	}
 
 	return Super::OnExecute_Implementation(MyTarget, Parameters);
