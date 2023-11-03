@@ -31,6 +31,8 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		const FVector Velocity = PlayerCharacter->GetVelocity();
 		Speed = Velocity.Length();
 
+		bIsFalling = CharacterMovement->IsFalling();
+
 		MovementDirection = UKismetAnimationLibrary::CalculateDirection(Velocity, PlayerCharacter->GetActorRotation());
 
 		BaseRotationPitch = PlayerCharacter->GetBaseAimRotation().Pitch;

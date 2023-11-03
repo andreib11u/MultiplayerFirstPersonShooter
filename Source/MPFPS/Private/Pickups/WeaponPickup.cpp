@@ -9,5 +9,5 @@ void AWeaponPickup::OnPickup(APlayerCharacter* PlayerCharacter)
 {
 	Super::OnPickup(PlayerCharacter);
 
-	PlayerCharacter->GetWeaponComponent()->AddWeapon(WeaponClass);
+	PlayerCharacter->GetEquipmentComponent()->AddWeapon(WeaponClass);
 }

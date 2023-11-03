@@ -6,6 +6,7 @@
 #include "Components/CanvasPanelSlot.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 #include "UI/HUD/AmmoWidget.h"
+#include "UI/HUD/CrosshairWidget.h"
 #include "UI/HUD/DamageDirectionIndicatorWidget.h"
 #include "UI/HUD/HealthBarWidget.h"
 #include "Weapons/EquipmentComponent.h"
@@ -24,6 +25,8 @@ void UHUDWidget::Init(UFPSAbilitySystemComponent* AbilitySystemComponent)
 		OnItemChanged(EquipmentComponent->GetCurrentItem());
 
 		EquipmentComponent->OnCurrentItemChanged.AddDynamic(this, &UHUDWidget::OnItemChanged);
+
+		Crosshair->Init(EquipmentComponent);
 	}
 }
 

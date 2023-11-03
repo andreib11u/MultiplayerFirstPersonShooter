@@ -8,6 +8,7 @@
 #include "Weapons/Weapon.h"
 #include "PlayerCharacter.generated.h"
 
+class UPlayerAttributeSet;
 class UFPSGameplayAbility;
 class UEquipmentComponent;
 class UGameplayAbility;
@@ -32,7 +33,7 @@ public:
 
 	UCameraComponent* GetFirstPersonCamera() const { return FirstPersonCamera; }
 	USkeletalMeshComponent* GetFirstPersonMesh() const { return FirstPersonMesh; }
-	UEquipmentComponent* GetWeaponComponent() const { return EquipmentComponent; }
+	UEquipmentComponent* GetEquipmentComponent() const { return EquipmentComponent; }
 
 	USkeletalMeshComponent* GetFirstPersonWeaponMesh() const { return FirstPersonWeaponMeshComponent; }
 	USkeletalMeshComponent* GetThirdPersonWeaponMesh() const { return ThirdPersonWeaponMeshComponent; }
@@ -45,6 +46,8 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual void InitializeAttributes() override;
+
 private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	class UInputDataAsset* InputActions;
@@ -56,6 +59,8 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (AllowPrivateAccess = "true"))
 	UEquipmentComponent* EquipmentComponent;
 
+	UPROPERTY()
+	UPlayerAttributeSet* PlayerAttributeSet;
 
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* FirstPersonMesh;
@@ -76,8 +81,8 @@ private:
 
 	void PrimaryActionPressed();
 	void PrimaryActionReleased();
-	void SecondaryActionActionPressed();
-	void SecondaryActionActionReleased();
+	void SecondaryActionPressed();
+	void SecondaryActionReleased();
 	void ReloadPressed();
 	void ReloadReleased();
 };

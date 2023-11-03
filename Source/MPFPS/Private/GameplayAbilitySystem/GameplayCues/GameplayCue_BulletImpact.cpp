@@ -14,7 +14,7 @@ bool UGameplayCue_BulletImpact::OnExecute_Implementation(AActor* MyTarget, const
 	auto PlayerCharacter = Cast<APlayerCharacter>(Parameters.GetEffectCauser());
 	if (PlayerCharacter)
 	{
-		auto Weapon = Cast<UWeapon>(PlayerCharacter->GetWeaponComponent()->GetCurrentItem());
+		auto Weapon = Cast<UWeapon>(PlayerCharacter->GetEquipmentComponent()->GetCurrentItem());
 		check(Weapon);
 		const FName SocketName = Weapon->GetMuzzleSocketName();
 

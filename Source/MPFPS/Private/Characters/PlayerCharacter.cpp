@@ -5,9 +5,8 @@
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
-#include "GameplayAbilitySystem/Abilities/GameplayAbility_FireOnce.h"
-#include "GameplayAbilitySystem/Abilities/PrintTextGameplayAbility.h"
 #include "GameplayFramework/FPSPlayerState.h"
 #include "Input/InputDataAsset.h"
 #include "Net/UnrealNetwork.h"
@@ -91,9 +90,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	if (InputActions->SecondaryAction)
 	{
 		EnhancedInputComponent->BindAction(InputActions->SecondaryAction, ETriggerEvent::Started, this,
-										   &APlayerCharacter::SecondaryActionActionPressed);
+										   &APlayerCharacter::SecondaryActionPressed);
 		EnhancedInputComponent->BindAction(InputActions->SecondaryAction, ETriggerEvent::Completed, this,
-										   &APlayerCharacter::SecondaryActionActionReleased);
+										   &APlayerCharacter::SecondaryActionReleased);
 	}
 
 	if (InputActions->Reload)
@@ -220,6 +219,12 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
+void APlayerCharacter::InitializeAttributes()
+{
+	Super::InitializeAttributes();
+
+}
+
 void APlayerCharacter::Look(const FInputActionValue& InputActionValue)
 {
 	const auto Value = InputActionValue.Get<FVector2D>();
@@ -246,12 +251,12 @@ void APlayerCharacter::PrimaryActionReleased()
 	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInput::PrimaryAction));
 }
 
-void APlayerCharacter::SecondaryActionActionPressed()
+void APlayerCharacter::SecondaryActionPressed()
 {
 	AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityInput::SecondaryAction));
 }
 
-void APlayerCharacter::SecondaryActionActionReleased()
+void APlayerCharacter::SecondaryActionReleased()
 {
 	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInput::SecondaryAction));
 }

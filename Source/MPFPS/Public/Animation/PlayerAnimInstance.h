@@ -32,6 +32,8 @@ private:
 	float MovementDirection;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	float BaseRotationPitch;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	bool bIsFalling;
 
 	UPROPERTY()
 	APlayerCharacter* PlayerCharacter;

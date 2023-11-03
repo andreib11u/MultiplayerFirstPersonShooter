@@ -2,6 +2,8 @@
 
 
 #include "Weapons/EquipmentComponent.h"
+
+#include "Characters/PlayerCharacter.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Types/FPSGameplayAbilityTypes.h"
@@ -31,6 +33,18 @@ void UEquipmentComponent::PreReplication(IRepChangedPropertyTracker& ChangedProp
 								  (IsValid(AbilitySystemComponent) && !AbilitySystemComponent->HasMatchingGameplayTag(WeaponIsFiringTag)));
 	DOREPLIFETIME_ACTIVE_OVERRIDE(UEquipmentComponent, CurrentReserveAmmo,
 								  (IsValid(AbilitySystemComponent) && !AbilitySystemComponent->HasMatchingGameplayTag(WeaponIsFiringTag)));
+}
+
+void UEquipmentComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	const double OwnerSpeedSquared = PlayerCharacterOwner->GetVelocity().SquaredLength();
+
+	TargetSpread = OwnerSpeedSquared > 0.f ? CurrentWeaponStats.WalkSpread : CurrentWeaponStats.StandSpread;
+	Spread = TargetSpread + AddedSpread;
+
+	AddedSpread = FMath::FInterpConstantTo(AddedSpread, 0.f, DeltaTime, CurrentWeaponStats.SpreadDecay);
 }
 
 void UEquipmentComponent::OnRep_CurrentClipAmmo()
@@ -106,6 +120,11 @@ void UEquipmentComponent::BeginPlay()
 	}
 
 	OnCurrentItemChanged.Broadcast(CurrentItem);
+
+	PlayerCharacterOwner = Cast<APlayerCharacter>(GetOwner());
+	checkf(PlayerCharacterOwner, TEXT("EquipmentComponent attached not to a APlayerCharacter"))
+
+	OwnerMovement = PlayerCharacterOwner->GetCharacterMovement();
 }
 
 void UEquipmentComponent::SpendAmmo(float Ammo)
@@ -138,6 +157,12 @@ void UEquipmentComponent::ReloadAmmo()
 		OnCurrentClipAmmoChanged.Broadcast(CurrentClipAmmo);
 		OnCurrentReserveAmmoChanged.Broadcast(CurrentReserveAmmo);
 	}
+}
+
+void UEquipmentComponent::AddSpread(float InSpread)
+{
+	AddedSpread += InSpread;
+	OnSpreadAdded.ExecuteIfBound(InSpread);
 }
 
 void UEquipmentComponent::SetCurrentClipAmmo(float Ammo)

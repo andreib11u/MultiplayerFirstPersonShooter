@@ -48,6 +48,7 @@ private:
 
 
 	// Max/Min values
+
 	float MinWalkSpeed = 50.f;
 	float MaxWalkSpeed = 1000.f;
 };

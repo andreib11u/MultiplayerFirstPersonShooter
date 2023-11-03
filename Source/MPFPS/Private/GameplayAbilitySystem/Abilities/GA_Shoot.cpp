@@ -16,7 +16,7 @@ void UGA_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 	UE_LOG(LogTemp, Warning, TEXT("Shoot ActivateAbility"))
 	if (auto PlayerCharacter = Cast<APlayerCharacter>(ActorInfo->AvatarActor))
 	{
-		auto Weapon = Cast<UWeapon>(PlayerCharacter->GetWeaponComponent()->GetCurrentItem());
+		auto Weapon = Cast<UWeapon>(PlayerCharacter->GetEquipmentComponent()->GetCurrentItem());
 		if (!Weapon)
 		{
 			return;

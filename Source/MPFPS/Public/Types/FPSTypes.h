@@ -25,4 +25,11 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float ShotCooldown;
+
+	UPROPERTY(EditAnywhere)
+	float StandSpread = 0.1f;
+	UPROPERTY(EditAnywhere)
+	float WalkSpread = 0.5f;
+	UPROPERTY(EditAnywhere)
+	float SpreadDecay = 3.f;
 };

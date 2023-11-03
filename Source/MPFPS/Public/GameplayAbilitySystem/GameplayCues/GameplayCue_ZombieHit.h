@@ -14,6 +14,7 @@ class MPFPS_API UGameplayCue_ZombieHit : public UGameplayCueNotify_Static
 {
 	GENERATED_BODY()
 public:
+	void AddDamageDirectionToPlayer(AActor* MyTarget, AActor* EffectCauser) const;
 	virtual bool OnExecute_Implementation(AActor* MyTarget, const FGameplayCueParameters& Parameters) const override;
 
 private:

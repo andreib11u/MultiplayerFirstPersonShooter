@@ -8,12 +8,15 @@
 #include "Types/FPSTypes.h"
 #include "EquipmentComponent.generated.h"
 
+class UCharacterMovementComponent;
+class APlayerCharacter;
 class UAbilitySystemComponent;
 class UEquippableItem;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCurrentItemChanged, UEquippableItem*, CurrentItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCurrentClipAmmoChanged, float, CurrentClipAmmo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCurrentReserveAmmoChanged, float, CurrentReserveAmmo);
+DECLARE_DELEGATE_OneParam(FOnSpreadAdded, float);
 
 class UWeapon;
 
@@ -45,12 +48,17 @@ public:
 	void SpendAmmo(float Ammo);
 	void ReloadAmmo();
 
+	void AddSpread(float InSpread);
+	FOnSpreadAdded OnSpreadAdded;
+
 	void SetCurrentClipAmmo(float Ammo);
 	void SetCurrentReserveAmmo(float Ammo);
 	float GetCurrentClipAmmo() const { return CurrentClipAmmo; }
 	float GetCurrentReserveAmmo() const { return CurrentReserveAmmo; }
 	bool IsMaxClipAmmo() const;
 	FWeaponStats GetWeaponStats() const { return CurrentWeaponStats; }
+	float GetSpread() const { return Spread; }
+	float GetTargetSpread() const { return TargetSpread; }
 
 	void SetAmmoFrom(UWeapon* Weapon);
 
@@ -60,6 +68,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void PreReplication(IRepChangedPropertyTracker& ChangedPropertyTracker) override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 private:
 	UPROPERTY(VisibleInstanceOnly)
@@ -77,6 +86,12 @@ private:
 	UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_CurrentReserveAmmo)
 	float CurrentReserveAmmo;
 
+	UPROPERTY(EditAnywhere, meta = (ClampMax = "1", ClampMin = "0"))
+	float Spread = 0.f;
+
+	float TargetSpread;
+	float AddedSpread;
+
 	UPROPERTY(EditAnywhere)
 	FWeaponStats CurrentWeaponStats;
 
@@ -85,6 +100,10 @@ private:
 
 	UPROPERTY()
 	UAbilitySystemComponent* AbilitySystemComponent;
+	UPROPERTY()
+	APlayerCharacter* PlayerCharacterOwner;
+	UPROPERTY()
+	UCharacterMovementComponent* OwnerMovement;
 
 	UFUNCTION()
 	void OnRep_CurrentClipAmmo();

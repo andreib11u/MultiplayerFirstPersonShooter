@@ -4,6 +4,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
+#include "Characters/PlayerCharacter.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_ServerWaitForClientData.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitTargetDataUsingActor.h"
@@ -22,6 +23,16 @@ void UGameplayAbility_FireOnce::FireShot()
 			if (!TargetActor)
 			{
 				SpawnTargetActor();
+			}
+
+			auto PlayerCharacter = Cast<APlayerCharacter>(GetActorInfo().AvatarActor);
+			if (PlayerCharacter)
+			{
+				auto EquipmentComponent = PlayerCharacter->GetEquipmentComponent();
+				if (EquipmentComponent)
+				{
+					EquipmentComponent->AddSpread(0.1f); // todo: magic number
+				}
 			}
 
 			WaitTargetDataTask = UAbilityTask_WaitTargetDataUsingActor::WaitTargetDataWithReusableActor(

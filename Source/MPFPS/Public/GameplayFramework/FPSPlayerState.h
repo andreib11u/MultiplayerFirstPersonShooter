@@ -8,8 +8,8 @@
 #include "GameplayEffectTypes.h"
 #include "FPSPlayerState.generated.h"
 
+class UPlayerAttributeSet;
 class UFPSAbilitySystemComponent;
-class UBaseAttributeSet;
 class UAbilitySystemComponent;
 
 /**
@@ -24,7 +24,7 @@ public:
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UFPSAbilitySystemComponent* GetFPSAbilitySystemComponent() const { return AbilitySystemComponent; }
-	UBaseAttributeSet* GetAttributeSet() const { return AttributeSet; }
+	UPlayerAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -32,7 +32,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	UFPSAbilitySystemComponent* AbilitySystemComponent;
 	UPROPERTY()
-	UBaseAttributeSet* AttributeSet;
+	UPlayerAttributeSet* AttributeSet;
 
 	void CurrentHealthChanged(const FOnAttributeChangeData& OnAttributeChangeData);
 };
