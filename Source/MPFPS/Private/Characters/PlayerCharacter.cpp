@@ -9,8 +9,11 @@
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 #include "GameplayFramework/FPSPlayerState.h"
 #include "Input/InputDataAsset.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Subsystems/FindActorsOfClassSubsystem.h"
+#include "Types/CollisionTypes.h"
 #include "Types/FPSGameplayAbilityTypes.h"
 #include "Weapons/Weapon.h"
 #include "Weapons/EquipmentComponent.h"
@@ -213,6 +216,42 @@ void APlayerCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		FindActorsSubsystem->RemoveActor(APlayerCharacter::StaticClass(), this);
 	}
 }
+
+#if WITH_EDITOR
+void APlayerCharacter::ShowDebugSpreadCone(float HalfConeDeg)
+{
+	for (int32 ThetaDeg = 0; ThetaDeg < 360; ++ThetaDeg)
+	{
+		FVector StartTrace = GetFirstPersonCamera()->GetComponentLocation();
+		StartTrace.X -= 1.f;
+		//const FVector DeviationVector = FMath::VRandCone(GetBaseAimRotation().Vector(), FMath::DegreesToRadians(45.f));
+
+		// get axes we need to rotate around
+		FMatrix const DirMat = FRotationMatrix(GetBaseAimRotation());
+		// note the axis translation, since we want the variation to be around X
+		FVector const DirZ = DirMat.GetScaledAxis(EAxis::X);
+		FVector const DirY = DirMat.GetScaledAxis(EAxis::Y);
+
+		FVector Result = GetBaseAimRotation().Vector().RotateAngleAxis(HalfConeDeg, DirY);
+		Result = Result.RotateAngleAxis(ThetaDeg, DirZ);
+
+		// ensure it's a unit vector (might not have been passed in that way)
+		Result = Result.GetSafeNormal();
+
+		const FVector EndTrace = StartTrace + Result * 9999.f;
+
+		TArray<AActor*> ActorsToIgnore;
+		/*ActorsToIgnore.Add(Character);*/
+		TArray<FHitResult> Results;
+
+		const ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(BULLET_TRACE_COLLISION);
+
+		TArray<FHitResult> LineTraceMultiResults;
+		UKismetSystemLibrary::LineTraceMulti(GetWorld(), StartTrace, EndTrace, TraceType, true, ActorsToIgnore,
+		                                     EDrawDebugTrace::ForOneFrame, LineTraceMultiResults, true, FLinearColor::Yellow);
+	}
+}
+#endif // WITH_EDITOR
 
 void APlayerCharacter::Tick(float DeltaSeconds)
 {

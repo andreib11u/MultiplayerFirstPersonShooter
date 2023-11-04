@@ -90,6 +90,7 @@ private:
 	float Spread = 0.f;
 
 	float TargetSpread;
+	float TargetMaxSpread;
 	float AddedSpread;
 
 	UPROPERTY(EditAnywhere)

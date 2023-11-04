@@ -15,6 +15,9 @@ class MPFPS_API ATargetActor_LineTrace : public AGameplayAbilityTargetActor
 	GENERATED_BODY()
 public:
 	ATargetActor_LineTrace();
+
+	void Configure(const FVector& InStartTrace, const FVector& InEndTrace, ECollisionChannel InCollisionChannel);
+
 	TArray<FHitResult> PerformTrace();
 
 	/** Initialize and begin targeting logic  */
@@ -43,4 +46,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	FVector StartTrace;
+	FVector EndTrace;
+	ECollisionChannel CollisionChannel;
 };

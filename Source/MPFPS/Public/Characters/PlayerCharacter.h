@@ -74,6 +74,10 @@ private:
 	UFUNCTION()
 	void OnItemChanged(UEquippableItem* Item);
 
+#if WITH_EDITOR
+	void ShowDebugSpreadCone(float HalfConeDeg);
+#endif
+
 	// Input callbacks
 
 	void Look(const FInputActionValue& InputActionValue);

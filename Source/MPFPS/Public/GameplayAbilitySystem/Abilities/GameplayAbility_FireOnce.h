@@ -53,4 +53,7 @@ private:
 	AGameplayAbilityTargetActor* TargetActor;
 	UPROPERTY()
 	UAbilityTask_ServerWaitForClientData* ServerWaitForClientDataTask;
+
+	UPROPERTY(EditAnywhere)
+	float TraceLength = 9999.f;
 };

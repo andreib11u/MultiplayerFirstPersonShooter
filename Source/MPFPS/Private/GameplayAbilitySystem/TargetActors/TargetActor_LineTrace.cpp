@@ -2,57 +2,53 @@
 
 #include "GameplayAbilitySystem/TargetActors/TargetActor_LineTrace.h"
 #include "Abilities/GameplayAbility.h"
-#include "Camera/CameraComponent.h"
-#include "Characters/PlayerCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "Types/CollisionTypes.h"
 
 ATargetActor_LineTrace::ATargetActor_LineTrace()
 {
 	ShouldProduceTargetDataOnServer = false;
 }
 
+void ATargetActor_LineTrace::Configure(const FVector& InStartTrace, const FVector& InEndTrace, ECollisionChannel InCollisionChannel)
+{
+	StartTrace = InStartTrace;
+	EndTrace = InEndTrace;
+	CollisionChannel = InCollisionChannel;
+}
+
 TArray<FHitResult> ATargetActor_LineTrace::PerformTrace()
 {
-	auto Character = Cast<APlayerCharacter>(OwningAbility->GetCurrentSourceObject());
-	if (ensure(Character))
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(Cast<AActor>(OwningAbility->GetCurrentSourceObject()));
+	TArray<FHitResult> Results;
+
+	const ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(CollisionChannel);
+
+	TArray<FHitResult> LineTraceMultiResults;
+	UKismetSystemLibrary::LineTraceMulti(GetWorld(), StartTrace, EndTrace, TraceType, true, ActorsToIgnore, EDrawDebugTrace::None,
+										 LineTraceMultiResults, true, FLinearColor::Yellow);
+
+	// make hits from LineTraceMulti unique
+	TArray<AActor*> HitActors;
+	for (FHitResult MultiResult : LineTraceMultiResults)
 	{
-		const FVector StartTrace = Character->GetFirstPersonCamera()->GetComponentLocation();
-		const FVector EndTrace = StartTrace + Character->GetBaseAimRotation().Vector() * 9999.f;
-
-		TArray<AActor*> ActorsToIgnore;
-		ActorsToIgnore.Add(Character);
-		TArray<FHitResult> Results;
-
-		const ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(BULLET_TRACE_COLLISION);
-
-		TArray<FHitResult> LineTraceMultiResults;
-		UKismetSystemLibrary::LineTraceMulti(GetWorld(), StartTrace, EndTrace, TraceType, true, ActorsToIgnore,
-											 EDrawDebugTrace::None, LineTraceMultiResults, true, FLinearColor::Yellow);
-
-		// make hits from LineTraceMulti unique
-		TArray<AActor*> HitActors;
-		for (FHitResult MultiResult : LineTraceMultiResults)
+		if (!HitActors.Contains(MultiResult.GetActor()))
 		{
-			if (!HitActors.Contains(MultiResult.GetActor()))
-			{
-				Results.Add(MultiResult);
-				HitActors.Add(MultiResult.GetActor());
-			}
+			Results.Add(MultiResult);
+			HitActors.Add(MultiResult.GetActor());
 		}
-
-		if (Results.IsEmpty())
-		{
-			FHitResult NoHitHappenedHitResult = FHitResult();
-			NoHitHappenedHitResult.TraceStart = StartTrace;
-			NoHitHappenedHitResult.TraceEnd = EndTrace;
-			NoHitHappenedHitResult.Location = EndTrace;
-			Results.Add(NoHitHappenedHitResult);
-		}
-
-		return Results;
 	}
-	return {};
+
+	if (Results.IsEmpty())
+	{
+		FHitResult NoHitHappenedHitResult = FHitResult();
+		NoHitHappenedHitResult.TraceStart = StartTrace;
+		NoHitHappenedHitResult.TraceEnd = EndTrace;
+		NoHitHappenedHitResult.Location = EndTrace;
+		Results.Add(NoHitHappenedHitResult);
+	}
+
+	return Results;
 }
 
 void ATargetActor_LineTrace::StartTargeting(UGameplayAbility* Ability)
@@ -98,7 +94,6 @@ void ATargetActor_LineTrace::ConfirmTargeting()
 void ATargetActor_LineTrace::CancelTargeting()
 {
 	Super::CancelTargeting();
-
 }
 
 void ATargetActor_LineTrace::BindToConfirmCancelInputs()

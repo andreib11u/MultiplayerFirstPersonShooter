@@ -4,11 +4,13 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
+#include "Camera/CameraComponent.h"
 #include "Characters/PlayerCharacter.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_ServerWaitForClientData.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitTargetDataUsingActor.h"
 #include "GameplayAbilitySystem/TargetActors/TargetActor_LineTrace.h"
+#include "Types/CollisionTypes.h"
 #include "Weapons/EquipmentComponent.h"
 
 void UGameplayAbility_FireOnce::FireShot()
@@ -25,13 +27,28 @@ void UGameplayAbility_FireOnce::FireShot()
 				SpawnTargetActor();
 			}
 
+			auto LineTraceActor = Cast<ATargetActor_LineTrace>(TargetActor);
+			if (LineTraceActor)
+			{
+				auto Character = Cast<APlayerCharacter>(GetSourceObject(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()));
+				check(Character);
+
+				const FVector StartTrace = Character->GetFirstPersonCamera()->GetComponentLocation();
+				const float Spread = Character->GetEquipmentComponent()->GetSpread();
+				const float HalfConeAngleDeg = FMath::Lerp(0.01, 20.f, Spread);
+				const FVector DeviationVector = FMath::VRandCone(Character->GetBaseAimRotation().Vector(), FMath::DegreesToRadians(HalfConeAngleDeg));
+				const FVector EndTrace = StartTrace + DeviationVector * TraceLength;
+
+				LineTraceActor->Configure(StartTrace, EndTrace, BULLET_TRACE_COLLISION);
+			}
+
 			auto PlayerCharacter = Cast<APlayerCharacter>(GetActorInfo().AvatarActor);
 			if (PlayerCharacter)
 			{
 				auto EquipmentComponent = PlayerCharacter->GetEquipmentComponent();
 				if (EquipmentComponent)
 				{
-					EquipmentComponent->AddSpread(0.1f); // todo: magic number
+					EquipmentComponent->AddSpread(0.1f); // todo: magic number. maybe we can even not to pass a parameter
 				}
 			}
 
@@ -48,10 +65,11 @@ void UGameplayAbility_FireOnce::SpawnTargetActor()
 {
 	if (!TargetActor)
 	{
+		AGameplayAbilityTargetActor* SpawnedActor = nullptr;
+
 		UAbilityTask_WaitTargetData* SpawnTargetActorTask =
 			UAbilityTask_WaitTargetData::WaitTargetData(this, NAME_None, EGameplayTargetingConfirmation::Instant, ATargetActor_LineTrace::StaticClass());
-
-		AGameplayAbilityTargetActor* SpawnedActor;
+		
 		SpawnTargetActorTask->BeginSpawningActor(this, ATargetActor_LineTrace::StaticClass(), SpawnedActor);
 		SpawnTargetActorTask->FinishSpawningActor(this, SpawnedActor);
 

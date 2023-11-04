@@ -42,6 +42,7 @@ void UEquipmentComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	const double OwnerSpeedSquared = PlayerCharacterOwner->GetVelocity().SquaredLength();
 
 	TargetSpread = OwnerSpeedSquared > 0.f ? CurrentWeaponStats.WalkSpread : CurrentWeaponStats.StandSpread;
+	TargetMaxSpread = OwnerSpeedSquared > 0.f ? CurrentWeaponStats.MaxWalkSpread : CurrentWeaponStats.MaxStandSpread;
 	Spread = TargetSpread + AddedSpread;
 
 	AddedSpread = FMath::FInterpConstantTo(AddedSpread, 0.f, DeltaTime, CurrentWeaponStats.SpreadDecay);
@@ -161,7 +162,7 @@ void UEquipmentComponent::ReloadAmmo()
 
 void UEquipmentComponent::AddSpread(float InSpread)
 {
-	AddedSpread += InSpread;
+	AddedSpread = FMath::Clamp(AddedSpread + InSpread, 0.f, TargetMaxSpread);
 	OnSpreadAdded.ExecuteIfBound(InSpread);
 }
 
