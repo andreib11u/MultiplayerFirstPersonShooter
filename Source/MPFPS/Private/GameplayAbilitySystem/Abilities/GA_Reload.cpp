@@ -25,7 +25,7 @@ void UGA_Reload::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 
 	FGameplayTagContainer EventTags;
 	EventTags.AddTag(ReloadEventTag);
-	UAbilityTask_PlayMontageForMesh* PlayFirstPersonMontage = UAbilityTask_PlayMontageForMesh::PlayMontageForMeshAndWaitForEvent(
+	PlayFirstPersonMontage = UAbilityTask_PlayMontageForMesh::PlayMontageForMeshAndWaitForEvent(
 		this, NAME_None, PlayerCharacter->GetFirstPersonMesh(), FirstPersonReloadMontage, EventTags, 1.f, NAME_None, false, 1.f, false);
 
 	if (!PlayFirstPersonMontage)
@@ -47,16 +47,33 @@ bool UGA_Reload::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 									const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags,
 									FGameplayTagContainer* OptionalRelevantTags) const
 {
+	UE_LOG(LogTemp, Warning, TEXT("Reload CanActivateAbility"))
 	if (auto EquipmentComponent = ActorInfo->AvatarActor->FindComponentByClass<UEquipmentComponent>())
 	{
 		const bool bHasWeaponInHands = EquipmentComponent->GetCurrentItem()->IsA<UWeapon>();
 		const bool bHasReserveAmmo = EquipmentComponent->GetCurrentReserveAmmo() > 0.f;
 		const bool bMaxClipAmmo = EquipmentComponent->IsMaxClipAmmo();
 
+		UE_LOG(LogTemp, Warning, TEXT("Reload CanActivateAbility is %s"), bHasReserveAmmo && bHasWeaponInHands && !bMaxClipAmmo ? TEXT("true") : TEXT("false"))
+
 		return bHasReserveAmmo && bHasWeaponInHands && !bMaxClipAmmo;
 	}
 
 	return false;
+}
+
+void UGA_Reload::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
+{
+	Super::InputPressed(Handle, ActorInfo, ActivationInfo);
+
+	ActivateAbility(Handle, ActorInfo, ActivationInfo, nullptr);
+
+}
+
+void UGA_Reload::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility, bool bWasCancelled)
+{
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void UGA_Reload::OnMontageCancelled(FGameplayTag EventTag, FGameplayEventData EventData)
@@ -76,6 +93,7 @@ void UGA_Reload::OnEventReceived(FGameplayTag EventTag, FGameplayEventData Event
 		UEquipmentComponent* EquipmentComponent = GetCurrentActorInfo()->AvatarActor->FindComponentByClass<UEquipmentComponent>();
 		if (!EquipmentComponent)
 		{
+			PlayFirstPersonMontage->EventReceived.RemoveDynamic(this, &UGA_Reload::OnEventReceived);
 			EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, true);
 			return;
 		}

@@ -13,7 +13,6 @@ DEFINE_LOG_CATEGORY_STATIC(LogShootAbility, All, All);
 void UGA_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 								const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Shoot ActivateAbility"))
 	if (auto PlayerCharacter = Cast<APlayerCharacter>(ActorInfo->AvatarActor))
 	{
 		auto Weapon = Cast<UWeapon>(PlayerCharacter->GetEquipmentComponent()->GetCurrentItem());

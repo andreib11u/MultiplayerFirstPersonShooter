@@ -17,47 +17,41 @@ void UGameplayAbility_FireOnce::FireShot()
 {
 	if (GetActorInfo().IsLocallyControlledPlayer())
 	{
-		const float ShotTime = GetWorld()->GetTimeSeconds();
-		const float ShotTimeDifference = ShotTime - LastShotTime;
-
-		if (ShotTimeDifference > TimeBetweenShots)
+		if (!TargetActor)
 		{
-			if (!TargetActor)
-			{
-				SpawnTargetActor();
-			}
-
-			auto LineTraceActor = Cast<ATargetActor_LineTrace>(TargetActor);
-			if (LineTraceActor)
-			{
-				auto Character = Cast<APlayerCharacter>(GetSourceObject(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()));
-				check(Character);
-
-				const FVector StartTrace = Character->GetFirstPersonCamera()->GetComponentLocation();
-				const float Spread = Character->GetEquipmentComponent()->GetSpread();
-				const float HalfConeAngleDeg = FMath::Lerp(0.01, 20.f, Spread);
-				const FVector DeviationVector = FMath::VRandCone(Character->GetBaseAimRotation().Vector(), FMath::DegreesToRadians(HalfConeAngleDeg));
-				const FVector EndTrace = StartTrace + DeviationVector * TraceLength;
-
-				LineTraceActor->Configure(StartTrace, EndTrace, BULLET_TRACE_COLLISION);
-			}
-
-			auto PlayerCharacter = Cast<APlayerCharacter>(GetActorInfo().AvatarActor);
-			if (PlayerCharacter)
-			{
-				auto EquipmentComponent = PlayerCharacter->GetEquipmentComponent();
-				if (EquipmentComponent)
-				{
-					EquipmentComponent->AddSpread(0.1f); // todo: magic number. maybe we can even not to pass a parameter
-				}
-			}
-
-			WaitTargetDataTask = UAbilityTask_WaitTargetDataUsingActor::WaitTargetDataWithReusableActor(
-				this, NAME_None, EGameplayTargetingConfirmation::Instant, TargetActor, true);
-
-			WaitTargetDataTask->ValidData.AddDynamic(this, &UGameplayAbility_FireOnce::OnValidDataAcquired);
-			WaitTargetDataTask->Activate();
+			SpawnTargetActor();
 		}
+
+		auto LineTraceActor = Cast<ATargetActor_LineTrace>(TargetActor);
+		if (LineTraceActor)
+		{
+			auto Character = Cast<APlayerCharacter>(GetSourceObject(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()));
+			check(Character);
+
+			const FVector StartTrace = Character->GetFirstPersonCamera()->GetComponentLocation();
+			const float Spread = Character->GetEquipmentComponent()->GetSpread();
+			const float HalfConeAngleDeg = FMath::Lerp(0.01, 20.f, Spread);
+			const FVector DeviationVector = FMath::VRandCone(Character->GetBaseAimRotation().Vector(), FMath::DegreesToRadians(HalfConeAngleDeg));
+			const FVector EndTrace = StartTrace + DeviationVector * TraceLength;
+
+			LineTraceActor->Configure(StartTrace, EndTrace, BULLET_TRACE_COLLISION);
+		}
+
+		auto PlayerCharacter = Cast<APlayerCharacter>(GetActorInfo().AvatarActor);
+		if (PlayerCharacter)
+		{
+			auto EquipmentComponent = PlayerCharacter->GetEquipmentComponent();
+			if (EquipmentComponent)
+			{
+				EquipmentComponent->AddSpread(0.1f); // todo: magic number. maybe we can even not to pass a parameter
+			}
+		}
+
+		WaitTargetDataTask = UAbilityTask_WaitTargetDataUsingActor::WaitTargetDataWithReusableActor(
+			this, NAME_None, EGameplayTargetingConfirmation::Instant, TargetActor, true);
+
+		WaitTargetDataTask->ValidData.AddDynamic(this, &UGameplayAbility_FireOnce::OnValidDataAcquired);
+		WaitTargetDataTask->Activate();
 	}
 }
 
@@ -67,9 +61,9 @@ void UGameplayAbility_FireOnce::SpawnTargetActor()
 	{
 		AGameplayAbilityTargetActor* SpawnedActor = nullptr;
 
-		UAbilityTask_WaitTargetData* SpawnTargetActorTask =
-			UAbilityTask_WaitTargetData::WaitTargetData(this, NAME_None, EGameplayTargetingConfirmation::Instant, ATargetActor_LineTrace::StaticClass());
-		
+		UAbilityTask_WaitTargetData* SpawnTargetActorTask = UAbilityTask_WaitTargetData::WaitTargetData(
+			this, NAME_None, EGameplayTargetingConfirmation::Instant, ATargetActor_LineTrace::StaticClass());
+
 		SpawnTargetActorTask->BeginSpawningActor(this, ATargetActor_LineTrace::StaticClass(), SpawnedActor);
 		SpawnTargetActorTask->FinishSpawningActor(this, SpawnedActor);
 
@@ -80,8 +74,6 @@ void UGameplayAbility_FireOnce::SpawnTargetActor()
 void UGameplayAbility_FireOnce::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 												const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	UE_LOG(LogTemp, Warning, TEXT("FireOnce ActivateAbility"))
-
 	SpawnTargetActor();
 
 	ServerWaitForClientDataTask = UAbilityTask_ServerWaitForClientData::ServerWaitForClientTargetData(this, NAME_None, false);
@@ -94,9 +86,18 @@ void UGameplayAbility_FireOnce::ActivateAbility(const FGameplayAbilitySpecHandle
 bool UGameplayAbility_FireOnce::CheckCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 										  FGameplayTagContainer* OptionalRelevantTags) const
 {
+	if (!GetCurrentActorInfo())
+	{
+		return false;
+	}
+
+	if (!GetCurrentActorInfo()->AvatarActor.IsValid())
+	{
+		return false;
+	}
+
 	if (auto EquipmentComponent = GetCurrentActorInfo()->AvatarActor->FindComponentByClass<UEquipmentComponent>())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("FireOnce CheckCost: %i"), EquipmentComponent->GetCurrentClipAmmo() > 0.f)
 		return EquipmentComponent->GetCurrentClipAmmo() > 0.f;
 	}
 
@@ -114,8 +115,8 @@ bool UGameplayAbility_FireOnce::CommitAbilityCost(const FGameplayAbilitySpecHand
 	return true;
 }
 
-void UGameplayAbility_FireOnce::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
-	bool bReplicateEndAbility, bool bWasCancelled)
+void UGameplayAbility_FireOnce::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+										   const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
 	if (ServerWaitForClientDataTask)
 	{
@@ -136,7 +137,6 @@ void UGameplayAbility_FireOnce::OnValidDataAcquired(const FGameplayAbilityTarget
 		Parameters.EffectCauser = GetAvatarActorFromActorInfo();
 		Parameters.Location = DataPtr->GetEndPoint();
 
-		
 		// apply damage
 		auto AbilitySystemInterface = Cast<IAbilitySystemInterface>(DataPtr->GetHitResult()->GetActor());
 		if (AbilitySystemInterface)
