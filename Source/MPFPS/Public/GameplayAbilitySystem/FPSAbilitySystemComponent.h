@@ -111,11 +111,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "GameplayCue", Meta = (AutoCreateRefTerm = "GameplayCueParameters", GameplayTagFilter = "GameplayCue"))
 	void RemoveGameplayCueLocal(const FGameplayTag GameplayCueTag, const FGameplayCueParameters& GameplayCueParameters);
 
+	virtual void AbilityLocalInputPressedQueued(int32 InputID);
+	virtual void AbilityLocalInputReleasedQueued(int32 InputID);
+
 	// Returns the current animating ability
 	UGameplayAbility* GetAnimatingAbilityFromAnyMesh();
 
 	FGameplayAbilityLocalAnimMontageForMesh& GetLocalAnimMontageInfoForMesh(USkeletalMeshComponent* InMesh);
 	FGameplayAbilityRepAnimMontageForMesh& GetGameplayAbilityRepAnimMontageForMesh(USkeletalMeshComponent* InMesh);
+
 
 private:
 	// Data structure for montages that were instigated locally (everything if server, predictive if client. replicated if simulated proxy)
@@ -128,10 +132,15 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_ReplicatedAnimMontageForMesh)
 	TArray<FGameplayAbilityRepAnimMontageForMesh> RepAnimMontageInfoForMeshes;
 
+	int32 QueuedInputID = INDEX_NONE;
+	FDelegateHandle ActivateQueuedAbilityDelegateHandle;
+
 	UFUNCTION()
 	virtual void OnRep_ReplicatedAnimMontageForMesh();
 
 	virtual bool IsReadyForReplicatedMontageForMesh();
+
+	void ActivateQueuedAbility(const FAbilityEndedData& AbilityEndedData);
 };
 
 template <typename AttributeSet>

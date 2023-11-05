@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "FPSGameplayAbility.h"
+#include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
 #include "GA_Shoot.generated.h"
 
 /**
@@ -23,6 +24,9 @@ public:
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 							const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
+	virtual void InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+							  const FGameplayAbilityActivationInfo ActivationInfo) override;
+
 private:
 	UPROPERTY(EditAnywhere, meta = (GameplayTagFilter = "Weapon.FireMode"))
 	FGameplayTag SemiAutoTag = FGameplayTag::RequestGameplayTag("Weapon.FireMode.SemiAuto");
@@ -34,13 +38,19 @@ private:
 
 	UPROPERTY()
 	class UGameplayAbility_FireOnce* SingleShotAbilityInstance;
+	UPROPERTY()
+	class UAbilityTask_WaitDelay* WaitDelayTask;
+	UPROPERTY()
+	UAbilityTask_WaitInputRelease* WaitInputReleaseTask;
+
+	float LastShotTime = -9999.f;
 
 	UFUNCTION()
 	void OnInputRelease(float TimeHeld);
 	UFUNCTION()
 	void OnShotCooldownExpired();
 
-	void EndBothAbilities();
+	void EndShootAbilities();
 
 	FGameplayAbilitySpecHandle SingleShotAbilitySpecHandle;
 	UPROPERTY(EditAnywhere)

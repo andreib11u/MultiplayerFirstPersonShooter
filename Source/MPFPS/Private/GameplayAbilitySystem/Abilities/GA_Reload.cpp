@@ -47,14 +47,11 @@ bool UGA_Reload::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 									const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags,
 									FGameplayTagContainer* OptionalRelevantTags) const
 {
-	UE_LOG(LogTemp, Warning, TEXT("Reload CanActivateAbility"))
 	if (auto EquipmentComponent = ActorInfo->AvatarActor->FindComponentByClass<UEquipmentComponent>())
 	{
 		const bool bHasWeaponInHands = EquipmentComponent->GetCurrentItem()->IsA<UWeapon>();
 		const bool bHasReserveAmmo = EquipmentComponent->GetCurrentReserveAmmo() > 0.f;
 		const bool bMaxClipAmmo = EquipmentComponent->IsMaxClipAmmo();
-
-		UE_LOG(LogTemp, Warning, TEXT("Reload CanActivateAbility is %s"), bHasReserveAmmo && bHasWeaponInHands && !bMaxClipAmmo ? TEXT("true") : TEXT("false"))
 
 		return bHasReserveAmmo && bHasWeaponInHands && !bMaxClipAmmo;
 	}
@@ -65,9 +62,6 @@ bool UGA_Reload::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 void UGA_Reload::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
 	Super::InputPressed(Handle, ActorInfo, ActivationInfo);
-
-	ActivateAbility(Handle, ActorInfo, ActivationInfo, nullptr);
-
 }
 
 void UGA_Reload::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,

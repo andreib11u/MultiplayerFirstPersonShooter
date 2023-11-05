@@ -280,6 +280,71 @@ void UFPSAbilitySystemComponent::RemoveGameplayCueLocal(const FGameplayTag Gamep
 																			GameplayCueParameters);
 }
 
+void UFPSAbilitySystemComponent::AbilityLocalInputPressedQueued(int32 InputID)
+{
+	// Consume the input if this InputID is overloaded with GenericConfirm/Cancel and the GenericConfim/Cancel callback is bound
+	if (IsGenericConfirmInputBound(InputID))
+	{
+		LocalInputConfirm();
+		return;
+	}
+
+	if (IsGenericCancelInputBound(InputID))
+	{
+		LocalInputCancel();
+		return;
+	}
+
+	// ---------------------------------------------------------
+
+	ABILITYLIST_SCOPE_LOCK();
+	for (FGameplayAbilitySpec& Spec : ActivatableAbilities.Items)
+	{
+		if (Spec.InputID == InputID)
+		{
+			if (Spec.Ability)
+			{
+				Spec.InputPressed = true;
+				if (Spec.IsActive())
+				{
+					if (Spec.Ability->bReplicateInputDirectly && IsOwnerActorAuthoritative() == false)
+					{
+						ServerSetInputPressed(Spec.Handle);
+					}
+
+					AbilitySpecInputPressed(Spec);
+
+					// Invoke the InputPressed event. This is not replicated here. If someone is listening, they may replicate the InputPressed event
+					// to the server.
+					InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputPressed, Spec.Handle,
+										  Spec.ActivationInfo.GetActivationPredictionKey());
+				}
+				else
+				{
+					// Ability is not active, so try to activate it
+					TryActivateAbility(Spec.Handle);
+
+					QueuedInputID = InputID;
+
+					OnAbilityEnded.Remove(ActivateQueuedAbilityDelegateHandle);
+					ActivateQueuedAbilityDelegateHandle = OnAbilityEnded.AddUObject(this, &UFPSAbilitySystemComponent::ActivateQueuedAbility);
+				}
+			}
+		}
+	}
+}
+
+void UFPSAbilitySystemComponent::AbilityLocalInputReleasedQueued(int32 InputID)
+{
+	AbilityLocalInputReleased(InputID);
+
+	if (QueuedInputID == InputID && ActivateQueuedAbilityDelegateHandle.IsValid())
+	{
+		OnAbilityEnded.Remove(ActivateQueuedAbilityDelegateHandle);
+		QueuedInputID = INDEX_NONE;
+	}
+}
+
 UGameplayAbility* UFPSAbilitySystemComponent::GetAnimatingAbilityFromAnyMesh()
 {
 	// Only one ability can be animating for all meshes
@@ -483,4 +548,13 @@ bool UFPSAbilitySystemComponent::IsReadyForReplicatedMontageForMesh()
 {
 	/** Children may want to override this for additional checks (e.g, "has skin been applied") */
 	return true;
+}
+
+void UFPSAbilitySystemComponent::ActivateQueuedAbility(const FAbilityEndedData& AbilityEndedData)
+{
+	auto FPSAbility = Cast<UFPSGameplayAbility>(AbilityEndedData.AbilityThatEnded);
+	if (QueuedInputID != INDEX_NONE && (FPSAbility && QueuedInputID != static_cast<int32>(FPSAbility->GetAbilityInput())))
+	{
+		AbilityLocalInputPressedQueued(QueuedInputID);
+	}
 }

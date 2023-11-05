@@ -18,6 +18,17 @@ void UGA_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 		auto Weapon = Cast<UWeapon>(PlayerCharacter->GetEquipmentComponent()->GetCurrentItem());
 		if (!Weapon)
 		{
+			CancelAbility(Handle, ActorInfo, ActivationInfo, true);
+			return;
+		}
+
+		const float ShotTime = GetWorld()->GetTimeSeconds();
+		const float ShotTimeDifference = ShotTime - LastShotTime;
+		LastShotTime = ShotTime;
+
+		if (ShotTimeDifference < Weapon->WeaponStats.ShotCooldown)
+		{
+			CancelAbility(Handle, ActorInfo, ActivationInfo, true);
 			return;
 		}
 
@@ -47,7 +58,7 @@ void UGA_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 				return;
 			}
 
-			UAbilityTask_WaitInputRelease* WaitInputReleaseTask = UAbilityTask_WaitInputRelease::WaitInputRelease(this, true);
+			WaitInputReleaseTask = UAbilityTask_WaitInputRelease::WaitInputRelease(this, true);
 			if (!WaitInputReleaseTask)
 			{
 				UE_LOG(LogShootAbility, Warning, TEXT("Couldn't create WaitInputRelease task. Ability is canceled"));
@@ -59,7 +70,7 @@ void UGA_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 			WaitInputReleaseTask->OnRelease.AddDynamic(this, &UGA_Shoot::OnInputRelease);
 			WaitInputReleaseTask->Activate();
 
-			UAbilityTask_WaitDelay* WaitDelayTask = UAbilityTask_WaitDelay::WaitDelay(this, ShotCooldown);
+			WaitDelayTask = UAbilityTask_WaitDelay::WaitDelay(this, ShotCooldown);
 			if (!WaitDelayTask)
 			{
 				UE_LOG(LogShootAbility, Warning, TEXT("Couldn't create WaitDelay task. Ability is canceled"));
@@ -96,15 +107,24 @@ void UGA_Shoot::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGamep
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UGA_Shoot::OnInputRelease(float TimeHeld)
+void UGA_Shoot::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
-	EndBothAbilities();
+	Super::InputPressed(Handle, ActorInfo, ActivationInfo);
+
 }
 
-void UGA_Shoot::EndBothAbilities()
+void UGA_Shoot::OnInputRelease(float TimeHeld)
 {
-	SingleShotAbilityInstance->CancelAbility(SingleShotAbilitySpecHandle, SingleShotAbilityInstance->GetCurrentActorInfo(),
-											 SingleShotAbilityInstance->GetCurrentActivationInfo(), true);
+	EndShootAbilities();
+}
+
+void UGA_Shoot::EndShootAbilities()
+{
+	if (SingleShotAbilityInstance)
+	{
+		SingleShotAbilityInstance->CancelAbility(SingleShotAbilitySpecHandle, SingleShotAbilityInstance->GetCurrentActorInfo(),
+												 SingleShotAbilityInstance->GetCurrentActivationInfo(), true);
+	}
 
 	EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
 }
@@ -114,13 +134,13 @@ void UGA_Shoot::OnShotCooldownExpired()
 	if (CheckCost(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), nullptr))
 	{
 		SingleShotAbilityInstance->FireShot();
-		UAbilityTask_WaitDelay* WaitDelayTask = UAbilityTask_WaitDelay::WaitDelay(this, ShotCooldown);
+		WaitDelayTask = UAbilityTask_WaitDelay::WaitDelay(this, ShotCooldown);
 
 		WaitDelayTask->OnFinish.AddDynamic(this, &UGA_Shoot::OnShotCooldownExpired);
 		WaitDelayTask->Activate();
 	}
 	else
 	{
-		EndBothAbilities();
+		EndShootAbilities();
 	}
 }

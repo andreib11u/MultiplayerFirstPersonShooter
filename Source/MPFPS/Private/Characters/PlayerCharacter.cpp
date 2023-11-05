@@ -282,12 +282,12 @@ void APlayerCharacter::Move(const FInputActionValue& InputActionValue)
 
 void APlayerCharacter::PrimaryActionPressed()
 {
-	AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityInput::PrimaryAction));
+	AbilitySystemComponent->AbilityLocalInputPressedQueued(static_cast<int32>(EAbilityInput::PrimaryAction));
 }
 
 void APlayerCharacter::PrimaryActionReleased()
 {
-	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInput::PrimaryAction));
+	AbilitySystemComponent->AbilityLocalInputReleasedQueued(static_cast<int32>(EAbilityInput::PrimaryAction));
 }
 
 void APlayerCharacter::SecondaryActionPressed()
