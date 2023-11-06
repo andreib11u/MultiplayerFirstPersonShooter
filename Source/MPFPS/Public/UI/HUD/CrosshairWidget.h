@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffectTypes.h"
+#include "Characters/PlayerCharacter.h"
 #include "UI/FPSUserWidget.h"
 #include "CrosshairWidget.generated.h"
 
+class UImage;
 class UEquipmentComponent;
 class UBorder;
 class UFPSAbilitySystemComponent;
@@ -22,9 +24,12 @@ public:
 	void SetTargetSpread(float InSpread);
 	void AddSpread(float InSpread);
 
+	void ChangeColor(FLinearColor Color);
+
 protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
+	void UpdateColorWithTargetAttitude();
 private:
 	UPROPERTY(meta = (BindWidget))
 	UBorder* Right;
@@ -35,12 +40,26 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UBorder* Up;
 
+	UPROPERTY(meta = (BindWidget))
+	UImage* RightImage;
+	UPROPERTY(meta = (BindWidget))
+	UImage* LeftImage;
+	UPROPERTY(meta = (BindWidget))
+	UImage* DownImage;
+	UPROPERTY(meta = (BindWidget))
+	UImage* UpImage;
+
+	UPROPERTY()
+	APlayerCharacter* PlayerCharacter;
+
 	void CalculateCrosshairPosition();
 
 	TInterval<float> RightPositions;
 	TInterval<float> LeftPositions;
 	TInterval<float> DownPositions;
 	TInterval<float> UpPositions;
+
+	FLinearColor CrosshairColor;
 
 	UPROPERTY()
 	UEquipmentComponent* EquipmentComponent;

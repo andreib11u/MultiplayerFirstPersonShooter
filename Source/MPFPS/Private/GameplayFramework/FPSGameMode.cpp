@@ -6,6 +6,7 @@
 #include "Characters/PlayerCharacter.h"
 #include "GameFramework/PlayerStart.h"
 #include "GameplayFramework/FPSPlayerController.h"
+#include "Settings/FPSSettings.h"
 
 static int32 PlayerIndex = 0;
 
@@ -38,4 +39,11 @@ void AFPSGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	GetWorld()->SpawnActor<AActor>(*ActorToSpawn, FVector{1300.f, 1140.f, 70.f}, FRotator());
+}
+
+void AFPSGameMode::StartPlay()
+{
+	Super::StartPlay();
+
+	FGenericTeamId::SetAttitudeSolver(&UFPSSettings::GetAttitude);
 }

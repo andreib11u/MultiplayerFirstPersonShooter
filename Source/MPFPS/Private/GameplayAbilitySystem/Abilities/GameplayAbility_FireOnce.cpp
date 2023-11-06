@@ -148,7 +148,6 @@ void UGameplayAbility_FireOnce::OnValidDataAcquired(const FGameplayAbilityTarget
 			Parameters.EffectContext = EffectSpec.Data.Get()->GetEffectContext();
 			Parameters.EffectContext.AddHitResult(*DataPtr->GetHitResult());
 
-			EffectSpec.Data.Get()->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag("Value.Damage"), 15.f);
 			AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
 		}
 

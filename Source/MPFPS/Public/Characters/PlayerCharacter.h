@@ -25,6 +25,7 @@ class USkeletalMeshComponent;
 UCLASS()
 class MPFPS_API APlayerCharacter : public ABaseCharacter, public IAbilitySystemInterface
 {
+private:
 	GENERATED_BODY()
 
 public:
@@ -37,6 +38,7 @@ public:
 
 	USkeletalMeshComponent* GetFirstPersonWeaponMesh() const { return FirstPersonWeaponMeshComponent; }
 	USkeletalMeshComponent* GetThirdPersonWeaponMesh() const { return ThirdPersonWeaponMeshComponent; }
+
 
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;

@@ -80,8 +80,16 @@ void ABaseCharacter::GrantAbilities()
 			}
 		}
 	}
+}
 
-	
+void ABaseCharacter::SetGenericTeamId(const FGenericTeamId& TeamID)
+{
+	Team = static_cast<EFPSTeam>(TeamID.GetId());
+}
+
+FGenericTeamId ABaseCharacter::GetGenericTeamId() const
+{
+	return static_cast<uint8>(Team);
 }
 
 void ABaseCharacter::BeginPlay()

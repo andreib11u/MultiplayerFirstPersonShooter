@@ -15,19 +15,19 @@ UCLASS()
 class MPFPS_API AFPSGameMode : public AGameMode
 {
 	GENERATED_BODY()
-public:
+protected:
 	virtual APawn* SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot) override;
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
 	virtual void BeginPlay() override;
+	virtual void StartPlay() override;
 
+private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AActor> ActorToSpawn;
 
 	FOnPlayerPawnSpawned OnPlayerPawnSpawned;
 
-private:
 	UPROPERTY()
 	TArray<APawn*> AlivePlayerPawns;
-
 };
