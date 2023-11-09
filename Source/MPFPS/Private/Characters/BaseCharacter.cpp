@@ -72,7 +72,8 @@ void ABaseCharacter::GrantAbilities()
 
 		for (TSubclassOf<UFPSGameplayAbility> Ability : Abilities)
 		{
-			FGameplayAbilitySpec Spec = FGameplayAbilitySpec(Ability, 1, 0, this);
+			auto AbilityCDO = Cast<UFPSGameplayAbility>(Ability->GetDefaultObject());
+			FGameplayAbilitySpec Spec = FGameplayAbilitySpec(Ability, 1, static_cast<int32>(AbilityCDO->GetAbilityInput()), this);
 
 			if (ensure(AbilitySystemComponent))
 			{

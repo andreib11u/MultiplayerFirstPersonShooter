@@ -51,7 +51,7 @@ void UGameplayAbility_FireOnce::FireShot()
 			this, NAME_None, EGameplayTargetingConfirmation::Instant, TargetActor, true);
 
 		WaitTargetDataTask->ValidData.AddDynamic(this, &UGameplayAbility_FireOnce::OnValidDataAcquired);
-		WaitTargetDataTask->Activate();
+		WaitTargetDataTask->ReadyForActivation();
 	}
 }
 
@@ -78,7 +78,7 @@ void UGameplayAbility_FireOnce::ActivateAbility(const FGameplayAbilitySpecHandle
 
 	ServerWaitForClientDataTask = UAbilityTask_ServerWaitForClientData::ServerWaitForClientTargetData(this, NAME_None, false);
 	ServerWaitForClientDataTask->ValidData.AddDynamic(this, &UGameplayAbility_FireOnce::OnValidDataAcquired);
-	ServerWaitForClientDataTask->Activate();
+	ServerWaitForClientDataTask->ReadyForActivation();
 
 	FireShot();
 }

@@ -49,6 +49,15 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UImage* UpImage;
 
+	UPROPERTY(EditAnywhere)
+	FLinearColor ColorFriendly = FLinearColor::Green;
+	UPROPERTY(EditAnywhere)
+	FLinearColor ColorEnemy = FLinearColor::Red;
+	UPROPERTY(EditAnywhere)
+	FLinearColor OrdinaryCrosshairColor = FLinearColor::White;
+
+	FLinearColor CurrentCrosshairColor;
+
 	UPROPERTY()
 	APlayerCharacter* PlayerCharacter;
 
@@ -58,8 +67,6 @@ private:
 	TInterval<float> LeftPositions;
 	TInterval<float> DownPositions;
 	TInterval<float> UpPositions;
-
-	FLinearColor CrosshairColor;
 
 	UPROPERTY()
 	UEquipmentComponent* EquipmentComponent;

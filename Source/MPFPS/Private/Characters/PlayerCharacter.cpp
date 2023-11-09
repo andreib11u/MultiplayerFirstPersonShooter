@@ -124,6 +124,9 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 
 	EquipmentComponent->SetAbilitySystemComponent(AbilitySystemComponent);
 
+	AbilitySystemComponent->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &APlayerCharacter::OnGameplayEffectAdded);
+	AbilitySystemComponent->OnAnyGameplayEffectRemovedDelegate().AddUObject(this, &APlayerCharacter::OnGameplayEffectRemoved);
+
 	GrantAbilities();
 
 	InitializeAttributes();
@@ -146,6 +149,8 @@ void APlayerCharacter::OnItemChanged(UEquippableItem* Item)
 			FirstPersonWeaponMeshComponent->SetSkeletalMesh(Item->GetItemMesh());
 			FirstPersonWeaponMeshComponent->SetRelativeLocation(Item->FirstPersonLocation);
 			FirstPersonWeaponMeshComponent->SetRelativeRotation(Item->FirstPersonRotation);
+
+			FirstPersonMesh->SetRelativeLocation(Item->ArmsMeshRelativeLocation);
 		}
 		else
 		{
@@ -180,6 +185,8 @@ void APlayerCharacter::OnRep_PlayerState()
 	AbilitySystemComponent->InitAbilityActorInfo(FPSPlayerState, this);
 
 	EquipmentComponent->SetAbilitySystemComponent(AbilitySystemComponent);
+	AbilitySystemComponent->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &APlayerCharacter::OnGameplayEffectAdded);
+	AbilitySystemComponent->OnAnyGameplayEffectRemovedDelegate().AddUObject(this, &APlayerCharacter::OnGameplayEffectRemoved);
 
 	InitializeAttributes();
 }
@@ -252,6 +259,37 @@ void APlayerCharacter::ShowDebugSpreadCone(float HalfConeDeg)
 	}
 }
 #endif // WITH_EDITOR
+
+void APlayerCharacter::OnGameplayEffectAdded(UAbilitySystemComponent* InAbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec,
+											 FActiveGameplayEffectHandle ActiveGameplayEffectHandle)
+{
+	if (AimingEffect)
+	{
+		if (GameplayEffectSpec.Def->IsA(AimingEffect))
+		{
+			auto CurrentWeapon = Cast<UWeapon>(EquipmentComponent->GetCurrentItem());
+			if (CurrentWeapon)
+			{
+				FirstPersonMesh->SetRelativeLocation(CurrentWeapon->ArmsMeshRelativeLocationWhenAiming);
+			}
+		}
+	}
+}
+
+void APlayerCharacter::OnGameplayEffectRemoved(const FActiveGameplayEffect& ActiveGameplayEffect)
+{
+	if (AimingEffect)
+	{
+		if (ActiveGameplayEffect.Spec.Def->IsA(AimingEffect))
+		{
+			auto CurrentWeapon = Cast<UWeapon>(EquipmentComponent->GetCurrentItem());
+			if (CurrentWeapon)
+			{
+				FirstPersonMesh->SetRelativeLocation(CurrentWeapon->ArmsMeshRelativeLocation);
+			}
+		}
+	}
+}
 
 void APlayerCharacter::Tick(float DeltaSeconds)
 {

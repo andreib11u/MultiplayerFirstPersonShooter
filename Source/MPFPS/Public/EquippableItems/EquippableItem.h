@@ -37,4 +37,9 @@ public:
 	FVector FirstPersonLocation;
 	UPROPERTY(EditAnywhere)
 	FRotator FirstPersonRotation;
+
+	UPROPERTY(EditAnywhere)
+	FVector ArmsMeshRelativeLocation;
+	UPROPERTY(EditAnywhere)
+	FVector ArmsMeshRelativeLocationWhenAiming;
 };

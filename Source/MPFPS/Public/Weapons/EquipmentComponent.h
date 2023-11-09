@@ -97,7 +97,7 @@ private:
 	FWeaponStats CurrentWeaponStats;
 
 	UPROPERTY(EditAnywhere)
-	FGameplayTag WeaponIsFiringTag = FGameplayTag::RequestGameplayTag("Weapon.IsFiring");
+	FGameplayTag WeaponIsFiringTag = FGameplayTag::RequestGameplayTag("Weapon.State.IsFiring");
 
 	UPROPERTY()
 	UAbilitySystemComponent* AbilitySystemComponent;

@@ -64,3 +64,13 @@ public:
 	{
 	}
 };
+
+USTRUCT()
+struct FWeaponStateAnimations
+{
+	GENERATED_BODY()
+public:
+	//UPROPERTY(EditAnywhere)
+
+};
+

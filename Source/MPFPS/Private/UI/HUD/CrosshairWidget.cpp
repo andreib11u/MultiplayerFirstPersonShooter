@@ -41,9 +41,9 @@ void UCrosshairWidget::AddSpread(float InSpread)
 
 void UCrosshairWidget::ChangeColor(FLinearColor Color)
 {
-	if (CrosshairColor != Color)
+	if (CurrentCrosshairColor != Color)
 	{
-		CrosshairColor = Color;
+		CurrentCrosshairColor = Color;
 		RightImage->SetColorAndOpacity(Color);
 		LeftImage->SetColorAndOpacity(Color);
 		UpImage->SetColorAndOpacity(Color);
@@ -67,7 +67,7 @@ void UCrosshairWidget::UpdateColorWithTargetAttitude()
 	UKismetSystemLibrary::LineTraceMulti(GetWorld(), TraceStart, TraceEnd, TraceType, true, ActorsToIgnore, EDrawDebugTrace::None,
 	                                                  HitResults, true);
 
-	ChangeColor(FLinearColor::White);
+	ChangeColor(OrdinaryCrosshairColor);
 
 	if (!HitResults.IsEmpty())
 	{
@@ -75,11 +75,11 @@ void UCrosshairWidget::UpdateColorWithTargetAttitude()
 		{
 			if (GenericTeamAgentInterface->GetTeamAttitudeTowards(*HitResults[0].GetActor()) == ETeamAttitude::Hostile)
 			{
-				ChangeColor(FLinearColor::Red);
+				ChangeColor(ColorEnemy);
 			}
 			if (GenericTeamAgentInterface->GetTeamAttitudeTowards(*HitResults[0].GetActor()) == ETeamAttitude::Friendly)
 			{
-				ChangeColor(FLinearColor::Green);
+				ChangeColor(ColorFriendly);
 			}
 		}
 	}

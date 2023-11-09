@@ -57,7 +57,7 @@ void UGA_ZombieAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 
 	PlayMontageTask->OnCompleted.AddDynamic(this, &UGA_ZombieAttack::OnMontageCompleted);
 
-	PlayMontageTask->Activate();
+	PlayMontageTask->ReadyForActivation();
 }
 
 void UGA_ZombieAttack::Cancel()

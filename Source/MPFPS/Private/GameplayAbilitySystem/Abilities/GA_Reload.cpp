@@ -21,7 +21,7 @@ void UGA_Reload::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 	UAbilityTask_PlayMontageForMesh* PlayThirdPersonMontageTask = UAbilityTask_PlayMontageForMesh::PlayMontageForMeshAndWaitForEvent(
 		this, NAME_None, PlayerCharacter->GetMesh(), ThirdPersonReloadMontage, FGameplayTagContainer(), 1.f, NAME_None, false);
 
-	PlayThirdPersonMontageTask->Activate();
+	PlayThirdPersonMontageTask->ReadyForActivation();
 
 	FGameplayTagContainer EventTags;
 	EventTags.AddTag(ReloadEventTag);
@@ -40,7 +40,7 @@ void UGA_Reload::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
 	PlayFirstPersonMontage->OnCompleted.AddDynamic(this, &UGA_Reload::OnMontageCompleted);
 	PlayFirstPersonMontage->EventReceived.AddDynamic(this, &UGA_Reload::OnEventReceived);
 
-	PlayFirstPersonMontage->Activate();
+	PlayFirstPersonMontage->ReadyForActivation();
 }
 
 bool UGA_Reload::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,

@@ -39,7 +39,6 @@ public:
 	USkeletalMeshComponent* GetFirstPersonWeaponMesh() const { return FirstPersonWeaponMeshComponent; }
 	USkeletalMeshComponent* GetThirdPersonWeaponMesh() const { return ThirdPersonWeaponMeshComponent; }
 
-
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void PossessedBy(AController* NewController) override;
@@ -73,12 +72,19 @@ private:
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* ThirdPersonWeaponMeshComponent;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UGameplayEffect> AimingEffect;
+
 	UFUNCTION()
 	void OnItemChanged(UEquippableItem* Item);
 
 #if WITH_EDITOR
 	void ShowDebugSpreadCone(float HalfConeDeg);
 #endif
+
+	void OnGameplayEffectAdded(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec,
+							   FActiveGameplayEffectHandle ActiveGameplayEffectHandle);
+	void OnGameplayEffectRemoved(const FActiveGameplayEffect& ActiveGameplayEffect);
 
 	// Input callbacks
 
