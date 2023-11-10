@@ -1,6 +1,5 @@
 // Copyright Andrei Bondarenko 2023
 
-
 #include "Weapons/EquipmentComponent.h"
 
 #include "Characters/PlayerCharacter.h"
@@ -39,10 +38,18 @@ void UEquipmentComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	const double OwnerSpeedSquared = PlayerCharacterOwner->GetVelocity().SquaredLength();
+	if (PlayerCharacterOwner->GetAbilitySystemComponent()->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Weapon.State.Aiming")))
+	{
+		TargetSpread = CurrentWeaponStats.AimSpread;
+	}
+	else
+	{
+		const double OwnerSpeedSquared = PlayerCharacterOwner->GetVelocity().SquaredLength();
 
-	TargetSpread = OwnerSpeedSquared > 0.f ? CurrentWeaponStats.WalkSpread : CurrentWeaponStats.StandSpread;
-	TargetMaxSpread = OwnerSpeedSquared > 0.f ? CurrentWeaponStats.MaxWalkSpread : CurrentWeaponStats.MaxStandSpread;
+		TargetSpread = OwnerSpeedSquared > 0.f ? CurrentWeaponStats.WalkSpread : CurrentWeaponStats.StandSpread;
+		TargetMaxSpread = OwnerSpeedSquared > 0.f ? CurrentWeaponStats.MaxWalkSpread : CurrentWeaponStats.MaxStandSpread;
+	}
+	
 	Spread = TargetSpread + AddedSpread;
 
 	AddedSpread = FMath::FInterpConstantTo(AddedSpread, 0.f, DeltaTime, CurrentWeaponStats.SpreadDecay);
@@ -136,7 +143,7 @@ void UEquipmentComponent::BeginPlay()
 	PlayerCharacterOwner = Cast<APlayerCharacter>(GetOwner());
 	checkf(PlayerCharacterOwner, TEXT("EquipmentComponent attached not to a APlayerCharacter"))
 
-	OwnerMovement = PlayerCharacterOwner->GetCharacterMovement();
+		OwnerMovement = PlayerCharacterOwner->GetCharacterMovement();
 }
 
 void UEquipmentComponent::SpendAmmo(float Ammo)
@@ -173,8 +180,11 @@ void UEquipmentComponent::ReloadAmmo()
 
 void UEquipmentComponent::AddSpread(float InSpread)
 {
-	AddedSpread = FMath::Clamp(AddedSpread + InSpread, 0.f, TargetMaxSpread);
-	OnSpreadAdded.ExecuteIfBound(InSpread);
+	if (!PlayerCharacterOwner->GetAbilitySystemComponent()->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Weapon.State.Aiming")))
+	{
+		AddedSpread = FMath::Clamp(AddedSpread + InSpread, 0.f, TargetMaxSpread);
+		OnSpreadAdded.ExecuteIfBound(InSpread);
+	}
 }
 
 void UEquipmentComponent::SetCurrentClipAmmo(float Ammo)
@@ -188,4 +198,3 @@ void UEquipmentComponent::SetCurrentReserveAmmo(float Ammo)
 	CurrentReserveAmmo = Ammo;
 	OnCurrentReserveAmmoChanged.Broadcast(CurrentReserveAmmo);
 }
-

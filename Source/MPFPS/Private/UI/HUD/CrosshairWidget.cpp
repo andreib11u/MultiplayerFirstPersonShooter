@@ -27,6 +27,12 @@ void UCrosshairWidget::Init(UEquipmentComponent* Equipment)
 	check(PlayerCharacter);
 
 	SetTargetSpread(EquipmentComponent->GetSpread());
+
+	if (UAbilitySystemComponent* AbilitySystemComponent = PlayerCharacter->GetAbilitySystemComponent())
+	{
+		AbilitySystemComponent->RegisterGameplayTagEvent(FGameplayTag::RequestGameplayTag("Weapon.State.Aiming"))
+			.AddUObject(this, &UCrosshairWidget::OnAimingTagChanged);
+	}
 }
 
 void UCrosshairWidget::SetTargetSpread(float InSpread)
@@ -64,8 +70,7 @@ void UCrosshairWidget::UpdateColorWithTargetAttitude()
 	ActorsToIgnore.Add(PlayerCharacter);
 	TArray<FHitResult> HitResults;
 
-	UKismetSystemLibrary::LineTraceMulti(GetWorld(), TraceStart, TraceEnd, TraceType, true, ActorsToIgnore, EDrawDebugTrace::None,
-	                                                  HitResults, true);
+	UKismetSystemLibrary::LineTraceMulti(GetWorld(), TraceStart, TraceEnd, TraceType, true, ActorsToIgnore, EDrawDebugTrace::None, HitResults, true);
 
 	ChangeColor(OrdinaryCrosshairColor);
 
@@ -126,4 +131,16 @@ void UCrosshairWidget::CalculateCrosshairPosition()
 void UCrosshairWidget::OnSpreadAdded(float AddedSpread)
 {
 	AddSpread(AddedSpread);
+}
+
+void UCrosshairWidget::OnAimingTagChanged(FGameplayTag GameplayTag, int32 Count)
+{
+	if (Count > 0)
+	{
+		SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		SetVisibility(ESlateVisibility::HitTestInvisible);
+	}
 }

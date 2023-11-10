@@ -28,7 +28,7 @@ public:
 	float ShotCooldown;
 
 	UPROPERTY(EditAnywhere)
-	float StandSpread = 0.01f;
+	float StandSpread = 0.1f;
 	UPROPERTY(EditAnywhere)
 	float MaxStandSpread = 0.2f;
 	UPROPERTY(EditAnywhere)
@@ -37,6 +37,8 @@ public:
 	float MaxWalkSpread = 0.5f;
 	UPROPERTY(EditAnywhere)
 	float SpreadDecay = 0.5f;
+	UPROPERTY(EditAnywhere)
+	float AimSpread = 0.01;
 	UPROPERTY(EditAnywhere)
 	float Range = 9999.f;
 };

@@ -78,4 +78,5 @@ private:
 	float TargetSpread = 0.1f;
 
 	void OnSpreadAdded(float AddedSpread);
+	void OnAimingTagChanged(FGameplayTag GameplayTag, int32 Count);
 };

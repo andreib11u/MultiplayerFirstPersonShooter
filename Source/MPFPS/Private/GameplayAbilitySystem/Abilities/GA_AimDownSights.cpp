@@ -20,6 +20,12 @@ void UGA_AimDownSights::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		return;
 	}
 
+	if (!OwnerCharacter->GetEquipmentComponent()->GetCurrentWeapon())
+	{
+		CancelAbility(Handle, ActorInfo, ActivationInfo, true);
+		return;
+	}
+
 	InitialFOV = OwnerCharacter->GetFirstPersonCamera()->FieldOfView;
 
 	if (AimingEffect)
@@ -77,9 +83,7 @@ void UGA_AimDownSights::OnTargetFOVReached()
 
 void UGA_AimDownSights::ChangeFOVTick(float DeltaTime, float CurrentFOV)
 {
-	// todo gradually decrease/increase gun accuracy
-
-	/*const float FOVAlpha = (CurrentFOV - TargetFOV) / (InitialFOV - TargetFOV);
+	const float FOVAlpha = (CurrentFOV - TargetFOV) / (InitialFOV - TargetFOV);
 
 	UE_LOG(LogTemp, Warning, TEXT("fovalpha: %f"), FOVAlpha)
 
@@ -89,7 +93,7 @@ void UGA_AimDownSights::ChangeFOVTick(float DeltaTime, float CurrentFOV)
 	FVector IntermediateLocation =
 		Weapon->ArmsMeshRelativeLocationWhenAiming + FOVAlpha * (Weapon->ArmsMeshRelativeLocation - Weapon->ArmsMeshRelativeLocationWhenAiming);
 
-	OwnerCharacter->GetFirstPersonMesh()->SetRelativeLocation(IntermediateLocation);*/
+	OwnerCharacter->GetFirstPersonMesh()->SetRelativeLocation(IntermediateLocation);
 }
 
 void UGA_AimDownSights::OnInitialFOVReached()
