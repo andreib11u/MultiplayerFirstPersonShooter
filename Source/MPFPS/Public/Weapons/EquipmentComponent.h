@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
 #include "Types/FPSTypes.h"
@@ -37,6 +38,7 @@ public:
 	void EquipItem(const int32 ItemIndex);
 	void EquipItem(UEquippableItem* Item);
 	UEquippableItem* GetCurrentItem() const { return CurrentItem; }
+	UWeapon* GetCurrentWeapon() const { return Cast<UWeapon>(CurrentItem); }
 
 	void AddWeapon(TSubclassOf<UEquippableItem> ItemClass);
 
@@ -105,6 +107,8 @@ private:
 	APlayerCharacter* PlayerCharacterOwner;
 	UPROPERTY()
 	UCharacterMovementComponent* OwnerMovement;
+	UPROPERTY()
+	FGameplayAbilitySpecHandle CurrentWeaponAbilityHandle;
 
 	UFUNCTION()
 	void OnRep_CurrentClipAmmo();

@@ -5,6 +5,7 @@
 #include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
 #include "Characters/PlayerCharacter.h"
 #include "GameplayAbilitySystem/AbilityTasks/WaitChangeFOVTask.h"
+#include "Weapons/EquipmentComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogAimDownSightsAbility, All, All);
 
@@ -58,7 +59,7 @@ void UGA_AimDownSights::InputPressed(const FGameplayAbilitySpecHandle Handle, co
 	{
 		WaitChangeFOVTask->EndTask();
 	}
-	
+
 	WaitInputReleaseTask = UAbilityTask_WaitInputRelease::WaitInputRelease(this, true);
 	WaitInputReleaseTask->OnRelease.AddDynamic(this, &UGA_AimDownSights::OnInputRelease);
 	WaitInputReleaseTask->ReadyForActivation();
@@ -77,7 +78,18 @@ void UGA_AimDownSights::OnTargetFOVReached()
 void UGA_AimDownSights::ChangeFOVTick(float DeltaTime, float CurrentFOV)
 {
 	// todo gradually decrease/increase gun accuracy
-	UE_LOG(LogTemp, Warning, TEXT("CurrentFOV: %f"), CurrentFOV)
+
+	/*const float FOVAlpha = (CurrentFOV - TargetFOV) / (InitialFOV - TargetFOV);
+
+	UE_LOG(LogTemp, Warning, TEXT("fovalpha: %f"), FOVAlpha)
+
+	UEquipmentComponent* Equipment = OwnerCharacter->GetEquipmentComponent();
+	UWeapon* Weapon = Equipment->GetCurrentWeapon();
+
+	FVector IntermediateLocation =
+		Weapon->ArmsMeshRelativeLocationWhenAiming + FOVAlpha * (Weapon->ArmsMeshRelativeLocation - Weapon->ArmsMeshRelativeLocationWhenAiming);
+
+	OwnerCharacter->GetFirstPersonMesh()->SetRelativeLocation(IntermediateLocation);*/
 }
 
 void UGA_AimDownSights::OnInitialFOVReached()
@@ -101,5 +113,4 @@ void UGA_AimDownSights::OnInputRelease(float TimeHeld)
 	{
 		AbilitySystemComponent->RemoveActiveGameplayEffect(ActiveAimingEffectSpec);
 	}
-
 }

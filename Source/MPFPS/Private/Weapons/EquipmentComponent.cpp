@@ -68,6 +68,17 @@ void UEquipmentComponent::EquipItem(const int32 ItemIndex)
 
 void UEquipmentComponent::EquipItem(UEquippableItem* Item)
 {
+	if (CurrentItem)
+	{
+		if (GetOwner()->HasAuthority())
+		{
+			if (AbilitySystemComponent)
+			{
+				AbilitySystemComponent->ClearAbility(CurrentWeaponAbilityHandle);
+			}
+		}
+	}
+
 	CurrentItem = Item;
 
 	if (CurrentItem)
@@ -81,7 +92,7 @@ void UEquipmentComponent::EquipItem(UEquippableItem* Item)
 			{
 				FGameplayAbilitySpec Spec =
 					FGameplayAbilitySpec(CurrentItem->GetAbility(), 1, static_cast<int32>(EAbilityInput::PrimaryAction), GetOwner());
-				AbilitySystemComponent->GiveAbility(Spec);
+				CurrentWeaponAbilityHandle = AbilitySystemComponent->GiveAbility(Spec);
 			}
 		}
 	}
