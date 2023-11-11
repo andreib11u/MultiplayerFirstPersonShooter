@@ -9,12 +9,14 @@
 #include "UI/HUD/CrosshairWidget.h"
 #include "UI/HUD/DamageDirectionIndicatorWidget.h"
 #include "UI/HUD/HealthBarWidget.h"
+#include "UI/HUD/MoneyWidget.h"
 #include "Weapons/EquipmentComponent.h"
 #include "Weapons/Weapon.h"
 
 void UHUDWidget::Init(UFPSAbilitySystemComponent* AbilitySystemComponent)
 {
 	HealthBarWidget->Init(AbilitySystemComponent);
+	MoneyWidget->Init(AbilitySystemComponent);
 
 	CharacterOwner = Cast<APlayerCharacter>(AbilitySystemComponent->GetAvatarActor());
 	check(CharacterOwner);

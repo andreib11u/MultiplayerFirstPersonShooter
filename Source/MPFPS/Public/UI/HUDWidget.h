@@ -7,6 +7,7 @@
 #include "UI/FPSUserWidget.h"
 #include "HUDWidget.generated.h"
 
+class UMoneyWidget;
 class UCrosshairWidget;
 class APlayerCharacter;
 class UCanvasPanel;
@@ -39,6 +40,8 @@ private:
 	UCanvasPanel* HUDCanvas;
 	UPROPERTY(meta = (BindWidget))
 	UCrosshairWidget* Crosshair;
+	UPROPERTY(meta = (BindWidget))
+	UMoneyWidget* MoneyWidget;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UDamageDirectionIndicatorWidget> DamageDirectionIndicatorClass;

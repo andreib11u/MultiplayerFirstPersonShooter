@@ -103,6 +103,12 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(InputActions->Reload, ETriggerEvent::Started, this, &APlayerCharacter::ReloadPressed);
 		EnhancedInputComponent->BindAction(InputActions->Reload, ETriggerEvent::Completed, this, &APlayerCharacter::ReloadReleased);
 	}
+
+	if (InputActions->Use)
+	{
+		EnhancedInputComponent->BindAction(InputActions->Use, ETriggerEvent::Started, this, &APlayerCharacter::UsePressed);
+		EnhancedInputComponent->BindAction(InputActions->Use, ETriggerEvent::Completed, this, &APlayerCharacter::UseReleased);
+	}
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -346,4 +352,14 @@ void APlayerCharacter::ReloadPressed()
 void APlayerCharacter::ReloadReleased()
 {
 	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInput::Reload));
+}
+
+void APlayerCharacter::UsePressed()
+{
+	AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityInput::Interact));
+}
+
+void APlayerCharacter::UseReleased()
+{
+	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInput::Interact));
 }

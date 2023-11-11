@@ -40,6 +40,8 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayEffect> DamageEffect;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UGameplayEffect> AddMoneyEffect;
 
 	UPROPERTY(EditAnywhere, meta = (Categories = "GameplayCue"))
 	FGameplayTag ShotGameplayCue = FGameplayTag::RequestGameplayTag("GameplayCue.Shooting.BulletImpact");

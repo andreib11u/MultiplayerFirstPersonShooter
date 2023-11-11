@@ -19,6 +19,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attributes")
 	FGameplayAttributeData Spread;
 	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Spread)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attributes", ReplicatedUsing = OnRep_Money)
+	FGameplayAttributeData Money;
+	ATTRIBUTE_ACCESSORS(UPlayerAttributeSet, Money)
+
+	UFUNCTION()
+	void OnRep_Money(const FGameplayAttributeData& OldMoney);
 
 	// Max/Min values
 

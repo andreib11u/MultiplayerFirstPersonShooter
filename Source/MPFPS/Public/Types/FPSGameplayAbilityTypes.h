@@ -11,5 +11,6 @@ enum class EAbilityInput
 	None,
 	PrimaryAction,
 	SecondaryAction,
-	Reload
+	Reload,
+	Interact
 };

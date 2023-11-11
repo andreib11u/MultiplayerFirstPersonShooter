@@ -56,6 +56,8 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TArray<TSubclassOf<UFPSGameplayAbility>> Abilities;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UGameplayEffect> DeathEffect;
 
 	UPROPERTY(EditAnywhere, Category = "Team", meta = (AllowPrivateAccess = "true"))
 	EFPSTeam Team;

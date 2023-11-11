@@ -127,6 +127,18 @@ void ABaseCharacter::Death()
 
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetCollisionResponseToChannel(BULLET_TRACE_COLLISION, ECR_Ignore);
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	if (auto AbilitySystemInterface = Cast<IAbilitySystemInterface>(this))
+	{
+		auto AbilitySystemComponent = Cast<UFPSAbilitySystemComponent>(AbilitySystemInterface->GetAbilitySystemComponent());
+		if (!AbilitySystemComponent)
+		{
+			return;
+		}
+
+		AbilitySystemComponent->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag("Character.State.Dead"));
+	}
 }

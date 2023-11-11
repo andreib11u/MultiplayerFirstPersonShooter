@@ -9,6 +9,7 @@
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_ServerWaitForClientData.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitTargetDataUsingActor.h"
+#include "GameplayAbilitySystem/AttributeSets/BaseAttributeSet.h"
 #include "GameplayAbilitySystem/TargetActors/TargetActor_LineTrace.h"
 #include "Types/CollisionTypes.h"
 #include "Weapons/EquipmentComponent.h"
@@ -141,14 +142,22 @@ void UGameplayAbility_FireOnce::OnValidDataAcquired(const FGameplayAbilityTarget
 		auto AbilitySystemInterface = Cast<IAbilitySystemInterface>(DataPtr->GetHitResult()->GetActor());
 		if (AbilitySystemInterface)
 		{
-			UAbilitySystemComponent* AbilitySystemComponent = AbilitySystemInterface->GetAbilitySystemComponent();
+			UAbilitySystemComponent* TargetAbilitySystemComponent = AbilitySystemInterface->GetAbilitySystemComponent();
 
 			const FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(DamageEffect);
 
 			Parameters.EffectContext = EffectSpec.Data.Get()->GetEffectContext();
 			Parameters.EffectContext.AddHitResult(*DataPtr->GetHitResult());
 
-			AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
+			TargetAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
+			auto BaseAttributeSet = Cast<UBaseAttributeSet>(TargetAbilitySystemComponent->GetAttributeSet(UBaseAttributeSet::StaticClass()));
+
+			if (BaseAttributeSet->GetCurrentHealth() == 0.f) // todo: check for dead
+			{
+				FGameplayEffectSpecHandle AddMoneyEffectSpec = MakeOutgoingGameplayEffectSpec(AddMoneyEffect);
+				AddMoneyEffectSpec.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag("Value.Money"), 50.f);
+				GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*AddMoneyEffectSpec.Data.Get());
+			}
 		}
 
 		auto AbilitySystemComponent = Cast<UFPSAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());

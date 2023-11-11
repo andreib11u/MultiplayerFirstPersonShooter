@@ -97,4 +97,6 @@ private:
 	void SecondaryActionReleased();
 	void ReloadPressed();
 	void ReloadReleased();
+	void UsePressed();
+	void UseReleased();
 };

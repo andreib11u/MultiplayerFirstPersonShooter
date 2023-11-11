@@ -9,4 +9,5 @@
 
 #define BULLET_TRACE_COLLISION ECC_GameTraceChannel2
 #define ONLY_PLAYER_COLLISION ECC_GameTraceChannel4
+#define INTERACTION_TRACE_COLLISION ECC_GameTraceChannel5
 
