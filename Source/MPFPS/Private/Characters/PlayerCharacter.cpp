@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
+#include "GameplayAbilitySystem/Abilities/FPSGameplayAbility.h"
 #include "GameplayFramework/FPSPlayerState.h"
 #include "Input/InputDataAsset.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -307,6 +308,19 @@ void APlayerCharacter::InitializeAttributes()
 {
 	Super::InitializeAttributes();
 
+}
+
+void APlayerCharacter::GrantAbilities()
+{
+	Super::GrantAbilities();
+
+	if (AbilitySystemComponent && InitialWeaponAbility)
+	{
+		auto AbilityCDO = Cast<UFPSGameplayAbility>(InitialWeaponAbility->GetDefaultObject());
+		FGameplayAbilitySpec Spec = FGameplayAbilitySpec(InitialWeaponAbility, 1, static_cast<int32>(AbilityCDO->GetAbilityInput()), this);
+
+		AbilitySystemComponent->GiveAbilityAndActivateOnce(Spec);
+	}
 }
 
 void APlayerCharacter::Look(const FInputActionValue& InputActionValue)

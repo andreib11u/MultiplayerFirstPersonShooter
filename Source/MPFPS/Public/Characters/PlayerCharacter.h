@@ -49,6 +49,8 @@ protected:
 
 	virtual void InitializeAttributes() override;
 
+	virtual void GrantAbilities() override;
+
 private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	class UInputDataAsset* InputActions;
@@ -72,8 +74,11 @@ private:
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* ThirdPersonWeaponMeshComponent;
 
+
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayEffect> AimingEffect;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UFPSGameplayAbility> InitialWeaponAbility;
 
 	UFUNCTION()
 	void OnItemChanged(UEquippableItem* Item);
