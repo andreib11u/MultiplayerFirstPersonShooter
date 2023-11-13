@@ -19,6 +19,6 @@ void UGA_GiveWeapon::ActivateAbility(const FGameplayAbilitySpecHandle Handle, co
 	else
 	{
 		CancelAbility(Handle, ActorInfo, ActivationInfo, true);
-		UE_LOG(LogGiveWeaponAbility, Error, TEXT("GiveWeapon ability tried to activate on non-PlayerCharacter actor"))
+		UE_LOG(LogGiveWeaponAbility, Error, TEXT("%s ability tried to activate on non-PlayerCharacter actor"), *GetName())
 	}
 }

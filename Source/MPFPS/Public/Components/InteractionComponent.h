@@ -18,6 +18,10 @@ public:
 	TSubclassOf<UFPSGameplayAbility> GetInteractionAbility() const { return InteractionAbility; }
 	bool IsInstant() const { return bInstant; }
 	float GetActivationTime() const { return ActivationTime; }
+	FText GetInteractionText() const { return InteractionText; }
+
+	float GetProgress() const { return InteractionProgress; }
+	void SetInteractionProgress(float Progress) { InteractionProgress = Progress; }
 
 protected:
 	virtual void PostInitProperties() override;
@@ -32,4 +36,9 @@ private:
 
 	UPROPERTY(EditAnywhere, meta = (EditCondition = "!bInstant", EditConditionHides, Units = "s", ClampMin = "0"))
 	float ActivationTime = 1.f;
+
+	UPROPERTY(EditAnywhere)
+	FText InteractionText;
+
+	float InteractionProgress = 0.f;
 };

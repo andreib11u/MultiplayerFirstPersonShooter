@@ -9,6 +9,7 @@
 #include "UI/HUD/CrosshairWidget.h"
 #include "UI/HUD/DamageDirectionIndicatorWidget.h"
 #include "UI/HUD/HealthBarWidget.h"
+#include "UI/HUD/InteractionWidget.h"
 #include "UI/HUD/MoneyWidget.h"
 #include "Weapons/EquipmentComponent.h"
 #include "Weapons/Weapon.h"
@@ -20,6 +21,8 @@ void UHUDWidget::Init(UFPSAbilitySystemComponent* AbilitySystemComponent)
 
 	CharacterOwner = Cast<APlayerCharacter>(AbilitySystemComponent->GetAvatarActor());
 	check(CharacterOwner);
+
+	InteractionWidget->Init(CharacterOwner);
 
 	if (auto EquipmentComponent = AbilitySystemComponent->GetAvatarActor()->FindComponentByClass<UEquipmentComponent>())
 	{
@@ -62,16 +65,15 @@ void UHUDWidget::DisplayDamageDirectionIndicators()
 
 	for (auto DamageDirectionWidget : DamageDirectionWidgets)
 	{
-		if (DamageDirectionWidget.Key)
+		if (!DamageDirectionWidget.Key)
 		{
-			if (DamageDirectionWidget.Value->IsActive())
-			{
-				DamageDirectionWidget.Value->CalculateTransform();
-			}
-			else
-			{
-				DamageDirectionIndicators.Remove(DamageDirectionWidget.Key);
-			}
+			DamageDirectionIndicators.Remove(DamageDirectionWidget.Key);
+			continue;
+		}
+
+		if (DamageDirectionWidget.Value->IsActive())
+		{
+			DamageDirectionWidget.Value->CalculateTransform();
 		}
 		else
 		{

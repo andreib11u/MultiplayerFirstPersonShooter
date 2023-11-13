@@ -5,7 +5,7 @@
 #include "Components/SphereComponent.h"
 
 void APickup::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-                             bool bFromSweep, const FHitResult& SweepResult)
+							 bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (auto OverlappedPlayerCharacter = Cast<APlayerCharacter>(OtherActor))
 	{
@@ -41,16 +41,18 @@ void APickup::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	const float Time = GetGameTimeSinceCreation();
-	const float Sin = FMath::Sin(Time);
-	const FVector Location = GetActorLocation();
-	SetActorLocation({Location.X, Location.Y, InitialLocationZ + Sin * ZMaxOffset});
+	if (IsRotating)
+	{
+		const float Time = GetGameTimeSinceCreation();
+		const float Sin = FMath::Sin(Time);
+		const FVector Location = GetActorLocation();
+		SetActorLocation({ Location.X, Location.Y, InitialLocationZ + Sin * ZMaxOffset });
 
-	const FRotator Rotation = GetActorRotation();
-	SetActorRotation(FRotator{Rotation.Pitch, Rotation.Yaw + DeltaTime * RotationSpeed, Rotation.Roll});
+		const FRotator Rotation = GetActorRotation();
+		SetActorRotation(FRotator{ Rotation.Pitch, Rotation.Yaw + DeltaTime * RotationSpeed, Rotation.Roll });
+	}
 }
 
 void APickup::OnPickup(APlayerCharacter* PlayerCharacter)
 {
-	
 }

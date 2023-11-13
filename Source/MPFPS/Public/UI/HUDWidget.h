@@ -7,6 +7,7 @@
 #include "UI/FPSUserWidget.h"
 #include "HUDWidget.generated.h"
 
+class UInteractionWidget;
 class UMoneyWidget;
 class UCrosshairWidget;
 class APlayerCharacter;
@@ -28,6 +29,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AddDamageDirectionIndicator(AActor* DamageCauser);
 
+	UInteractionWidget* GetInteractionWidget() const { return InteractionWidget; }
+
 protected:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
@@ -42,6 +45,8 @@ private:
 	UCrosshairWidget* Crosshair;
 	UPROPERTY(meta = (BindWidget))
 	UMoneyWidget* MoneyWidget;
+	UPROPERTY(meta = (BindWidget))
+	UInteractionWidget* InteractionWidget;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UDamageDirectionIndicatorWidget> DamageDirectionIndicatorClass;

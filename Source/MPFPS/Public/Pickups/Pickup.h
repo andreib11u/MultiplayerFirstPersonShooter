@@ -30,6 +30,9 @@ private:
 	USphereComponent* Collision;
 
 	UPROPERTY(EditAnywhere)
+	bool IsRotating = true;
+
+	UPROPERTY(EditAnywhere)
 	float RotationSpeed = 20.f;
 
 	float InitialLocationZ;

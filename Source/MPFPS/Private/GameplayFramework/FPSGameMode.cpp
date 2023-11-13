@@ -37,8 +37,6 @@ AActor* AFPSGameMode::ChoosePlayerStart_Implementation(AController* Player)
 void AFPSGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-
-	GetWorld()->SpawnActor<AActor>(*ActorToSpawn, FVector{1300.f, 1140.f, 70.f}, FRotator());
 }
 
 void AFPSGameMode::StartPlay()

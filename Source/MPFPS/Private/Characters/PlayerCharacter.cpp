@@ -300,6 +300,7 @@ void APlayerCharacter::OnGameplayEffectRemoved(const FActiveGameplayEffect& Acti
 void APlayerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
 }
 
 void APlayerCharacter::InitializeAttributes()
@@ -323,7 +324,7 @@ void APlayerCharacter::Move(const FInputActionValue& InputActionValue)
 	AddMovementInput(GetActorRightVector(), Value.X);
 	AddMovementInput(GetActorForwardVector(), Value.Y);
 }
-
+// todo: change on two functions with payload instead
 void APlayerCharacter::PrimaryActionPressed()
 {
 	AbilitySystemComponent->AbilityLocalInputPressedQueued(static_cast<int32>(EAbilityInput::PrimaryAction));

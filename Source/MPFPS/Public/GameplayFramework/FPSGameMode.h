@@ -22,12 +22,4 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void StartPlay() override;
 
-private:
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<AActor> ActorToSpawn;
-
-	FOnPlayerPawnSpawned OnPlayerPawnSpawned;
-
-	UPROPERTY()
-	TArray<APawn*> AlivePlayerPawns;
 };
