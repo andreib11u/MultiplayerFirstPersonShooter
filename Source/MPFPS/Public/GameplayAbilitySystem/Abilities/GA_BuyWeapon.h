@@ -19,7 +19,13 @@ public:
 	virtual bool CheckCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 						   FGameplayTagContainer* OptionalRelevantTags) const override;
 
+	virtual bool CommitAbilityCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+								   const FGameplayAbilityActivationInfo ActivationInfo, FGameplayTagContainer* OptionalRelevantTags) override;
+
 private:
 	UPROPERTY(EditAnywhere)
 	float WeaponCost = 500.f;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UGameplayEffect> AddMoneyEffect;
 };

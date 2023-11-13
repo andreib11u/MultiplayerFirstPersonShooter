@@ -22,7 +22,7 @@ void UMoneyWidget::OnMoneyChanged(const FOnAttributeChangeData& OnAttributeChang
 		OverlayPanel->AddChildToOverlay(MoneyAdditionWidget);
 
 		FVector2D RenderTranslation = MoneyAdditionWidget->GetRenderTransform().Translation;
-		RenderTranslation.Y += -100.f;
+		RenderTranslation.Y += InitialRenderTranslationY;
 		MoneyAdditionWidget->SetRenderTranslation(RenderTranslation);
 		return;
 	}

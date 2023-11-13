@@ -12,6 +12,7 @@ void UGA_GiveWeapon::ActivateAbility(const FGameplayAbilitySpecHandle Handle, co
 {
 	if (auto PlayerCharacter = Cast<APlayerCharacter>(ActorInfo->AvatarActor))
 	{
+		CommitAbilityCost(Handle, ActorInfo, ActivationInfo);
 		PlayerCharacter->GetEquipmentComponent()->AddWeapon(Weapon);
 
 		UAbilityTask_PlayMontageForMesh* PlayThirdPersonMontageTask = UAbilityTask_PlayMontageForMesh::PlayMontageForMeshAndWaitForEvent(

@@ -36,6 +36,9 @@ private:
 	UPROPERTY()
 	UMoneyAdditionWidget* MoneyAdditionWidget;
 
+	UPROPERTY(EditAnywhere)
+	float InitialRenderTranslationY = -50.f;
+
 	UFUNCTION()
 	void MoneyAdditionAnimationEnded(int32 MoneyToAdd);
 };
