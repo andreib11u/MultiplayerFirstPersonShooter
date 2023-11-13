@@ -16,6 +16,8 @@ class MPFPS_API UGA_GiveWeapon : public UFPSGameplayAbility
 {
 	GENERATED_BODY()
 public:
+	UGA_GiveWeapon();
+
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 	                             const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 

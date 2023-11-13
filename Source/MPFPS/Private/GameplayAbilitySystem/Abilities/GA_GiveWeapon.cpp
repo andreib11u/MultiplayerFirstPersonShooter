@@ -7,8 +7,13 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogGiveWeaponAbility, All, All);
 
+UGA_GiveWeapon::UGA_GiveWeapon()
+{
+	bActivateWhenGranted = true;
+}
+
 void UGA_GiveWeapon::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-									 const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+                                     const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	if (auto PlayerCharacter = Cast<APlayerCharacter>(ActorInfo->AvatarActor))
 	{

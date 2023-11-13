@@ -49,8 +49,8 @@ void UGA_Interact::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 	WaitTargetDataTask->ReadyForActivation();
 }
 
-void UGA_Interact::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
-	bool bReplicateCancelAbility)
+void UGA_Interact::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+								 const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
 {
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 
@@ -151,7 +151,16 @@ void UGA_Interact::ActivateInteractionAbility()
 	if (InteractionAbility)
 	{
 		FGameplayAbilitySpec InteractionAbilitySpec = GetAbilitySystemComponentFromActorInfo()->BuildAbilitySpecFromClass(InteractionAbility);
-		GetAbilitySystemComponentFromActorInfo()->GiveAbilityAndActivateOnce(InteractionAbilitySpec);
+		if (GetCurrentActorInfo()->IsNetAuthority())
+		{
+			GetAbilitySystemComponentFromActorInfo()->GiveAbilityAndActivateOnce(InteractionAbilitySpec);
+		}
+		else
+		{
+			InteractionAbilitySpec.bActivateOnce = true;
+			GetAbilitySystemComponentFromActorInfo()->CallServerTryActivateAbility(
+				InteractionAbilitySpec.Handle, false, FPredictionKey::CreateNewPredictionKey(GetAbilitySystemComponentFromActorInfo()));
+		}
 
 		EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
 	}
@@ -179,12 +188,15 @@ void UGA_Interact::OnFirstValidDataAcquired(const FGameplayAbilityTargetDataHand
 	}
 	else
 	{
-		TickTask = UAbilityTask_Tick::AbilityTaskTick(this, NAME_None);
-		TickTask->OnTick.AddDynamic(this, &UGA_Interact::InteractTick);
-		TickTask->ReadyForActivation();
+		if (GetCurrentActorInfo()->IsLocallyControlled())
+		{
+			TickTask = UAbilityTask_Tick::AbilityTaskTick(this, NAME_None);
+			TickTask->OnTick.AddDynamic(this, &UGA_Interact::InteractTick);
+			TickTask->ReadyForActivation();
 
-		WaitInputReleaseTask = UAbilityTask_WaitInputRelease::WaitInputRelease(this, true);
-		WaitInputReleaseTask->OnRelease.AddDynamic(this, &UGA_Interact::OnInputRelease);
-		WaitInputReleaseTask->ReadyForActivation();
+			WaitInputReleaseTask = UAbilityTask_WaitInputRelease::WaitInputRelease(this, true);
+			WaitInputReleaseTask->OnRelease.AddDynamic(this, &UGA_Interact::OnInputRelease);
+			WaitInputReleaseTask->ReadyForActivation();
+		}
 	}
 }

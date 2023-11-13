@@ -38,6 +38,11 @@ void UEquipmentComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	if (!PlayerCharacterOwner->GetAbilitySystemComponent())
+	{
+		return;
+	}
+
 	if (PlayerCharacterOwner->GetAbilitySystemComponent()->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Weapon.State.Aiming")))
 	{
 		TargetSpread = CurrentWeaponStats.AimSpread;

@@ -319,7 +319,7 @@ void APlayerCharacter::GrantAbilities()
 		auto AbilityCDO = Cast<UFPSGameplayAbility>(InitialWeaponAbility->GetDefaultObject());
 		FGameplayAbilitySpec Spec = FGameplayAbilitySpec(InitialWeaponAbility, 1, static_cast<int32>(AbilityCDO->GetAbilityInput()), this);
 
-		AbilitySystemComponent->GiveAbilityAndActivateOnce(Spec);
+		AbilitySystemComponent->GiveAbility(Spec);
 	}
 }
 

@@ -50,11 +50,16 @@ public:
 
 	EAbilityInput GetAbilityInput() const { return AbilityInput; }
 
-private:
+protected:
+	virtual void OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
+
 	UPROPERTY(EditAnywhere)
 	EAbilityInput AbilityInput;
 
 	/** Active montages being played by this ability */
 	UPROPERTY()
 	TArray<FAbilityMeshMontage> CurrentAbilityMeshMontages;
+
+	UPROPERTY(EditAnywhere)
+	bool bActivateWhenGranted = false;
 };

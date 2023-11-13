@@ -50,3 +50,13 @@ bool UFPSGameplayAbility::FindAbilityMeshMontage(USkeletalMeshComponent* InMesh,
 
 	return false;
 }
+
+void UFPSGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+{
+	Super::OnAvatarSet(ActorInfo, Spec);
+
+	if (bActivateWhenGranted)
+	{
+		ActorInfo->AbilitySystemComponent->TryActivateAbility(Spec.Handle, false);
+	}
+}
