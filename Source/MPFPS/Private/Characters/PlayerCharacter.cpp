@@ -25,11 +25,11 @@ APlayerCharacter::APlayerCharacter()
 {
 	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>("FirstPersonCamera");
 	FirstPersonCamera->bUsePawnControlRotation = true;
-	FirstPersonCamera->SetRelativeLocation(FVector{-10.f, 0.f, 60.f});
+	FirstPersonCamera->SetRelativeLocation(FVector{ -10.f, 0.f, 60.f });
 	FirstPersonCamera->SetupAttachment(GetCapsuleComponent());
 
 	FirstPersonMesh = CreateDefaultSubobject<USkeletalMeshComponent>("FirstPersonMesh");
-	FirstPersonMesh->SetRelativeLocation(FVector{-30.f, 0.f, -151.32f});
+	FirstPersonMesh->SetRelativeLocation(FVector{ -30.f, 0.f, -151.32f });
 	FirstPersonMesh->SetCollisionProfileName("CharacterMesh");
 	FirstPersonMesh->CanCharacterStepUpOn = ECanBeCharacterBase::ECB_Yes;
 	FirstPersonMesh->CastShadow = false;
@@ -93,10 +93,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	if (InputActions->SecondaryAction)
 	{
-		EnhancedInputComponent->BindAction(InputActions->SecondaryAction, ETriggerEvent::Started, this,
-										   &APlayerCharacter::SecondaryActionPressed);
-		EnhancedInputComponent->BindAction(InputActions->SecondaryAction, ETriggerEvent::Completed, this,
-										   &APlayerCharacter::SecondaryActionReleased);
+		EnhancedInputComponent->BindAction(InputActions->SecondaryAction, ETriggerEvent::Started, this, &APlayerCharacter::SecondaryActionPressed);
+		EnhancedInputComponent->BindAction(InputActions->SecondaryAction, ETriggerEvent::Completed, this, &APlayerCharacter::SecondaryActionReleased);
 	}
 
 	if (InputActions->Reload)
@@ -238,7 +236,7 @@ void APlayerCharacter::ShowDebugSpreadCone(float HalfConeDeg)
 	{
 		FVector StartTrace = GetFirstPersonCamera()->GetComponentLocation();
 		StartTrace.X -= 1.f;
-		//const FVector DeviationVector = FMath::VRandCone(GetBaseAimRotation().Vector(), FMath::DegreesToRadians(45.f));
+		// const FVector DeviationVector = FMath::VRandCone(GetBaseAimRotation().Vector(), FMath::DegreesToRadians(45.f));
 
 		// get axes we need to rotate around
 		FMatrix const DirMat = FRotationMatrix(GetBaseAimRotation());
@@ -261,8 +259,8 @@ void APlayerCharacter::ShowDebugSpreadCone(float HalfConeDeg)
 		const ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(BULLET_TRACE_COLLISION);
 
 		TArray<FHitResult> LineTraceMultiResults;
-		UKismetSystemLibrary::LineTraceMulti(GetWorld(), StartTrace, EndTrace, TraceType, true, ActorsToIgnore,
-		                                     EDrawDebugTrace::ForOneFrame, LineTraceMultiResults, true, FLinearColor::Yellow);
+		UKismetSystemLibrary::LineTraceMulti(GetWorld(), StartTrace, EndTrace, TraceType, true, ActorsToIgnore, EDrawDebugTrace::ForOneFrame,
+											 LineTraceMultiResults, true, FLinearColor::Yellow);
 	}
 }
 #endif // WITH_EDITOR
@@ -277,7 +275,11 @@ void APlayerCharacter::OnGameplayEffectAdded(UAbilitySystemComponent* InAbilityS
 			auto CurrentWeapon = Cast<UWeapon>(EquipmentComponent->GetCurrentItem());
 			if (CurrentWeapon)
 			{
-				FirstPersonMesh->SetRelativeLocation(CurrentWeapon->ArmsMeshRelativeLocationWhenAiming);
+				int32 EffectStackCount = AbilitySystemComponent->GetGameplayEffectCount(GameplayEffectSpec.Def->GetClass(), nullptr);
+				if (EffectStackCount > 0)
+				{
+					FirstPersonMesh->SetRelativeLocation(CurrentWeapon->ArmsMeshRelativeLocationWhenAiming);
+				}
 			}
 		}
 	}
@@ -292,7 +294,11 @@ void APlayerCharacter::OnGameplayEffectRemoved(const FActiveGameplayEffect& Acti
 			auto CurrentWeapon = Cast<UWeapon>(EquipmentComponent->GetCurrentItem());
 			if (CurrentWeapon)
 			{
-				FirstPersonMesh->SetRelativeLocation(CurrentWeapon->ArmsMeshRelativeLocation);
+				int32 EffectStackCount = AbilitySystemComponent->GetGameplayEffectCount(ActiveGameplayEffect.Spec.Def->GetClass(), nullptr);
+				if (EffectStackCount < 1)
+				{
+					FirstPersonMesh->SetRelativeLocation(CurrentWeapon->ArmsMeshRelativeLocation);
+				}
 			}
 		}
 	}
@@ -301,13 +307,11 @@ void APlayerCharacter::OnGameplayEffectRemoved(const FActiveGameplayEffect& Acti
 void APlayerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
 }
 
 void APlayerCharacter::InitializeAttributes()
 {
 	Super::InitializeAttributes();
-
 }
 
 void APlayerCharacter::GrantAbilities()

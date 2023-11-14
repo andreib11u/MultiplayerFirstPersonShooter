@@ -39,6 +39,8 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayEffect> AttributeInitializationEffect;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UGameplayEffect> OnDeathEffect;
 
 	// attribute callbacks
 

@@ -58,4 +58,7 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float TraceLength = 9999.f;
+
+
+	TWeakObjectPtr<AActor> LastDeadTarget;
 };

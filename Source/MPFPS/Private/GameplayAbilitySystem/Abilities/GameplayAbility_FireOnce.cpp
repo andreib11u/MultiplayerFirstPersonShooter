@@ -152,8 +152,10 @@ void UGameplayAbility_FireOnce::OnValidDataAcquired(const FGameplayAbilityTarget
 			TargetAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
 			auto BaseAttributeSet = Cast<UBaseAttributeSet>(TargetAbilitySystemComponent->GetAttributeSet(UBaseAttributeSet::StaticClass()));
 
-			if (BaseAttributeSet->GetCurrentHealth() == 0.f) // todo: check for dead
+			if (BaseAttributeSet->GetCurrentHealth() == 0.f && GetCurrentActorInfo()->IsNetAuthority() &&
+				TargetAbilitySystemComponent->GetAvatarActor() != LastDeadTarget)
 			{
+				LastDeadTarget = TargetAbilitySystemComponent->GetAvatarActor();
 				FGameplayEffectSpecHandle AddMoneyEffectSpec = MakeOutgoingGameplayEffectSpec(AddMoneyEffect);
 				AddMoneyEffectSpec.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag("Value.Money"), 50.f);
 				GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*AddMoneyEffectSpec.Data.Get());

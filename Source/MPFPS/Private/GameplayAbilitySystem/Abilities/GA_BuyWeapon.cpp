@@ -19,7 +19,7 @@ bool UGA_BuyWeapon::CheckCost(const FGameplayAbilitySpecHandle Handle, const FGa
 
 		const UPlayerAttributeSet* PlayerAttributeSet = CastChecked<UPlayerAttributeSet>(AttributeSet);
 
-		return PlayerAttributeSet->GetMoney() > WeaponCost;
+		return PlayerAttributeSet->GetMoney() >= WeaponCost;
 	}
 
 	return false;
@@ -40,7 +40,7 @@ bool UGA_BuyWeapon::CommitAbilityCost(const FGameplayAbilitySpecHandle Handle, c
 
 		bool bHasEnoughMoney = PlayerAttributeSet->GetMoney() >= WeaponCost;
 
-		if (bHasEnoughMoney)
+		if (bHasEnoughMoney && ActorInfo->IsNetAuthority())
 		{
 			FGameplayEffectSpecHandle AddMoneyEffectSpec = MakeOutgoingGameplayEffectSpec(AddMoneyEffect);
 

@@ -9,7 +9,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogGiveWeaponAbility, All, All);
 
 UGA_GiveWeapon::UGA_GiveWeapon()
 {
-	bActivateWhenGranted = true;
+	bActivateWhenGranted = false;
 }
 
 void UGA_GiveWeapon::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,

@@ -4,8 +4,9 @@
 #include "AbilitySystemComponent.h"
 #include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
 #include "Characters/PlayerCharacter.h"
-#include "GameplayAbilitySystem/AbilityTasks/WaitChangeFOVTask.h"
+#include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitChangeFOV.h"
 #include "Weapons/EquipmentComponent.h"
+#include "Camera/CameraComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogAimDownSightsAbility, All, All);
 
@@ -45,17 +46,21 @@ void UGA_AimDownSights::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	WaitInputReleaseTask->OnRelease.AddDynamic(this, &UGA_AimDownSights::OnInputRelease);
 	WaitInputReleaseTask->ReadyForActivation();
 
-	WaitChangeFOVTask = UWaitChangeFOVTask::WaitChangeFOV(this, NAME_None, OwnerCharacter->GetFirstPersonCamera(), TargetFOV, InterpSpeed);
-	if (!WaitChangeFOVTask)
+	if (ActorInfo->IsLocallyControlled())
 	{
-		CancelAbility(Handle, ActorInfo, ActivationInfo, true);
-		UE_LOG(LogAimDownSightsAbility, Error, TEXT("Couldn't create WaitChangeFOVTask"))
-		return;
-	}
+		WaitChangeFOVTask =
+			UAbilityTask_WaitChangeFOV::WaitChangeFOV(this, NAME_None, OwnerCharacter->GetFirstPersonCamera(), TargetFOV, InterpSpeed);
+		if (!WaitChangeFOVTask)
+		{
+			CancelAbility(Handle, ActorInfo, ActivationInfo, true);
+			UE_LOG(LogAimDownSightsAbility, Error, TEXT("Couldn't create WaitChangeFOVTask"))
+			return;
+		}
 
-	WaitChangeFOVTask->OnTargetFOVReached.AddDynamic(this, &UGA_AimDownSights::OnTargetFOVReached);
-	WaitChangeFOVTask->OnChangeFOVTick.AddDynamic(this, &UGA_AimDownSights::ChangeFOVTick);
-	WaitChangeFOVTask->ReadyForActivation();
+		WaitChangeFOVTask->OnTargetFOVReached.AddDynamic(this, &UGA_AimDownSights::OnTargetFOVReached);
+		WaitChangeFOVTask->OnChangeFOVTick.AddDynamic(this, &UGA_AimDownSights::ChangeFOVTick);
+		WaitChangeFOVTask->ReadyForActivation();
+	}
 }
 
 void UGA_AimDownSights::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
@@ -70,22 +75,23 @@ void UGA_AimDownSights::InputPressed(const FGameplayAbilitySpecHandle Handle, co
 	WaitInputReleaseTask->OnRelease.AddDynamic(this, &UGA_AimDownSights::OnInputRelease);
 	WaitInputReleaseTask->ReadyForActivation();
 
-	WaitChangeFOVTask = UWaitChangeFOVTask::WaitChangeFOV(this, NAME_None, OwnerCharacter->GetFirstPersonCamera(), TargetFOV, InterpSpeed);
-	WaitChangeFOVTask->OnTargetFOVReached.AddDynamic(this, &UGA_AimDownSights::OnTargetFOVReached);
-	WaitChangeFOVTask->OnChangeFOVTick.AddDynamic(this, &UGA_AimDownSights::ChangeFOVTick);
-	WaitChangeFOVTask->ReadyForActivation();
+	if (ActorInfo->IsLocallyControlled())
+	{
+		WaitChangeFOVTask =
+			UAbilityTask_WaitChangeFOV::WaitChangeFOV(this, NAME_None, OwnerCharacter->GetFirstPersonCamera(), TargetFOV, InterpSpeed);
+		WaitChangeFOVTask->OnTargetFOVReached.AddDynamic(this, &UGA_AimDownSights::OnTargetFOVReached);
+		WaitChangeFOVTask->OnChangeFOVTick.AddDynamic(this, &UGA_AimDownSights::ChangeFOVTick);
+		WaitChangeFOVTask->ReadyForActivation();
+	}
 }
 
 void UGA_AimDownSights::OnTargetFOVReached()
 {
-	UE_LOG(LogTemp, Warning, TEXT("OnTargetFOVReached"))
 }
 
 void UGA_AimDownSights::ChangeFOVTick(float DeltaTime, float CurrentFOV)
 {
 	const float FOVAlpha = (CurrentFOV - TargetFOV) / (InitialFOV - TargetFOV);
-
-	UE_LOG(LogTemp, Warning, TEXT("fovalpha: %f"), FOVAlpha)
 
 	UEquipmentComponent* Equipment = OwnerCharacter->GetEquipmentComponent();
 	UWeapon* Weapon = Equipment->GetCurrentWeapon();
@@ -103,14 +109,18 @@ void UGA_AimDownSights::OnInitialFOVReached()
 
 void UGA_AimDownSights::OnInputRelease(float TimeHeld)
 {
-	if (WaitChangeFOVTask)
+	if (GetCurrentActorInfo()->IsLocallyControlled())
 	{
-		WaitChangeFOVTask->EndTask();
-	}
+		if (WaitChangeFOVTask)
+		{
+			WaitChangeFOVTask->EndTask();
+		}
 
-	WaitChangeFOVTask = UWaitChangeFOVTask::WaitChangeFOV(this, NAME_None, OwnerCharacter->GetFirstPersonCamera(), InitialFOV, InterpSpeed);
-	WaitChangeFOVTask->OnTargetFOVReached.AddDynamic(this, &UGA_AimDownSights::OnInitialFOVReached);
-	WaitChangeFOVTask->ReadyForActivation();
+		WaitChangeFOVTask =
+			UAbilityTask_WaitChangeFOV::WaitChangeFOV(this, NAME_None, OwnerCharacter->GetFirstPersonCamera(), InitialFOV, InterpSpeed);
+		WaitChangeFOVTask->OnTargetFOVReached.AddDynamic(this, &UGA_AimDownSights::OnInitialFOVReached);
+		WaitChangeFOVTask->ReadyForActivation();
+	}
 
 	UAbilitySystemComponent* const AbilitySystemComponent = GetAbilitySystemComponentFromActorInfo_Ensured();
 	if (AbilitySystemComponent)

@@ -147,20 +147,11 @@ void UGA_Interact::OnInputRelease(float TimeHeld)
 
 void UGA_Interact::ActivateInteractionAbility()
 {
-	TSubclassOf<UFPSGameplayAbility> InteractionAbility = InteractionComponent->GetInteractionAbility();
+	TSubclassOf<UGameplayAbility> InteractionAbility = InteractionComponent->GetInteractionAbility();
 	if (InteractionAbility)
 	{
-		FGameplayAbilitySpec InteractionAbilitySpec = GetAbilitySystemComponentFromActorInfo()->BuildAbilitySpecFromClass(InteractionAbility);
-		if (GetCurrentActorInfo()->IsNetAuthority())
-		{
-			GetAbilitySystemComponentFromActorInfo()->GiveAbilityAndActivateOnce(InteractionAbilitySpec);
-		}
-		else
-		{
-			InteractionAbilitySpec.bActivateOnce = true;
-			GetAbilitySystemComponentFromActorInfo()->CallServerTryActivateAbility(
-				InteractionAbilitySpec.Handle, false, FPredictionKey::CreateNewPredictionKey(GetAbilitySystemComponentFromActorInfo()));
-		}
+		FGameplayAbilitySpec* InteractionAbilitySpec = GetAbilitySystemComponentFromActorInfo()->FindAbilitySpecFromClass(InteractionAbility);
+		GetAbilitySystemComponentFromActorInfo()->TryActivateAbility(InteractionAbilitySpec->Handle, true);
 
 		EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
 	}

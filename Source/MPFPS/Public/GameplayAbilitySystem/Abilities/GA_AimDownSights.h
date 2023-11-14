@@ -6,7 +6,7 @@
 #include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
 #include "Characters/PlayerCharacter.h"
 #include "GameplayAbilitySystem/Abilities/FPSGameplayAbility.h"
-#include "GameplayAbilitySystem/AbilityTasks/WaitChangeFOVTask.h"
+#include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitChangeFOV.h"
 #include "GA_AimDownSights.generated.h"
 
 /**
@@ -37,7 +37,7 @@ private:
 	float InterpSpeed = 45.f;
 
 	UPROPERTY()
-	UWaitChangeFOVTask* WaitChangeFOVTask;
+	UAbilityTask_WaitChangeFOV* WaitChangeFOVTask;
 	UPROPERTY()
 	UAbilityTask_WaitInputRelease* WaitInputReleaseTask;
 	UPROPERTY()

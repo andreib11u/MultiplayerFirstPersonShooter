@@ -1,19 +1,21 @@
 // Copyright Andrei Bondarenko 2023
 
-#include "GameplayAbilitySystem/AbilityTasks/WaitChangeFOVTask.h"
+#include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitChangeFOV.h"
+#include "Camera/CameraComponent.h"
 
-UWaitChangeFOVTask::UWaitChangeFOVTask()
+UAbilityTask_WaitChangeFOV::UAbilityTask_WaitChangeFOV()
 {
 	bTickingTask = true;
 	bIsActive = false;
 }
 
-UWaitChangeFOVTask* UWaitChangeFOVTask::WaitChangeFOV(UGameplayAbility* OwningAbility, FName TaskInstanceName,
-													  class UCameraComponent* InCameraComponent, float InTargetFOV, float InInterpSpeed)
+UAbilityTask_WaitChangeFOV* UAbilityTask_WaitChangeFOV::WaitChangeFOV(UGameplayAbility* OwningAbility, FName TaskInstanceName,
+																	  class UCameraComponent* InCameraComponent, float InTargetFOV,
+																	  float InInterpSpeed)
 {
 	check(InCameraComponent);
 
-	UWaitChangeFOVTask* NewTask = NewAbilityTask<UWaitChangeFOVTask>(OwningAbility, TaskInstanceName);
+	UAbilityTask_WaitChangeFOV* NewTask = NewAbilityTask<UAbilityTask_WaitChangeFOV>(OwningAbility, TaskInstanceName);
 
 	NewTask->CameraComponent = InCameraComponent;
 	NewTask->TargetFOV = InTargetFOV;
@@ -25,12 +27,12 @@ UWaitChangeFOVTask* UWaitChangeFOVTask::WaitChangeFOV(UGameplayAbility* OwningAb
 	return NewTask;
 }
 
-void UWaitChangeFOVTask::Activate()
+void UAbilityTask_WaitChangeFOV::Activate()
 {
 	bIsActive = true;
 }
 
-void UWaitChangeFOVTask::TickTask(float DeltaTime)
+void UAbilityTask_WaitChangeFOV::TickTask(float DeltaTime)
 {
 	if (!bIsActive)
 	{
