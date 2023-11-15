@@ -138,10 +138,10 @@ void UGameplayAbility_FireOnce::OnValidDataAcquired(const FGameplayAbilityTarget
 		Parameters.EffectCauser = GetAvatarActorFromActorInfo();
 		Parameters.Location = DataPtr->GetEndPoint();
 
-		// apply damage
 		auto AbilitySystemInterface = Cast<IAbilitySystemInterface>(DataPtr->GetHitResult()->GetActor());
 		if (AbilitySystemInterface)
 		{
+			// apply damage to a target
 			UAbilitySystemComponent* TargetAbilitySystemComponent = AbilitySystemInterface->GetAbilitySystemComponent();
 
 			const FGameplayEffectSpecHandle EffectSpec = MakeOutgoingGameplayEffectSpec(DamageEffect);
@@ -150,14 +150,17 @@ void UGameplayAbility_FireOnce::OnValidDataAcquired(const FGameplayAbilityTarget
 			Parameters.EffectContext.AddHitResult(*DataPtr->GetHitResult());
 
 			TargetAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
-			auto BaseAttributeSet = Cast<UBaseAttributeSet>(TargetAbilitySystemComponent->GetAttributeSet(UBaseAttributeSet::StaticClass()));
 
+			// add money to owner if the target was killed by this ability
+			auto BaseAttributeSet = Cast<UBaseAttributeSet>(TargetAbilitySystemComponent->GetAttributeSet(UBaseAttributeSet::StaticClass()));
 			if (BaseAttributeSet->GetCurrentHealth() == 0.f && GetCurrentActorInfo()->IsNetAuthority() &&
 				TargetAbilitySystemComponent->GetAvatarActor() != LastDeadTarget)
 			{
 				LastDeadTarget = TargetAbilitySystemComponent->GetAvatarActor();
+
 				FGameplayEffectSpecHandle AddMoneyEffectSpec = MakeOutgoingGameplayEffectSpec(AddMoneyEffect);
 				AddMoneyEffectSpec.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag("Value.Money"), 50.f);
+
 				GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*AddMoneyEffectSpec.Data.Get());
 			}
 		}
