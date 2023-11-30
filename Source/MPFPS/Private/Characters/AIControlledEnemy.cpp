@@ -19,9 +19,9 @@ UAbilitySystemComponent* AAIControlledEnemy::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
-void AAIControlledEnemy::Death()
+void AAIControlledEnemy::OnZeroHealth()
 {
-	Super::Death();
+	Super::OnZeroHealth();
 
 	bDissolve = true;
 

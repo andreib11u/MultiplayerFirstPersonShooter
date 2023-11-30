@@ -60,6 +60,14 @@ void UEquipmentComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	AddedSpread = FMath::FInterpConstantTo(AddedSpread, 0.f, DeltaTime, CurrentWeaponStats.SpreadDecay);
 }
 
+void UEquipmentComponent::OnRep_CurrentItemClass()
+{
+	if (CurrentItemClass)
+	{
+		AddWeapon(CurrentItemClass);
+	}
+}
+
 void UEquipmentComponent::OnRep_CurrentClipAmmo()
 {
 	OnCurrentClipAmmoChanged.Broadcast(CurrentClipAmmo);

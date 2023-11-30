@@ -72,11 +72,14 @@ protected:
 	virtual void PreReplication(IRepChangedPropertyTracker& ChangedPropertyTracker) override;
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION()
+	void OnRep_CurrentItemClass();
+
 private:
 	UPROPERTY(VisibleInstanceOnly)
 	UEquippableItem* CurrentItem;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing=OnRep_CurrentItemClass)
 	TSubclassOf<UEquippableItem> CurrentItemClass;
 
 	UPROPERTY(EditAnywhere, Replicated)

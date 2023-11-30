@@ -31,7 +31,9 @@ void UCrosshairWidget::Init(UEquipmentComponent* Equipment)
 	if (UAbilitySystemComponent* AbilitySystemComponent = PlayerCharacter->GetAbilitySystemComponent())
 	{
 		AbilitySystemComponent->RegisterGameplayTagEvent(FGameplayTag::RequestGameplayTag("Weapon.State.Aiming"))
-			.AddUObject(this, &UCrosshairWidget::OnAimingTagChanged);
+			.AddUObject(this, &UCrosshairWidget::OnBlockTagChanged);
+		AbilitySystemComponent->RegisterGameplayTagEvent(FGameplayTag::RequestGameplayTag("Character.State.Downed"))
+			.AddUObject(this, &UCrosshairWidget::OnBlockTagChanged);
 	}
 }
 
@@ -133,14 +135,19 @@ void UCrosshairWidget::OnSpreadAdded(float AddedSpread)
 	AddSpread(AddedSpread);
 }
 
-void UCrosshairWidget::OnAimingTagChanged(FGameplayTag GameplayTag, int32 Count)
+void UCrosshairWidget::OnBlockTagChanged(FGameplayTag GameplayTag, int32 Count)
 {
 	if (Count > 0)
 	{
+		BlockedTagCount++;
 		SetVisibility(ESlateVisibility::Hidden);
 	}
 	else
 	{
-		SetVisibility(ESlateVisibility::HitTestInvisible);
+		BlockedTagCount--;
+		if (BlockedTagCount < 1)
+		{
+			SetVisibility(ESlateVisibility::HitTestInvisible);
+		}
 	}
 }

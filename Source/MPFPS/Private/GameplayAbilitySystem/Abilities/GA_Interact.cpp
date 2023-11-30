@@ -12,8 +12,34 @@
 #include "GameplayAbilitySystem/TargetActors/TargetActor_LineTrace.h"
 #include "Types/CollisionTypes.h"
 #include "Weapons/EquipmentComponent.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "GameplayFramework/FPSPlayerController.h"
+#include "UI/FPSHUD.h"
+#include "UI/HUDWidget.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogInteractAbility, All, All);
+
+void UGA_Interact::FindInteractionWidget()
+{
+	auto PlayerController = PlayerCharacter->GetController<AFPSPlayerController>();
+	if (!PlayerController)
+	{
+		return;
+	}
+
+	auto HUD = PlayerController->GetHUD<AFPSHUD>();
+	if (!HUD)
+	{
+		return;
+	}
+
+	if (!HUD->GetHUDWidget())
+	{
+		return;
+	}
+
+	InteractionWidget = HUD->GetHUDWidget()->GetInteractionWidget();
+}
 
 void UGA_Interact::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 								   const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -28,6 +54,8 @@ void UGA_Interact::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 		return;
 	}
 
+	FindInteractionWidget();
+
 	if (!TargetActor)
 	{
 		SpawnTargetActor();
@@ -37,7 +65,8 @@ void UGA_Interact::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 	if (LineTraceActor)
 	{
 		const FVector CameraLocation = PlayerCharacter->GetFirstPersonCamera()->GetComponentLocation();
-		const FVector EndTrace = CameraLocation + PlayerCharacter->GetFirstPersonCamera()->GetForwardVector() * InteractionLength;
+		const FVector EndTrace =
+			CameraLocation + PlayerCharacter->GetFirstPersonCamera()->GetForwardVector() * PlayerCharacter->GetInteractionLength();
 
 		LineTraceActor->Configure(CameraLocation, EndTrace, INTERACTION_TRACE_COLLISION);
 	}
@@ -56,7 +85,7 @@ void UGA_Interact::CancelAbility(const FGameplayAbilitySpecHandle Handle, const 
 
 	if (InteractionComponent.IsValid())
 	{
-		InteractionComponent->SetInteractionProgress(0.f);
+		SetInteractionProgress(0.f);
 	}
 }
 
@@ -99,18 +128,25 @@ void UGA_Interact::OnValidDataAcquired(const FGameplayAbilityTargetDataHandle& D
 	CancelAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true);
 }
 
+void UGA_Interact::SetInteractionProgress(const float CurrentInteractionProgress)
+{
+	InteractionProgress = CurrentInteractionProgress;
+	InteractionWidget->SetInteractionProgress(InteractionProgress);
+}
+
 void UGA_Interact::InteractTick(float DeltaTime)
 {
 	if (InteractionComponent->GetActivationTime() <= TimeActive)
 	{
 		ActivateInteractionAbility();
-		InteractionComponent->SetInteractionProgress(0.f);
+		SetInteractionProgress(0.f);
 		return;
 	}
 
-	const float InteractionProgress =
-		FMath::Lerp(0.f, InteractionComponent->GetActivationTime(), TimeActive / InteractionComponent->GetActivationTime());
-	InteractionComponent->SetInteractionProgress(InteractionProgress);
+	check(InteractionComponent->GetActivationTime() != 0.f);
+	const float CurrentInteractionProgress = TimeActive / InteractionComponent->GetActivationTime();
+
+	SetInteractionProgress(CurrentInteractionProgress);
 
 	if (!TargetActor)
 	{
@@ -121,7 +157,8 @@ void UGA_Interact::InteractTick(float DeltaTime)
 	if (LineTraceActor)
 	{
 		const FVector CameraLocation = PlayerCharacter->GetFirstPersonCamera()->GetComponentLocation();
-		const FVector EndTrace = CameraLocation + PlayerCharacter->GetFirstPersonCamera()->GetForwardVector() * InteractionLength;
+		const FVector EndTrace =
+			CameraLocation + PlayerCharacter->GetFirstPersonCamera()->GetForwardVector() * PlayerCharacter->GetInteractionLength();
 
 		LineTraceActor->Configure(CameraLocation, EndTrace, INTERACTION_TRACE_COLLISION);
 	}
@@ -150,8 +187,8 @@ void UGA_Interact::ActivateInteractionAbility()
 	TSubclassOf<UGameplayAbility> InteractionAbility = InteractionComponent->GetInteractionAbility();
 	if (InteractionAbility)
 	{
-		FGameplayAbilitySpec* InteractionAbilitySpec = GetAbilitySystemComponentFromActorInfo()->FindAbilitySpecFromClass(InteractionAbility);
-		GetAbilitySystemComponentFromActorInfo()->TryActivateAbility(InteractionAbilitySpec->Handle, true);
+		bool bActivated = TargetAbilitySystemComponent->TryActivateAbilityByClass(InteractionAbility);
+		UE_LOG(LogTemp, Warning, TEXT("Activated: %i"), bActivated)
 
 		EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
 	}
@@ -172,6 +209,8 @@ void UGA_Interact::OnFirstValidDataAcquired(const FGameplayAbilityTargetDataHand
 		CancelAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true);
 		return;
 	}
+
+	TargetAbilitySystemComponent = GetAbilitySystemComponentFromActorInfo();
 
 	if (InteractionComponent->IsInstant())
 	{

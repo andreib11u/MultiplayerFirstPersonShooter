@@ -1,6 +1,5 @@
 // Copyright Andrei Bondarenko 2023
 
-
 #include "Characters/BaseCharacter.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
@@ -12,6 +11,7 @@
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 #include "GameplayAbilitySystem/AttributeSets/BaseAttributeSet.h"
 #include "GameplayAbilitySystem/Abilities/FPSGameplayAbility.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Types/CollisionTypes.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogBaseCharacter, All, All);
@@ -39,7 +39,7 @@ void ABaseCharacter::InitializeAttributes()
 		{
 			return;
 		}
-		
+
 		const auto* AttributeSet = AbilitySystemComponent->GetAttributeSet<UBaseAttributeSet>();
 
 		// set attribute callbacks
@@ -96,13 +96,24 @@ FGenericTeamId ABaseCharacter::GetGenericTeamId() const
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	const float RightFootTargetOffset = IKFootTrace(IKTraceDistance, RightFootSocket);
+	const float LeftFootTargetOffset = IKFootTrace(IKTraceDistance, LeftFootSocket);
+
+	CurrentRightFootOffset = FMath::FInterpTo(CurrentRightFootOffset, RightFootTargetOffset, DeltaTime, IKInterpSpeed);
+	CurrentLeftFootOffset = FMath::FInterpTo(CurrentLeftFootOffset, LeftFootTargetOffset, DeltaTime, IKInterpSpeed);
+}
+
+void ABaseCharacter::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	IKTraceDistance = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 }
 
 void ABaseCharacter::OnWalkSpeedChanged(const FOnAttributeChangeData& OnAttributeChangeData)
@@ -114,11 +125,11 @@ void ABaseCharacter::OnCurrentHealthChanged(const FOnAttributeChangeData& OnAttr
 {
 	if (OnAttributeChangeData.NewValue <= 0.f)
 	{
-		Death();
+		OnZeroHealth();
 	}
 }
 
-void ABaseCharacter::Death()
+void ABaseCharacter::OnZeroHealth()
 {
 	if (GetController() && GetController()->IsA<AAIController>())
 	{
@@ -141,4 +152,24 @@ void ABaseCharacter::Death()
 
 		AbilitySystemComponent->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag("Character.State.Dead"));
 	}
+}
+
+float ABaseCharacter::IKFootTrace(float TraceDistance, FName Bone)
+{
+	FVector BoneLocation = GetMesh()->GetSocketLocation(Bone);
+	FVector ActorLocation = GetActorLocation();
+	FVector StartTrace = FVector{ BoneLocation.X, BoneLocation.Y, ActorLocation.Z };
+	FVector EndTrace = FVector{ BoneLocation.X, BoneLocation.Y, ActorLocation.Z - TraceDistance };
+
+	ETraceTypeQuery TraceTypeQuery = UEngineTypes::ConvertToTraceType(ECC_Visibility);
+	TArray<AActor*> ActorsToIgnore;
+	FHitResult HitResult;
+
+	bool bHit = UKismetSystemLibrary::LineTraceSingle(this, StartTrace, EndTrace, TraceTypeQuery, true, ActorsToIgnore, EDrawDebugTrace::None,
+													  HitResult, true);
+
+	FVector DifferenceVector = EndTrace - HitResult.Location;
+	float IKOffset = DifferenceVector.Length() / GetActorScale().X;
+
+	return bHit ? IKOffset : 0.f;
 }

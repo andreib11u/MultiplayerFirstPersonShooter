@@ -21,7 +21,7 @@ public:
 	AAIControlledEnemy();
 
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	virtual void Death() override;
+	virtual void OnZeroHealth() override;
 
 protected:
 	virtual void BeginPlay() override;

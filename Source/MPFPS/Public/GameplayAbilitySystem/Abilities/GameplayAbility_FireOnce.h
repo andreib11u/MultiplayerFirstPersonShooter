@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "FPSGameplayAbility.h"
-#include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
-#include "GameplayAbilitySystem/AbilityTasks/AbilityTask_ServerWaitForClientData.h"
 #include "GameplayAbility_FireOnce.generated.h"
 
+class AGameplayAbilityTargetActor;
+class UAbilityTask_ServerWaitForClientData;
 class UAbilityTask_WaitTargetDataUsingActor;
 /**
  *
@@ -42,6 +42,11 @@ private:
 	TSubclassOf<UGameplayEffect> DamageEffect;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayEffect> AddMoneyEffect;
+
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* ThirdPersonFireMontage;
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* FirstPersonFireMontage;
 
 	UPROPERTY(EditAnywhere, meta = (Categories = "GameplayCue"))
 	FGameplayTag ShotGameplayCue = FGameplayTag::RequestGameplayTag("GameplayCue.Shooting.BulletImpact");

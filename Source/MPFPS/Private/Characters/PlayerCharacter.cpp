@@ -5,7 +5,9 @@
 #include "EnhancedInputComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/InteractionComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 #include "GameplayAbilitySystem/Abilities/FPSGameplayAbility.h"
 #include "GameplayFramework/FPSPlayerState.h"
@@ -16,6 +18,8 @@
 #include "Subsystems/FindActorsOfClassSubsystem.h"
 #include "Types/CollisionTypes.h"
 #include "Types/FPSGameplayAbilityTypes.h"
+#include "UI/FPSHUD.h"
+#include "UI/HUDWidget.h"
 #include "Weapons/Weapon.h"
 #include "Weapons/EquipmentComponent.h"
 
@@ -43,6 +47,18 @@ APlayerCharacter::APlayerCharacter()
 
 	ThirdPersonWeaponMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("TPWeaponMesh");
 	ThirdPersonWeaponMeshComponent->SetupAttachment(GetMesh(), "weapon_r");
+
+	ThirdPersonCameraBoom = CreateDefaultSubobject<USpringArmComponent>("ThirdPersonCameraBoom");
+	ThirdPersonCameraBoom->SetupAttachment(GetCapsuleComponent());
+	ThirdPersonCameraBoom->bUsePawnControlRotation = true;
+
+	ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>("ThirdPersonCamera");
+	ThirdPersonCamera->SetupAttachment(ThirdPersonCameraBoom);
+	ThirdPersonCamera->SetActive(false);
+
+	ReviveInteraction = CreateDefaultSubobject<UInteractionComponent>("ReviveInteraction");
+	ReviveInteraction->SetupAttachment(GetCapsuleComponent());
+	ReviveInteraction->SetCollisionResponseToChannel(INTERACTION_TRACE_COLLISION, ECR_Ignore);
 }
 
 UAbilitySystemComponent* APlayerCharacter::GetAbilitySystemComponent() const
@@ -132,6 +148,11 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	AbilitySystemComponent->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &APlayerCharacter::OnGameplayEffectAdded);
 	AbilitySystemComponent->OnAnyGameplayEffectRemovedDelegate().AddUObject(this, &APlayerCharacter::OnGameplayEffectRemoved);
 
+	AbilitySystemComponent->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &APlayerCharacter::OnGameplayEffectAdded);
+	AbilitySystemComponent
+		->RegisterGameplayTagEvent(FGameplayTag::RequestGameplayTag("Character.State.Recovering"), EGameplayTagEventType::NewOrRemoved)
+		.AddUObject(this, &APlayerCharacter::OnReviving);
+
 	GrantAbilities();
 
 	InitializeAttributes();
@@ -148,21 +169,23 @@ void APlayerCharacter::OnItemChanged(UEquippableItem* Item)
 {
 	if (Item)
 	{
+		FirstPersonWeaponMeshComponent->SetSkeletalMesh(Item->GetItemMesh());
+		FirstPersonWeaponMeshComponent->SetRelativeLocation(Item->FirstPersonLocation);
+		FirstPersonWeaponMeshComponent->SetRelativeRotation(Item->FirstPersonRotation);
+
+		ThirdPersonWeaponMeshComponent->SetSkeletalMesh(Item->GetItemMesh());
+		ThirdPersonWeaponMeshComponent->SetRelativeLocation(Item->ThirdPersonLocation);
+		ThirdPersonWeaponMeshComponent->SetRelativeRotation(Item->ThirdPersonRotation);
+
 		if (IsLocallyControlled())
 		{
 			FirstPersonWeaponMeshComponent->SetVisibility(true, true);
-			FirstPersonWeaponMeshComponent->SetSkeletalMesh(Item->GetItemMesh());
-			FirstPersonWeaponMeshComponent->SetRelativeLocation(Item->FirstPersonLocation);
-			FirstPersonWeaponMeshComponent->SetRelativeRotation(Item->FirstPersonRotation);
 
 			FirstPersonMesh->SetRelativeLocation(Item->ArmsMeshRelativeLocation);
 		}
 		else
 		{
 			ThirdPersonWeaponMeshComponent->SetVisibility(true, true);
-			ThirdPersonWeaponMeshComponent->SetSkeletalMesh(Item->GetItemMesh());
-			ThirdPersonWeaponMeshComponent->SetRelativeLocation(Item->ThirdPersonLocation);
-			ThirdPersonWeaponMeshComponent->SetRelativeRotation(Item->ThirdPersonRotation);
 		}
 	}
 	else
@@ -191,9 +214,24 @@ void APlayerCharacter::OnRep_PlayerState()
 
 	EquipmentComponent->SetAbilitySystemComponent(AbilitySystemComponent);
 	AbilitySystemComponent->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &APlayerCharacter::OnGameplayEffectAdded);
+	AbilitySystemComponent
+		->RegisterGameplayTagEvent(FGameplayTag::RequestGameplayTag("Character.State.Recovering"), EGameplayTagEventType::NewOrRemoved)
+		.AddUObject(this, &APlayerCharacter::OnReviving);
 	AbilitySystemComponent->OnAnyGameplayEffectRemovedDelegate().AddUObject(this, &APlayerCharacter::OnGameplayEffectRemoved);
 
 	InitializeAttributes();
+}
+
+void APlayerCharacter::SetFirstPersonMeshVisibility()
+{
+	GetMesh()->SetVisibility(false, true);
+	FirstPersonMesh->SetVisibility(true, true);
+}
+
+void APlayerCharacter::SetThirdPersonMeshVisibility()
+{
+	GetMesh()->SetVisibility(true, true);
+	FirstPersonMesh->SetVisibility(false, true);
 }
 
 void APlayerCharacter::BeginPlay()
@@ -202,13 +240,11 @@ void APlayerCharacter::BeginPlay()
 
 	if (IsLocallyControlled())
 	{
-		GetMesh()->SetVisibility(false, true);
-		FirstPersonMesh->SetVisibility(true, true);
+		SetFirstPersonMeshVisibility();
 	}
 	else
 	{
-		GetMesh()->SetVisibility(true, true);
-		FirstPersonMesh->SetVisibility(false, true);
+		SetThirdPersonMeshVisibility();
 	}
 
 	auto FindActorsSubsystem = GetWorld()->GetSubsystem<UFindActorsOfClassSubsystem>();
@@ -287,26 +323,56 @@ void APlayerCharacter::OnGameplayEffectAdded(UAbilitySystemComponent* InAbilityS
 
 void APlayerCharacter::OnGameplayEffectRemoved(const FActiveGameplayEffect& ActiveGameplayEffect)
 {
-	if (AimingEffect)
+	if (AimingEffect && ActiveGameplayEffect.Spec.Def->IsA(AimingEffect))
 	{
-		if (ActiveGameplayEffect.Spec.Def->IsA(AimingEffect))
+		auto CurrentWeapon = Cast<UWeapon>(EquipmentComponent->GetCurrentItem());
+		if (CurrentWeapon)
 		{
-			auto CurrentWeapon = Cast<UWeapon>(EquipmentComponent->GetCurrentItem());
-			if (CurrentWeapon)
+			int32 EffectStackCount = AbilitySystemComponent->GetGameplayEffectCount(ActiveGameplayEffect.Spec.Def->GetClass(), nullptr);
+			if (EffectStackCount < 1)
 			{
-				int32 EffectStackCount = AbilitySystemComponent->GetGameplayEffectCount(ActiveGameplayEffect.Spec.Def->GetClass(), nullptr);
-				if (EffectStackCount < 1)
-				{
-					FirstPersonMesh->SetRelativeLocation(CurrentWeapon->ArmsMeshRelativeLocation);
-				}
+				FirstPersonMesh->SetRelativeLocation(CurrentWeapon->ArmsMeshRelativeLocation);
 			}
 		}
 	}
 }
 
+void APlayerCharacter::RecoveredFromDying()
+{
+	GetMesh()->SetCollisionResponseToChannel(BULLET_TRACE_COLLISION, ECR_Overlap);
+	AbilitySystemComponent->SetLooseGameplayTagCount(FGameplayTag::RequestGameplayTag("Character.State.Downed"), 0);
+
+	if (IsLocallyControlled())
+	{
+		SetFirstPersonMeshVisibility();
+
+		FirstPersonCamera->SetActive(true);
+		ThirdPersonCamera->SetActive(false);
+	}
+
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	bUseControllerRotationYaw = true;
+
+	ReviveInteraction->SetCollisionResponseToChannel(INTERACTION_TRACE_COLLISION, ECR_Ignore);
+}
+
 void APlayerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	if (bMoveTPCamera)
+	{
+		const float TargetArmLength = bMoveCameraForward ? InitialArmLengthTPCamera : TargetArmLengthTPCamera;
+
+		ThirdPersonCameraBoom->TargetArmLength =
+			FMath::FInterpConstantTo(ThirdPersonCameraBoom->TargetArmLength, TargetArmLength, DeltaSeconds, MoveCameraSpeed);
+
+		if (FMath::IsNearlyEqual(ThirdPersonCameraBoom->TargetArmLength, TargetArmLength))
+		{
+			bMoveTPCamera = false;
+			OnCameraFullyMoved.Broadcast();
+		}
+	}
 }
 
 void APlayerCharacter::InitializeAttributes()
@@ -324,6 +390,48 @@ void APlayerCharacter::GrantAbilities()
 		FGameplayAbilitySpec Spec = FGameplayAbilitySpec(InitialWeaponAbility, 1, static_cast<int32>(AbilityCDO->GetAbilityInput()), this);
 
 		AbilitySystemComponent->GiveAbility(Spec);
+	}
+}
+
+void APlayerCharacter::StartMovingTPCamera(bool bMoveForward)
+{
+	if (!bMoveForward)
+	{
+		FirstPersonCamera->SetActive(false);
+		ThirdPersonCamera->SetActive(true);
+	}
+
+	ThirdPersonCameraBoom->TargetArmLength = bMoveForward ? TargetArmLengthTPCamera : InitialArmLengthTPCamera;
+	bMoveTPCamera = true;
+	bMoveCameraForward = bMoveForward;
+}
+
+void APlayerCharacter::OnZeroHealth()
+{
+	GetMesh()->SetCollisionResponseToChannel(BULLET_TRACE_COLLISION, ECR_Ignore);
+	AbilitySystemComponent->SetLooseGameplayTagCount(FGameplayTag::RequestGameplayTag("Character.State.Downed"), 1);
+
+	StartMovingTPCamera(false);
+	if (IsLocallyControlled())
+	{
+		SetThirdPersonMeshVisibility();
+	}
+
+	GetCharacterMovement()->DisableMovement();
+	bUseControllerRotationYaw = false;
+
+	ReviveInteraction->SetCollisionResponseToChannel(INTERACTION_TRACE_COLLISION, ECR_Block);
+}
+
+void APlayerCharacter::OnReviving(FGameplayTag GameplayTag, int32 Count)
+{
+	if (Count > 0)
+	{
+		StartMovingTPCamera(true);
+	}
+	else
+	{
+		RecoveredFromDying();
 	}
 }
 

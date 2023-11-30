@@ -61,13 +61,11 @@ void UInteractionWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTi
 		if (LookAtInteractionComponent == InteractionComponent)
 		{
 			ShowInteraction(LookAtInteractionComponent->GetInteractionText());
-			SetInteractionProgress(InteractionComponent->GetProgress());
 			return;
 		}
 
 		InteractionComponent = LookAtInteractionComponent;
 		ShowInteraction(InteractionComponent->GetInteractionText());
-		SetInteractionProgress(InteractionComponent->GetProgress());
 		return;
 	}
 

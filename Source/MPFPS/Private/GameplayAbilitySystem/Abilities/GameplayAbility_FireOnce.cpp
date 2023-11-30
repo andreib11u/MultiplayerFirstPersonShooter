@@ -7,12 +7,15 @@
 #include "Camera/CameraComponent.h"
 #include "Characters/PlayerCharacter.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
+#include "GameplayAbilitySystem/AbilityTasks/AbilityTask_PlayMontageForMesh.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_ServerWaitForClientData.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitTargetDataUsingActor.h"
 #include "GameplayAbilitySystem/AttributeSets/BaseAttributeSet.h"
 #include "GameplayAbilitySystem/TargetActors/TargetActor_LineTrace.h"
 #include "Types/CollisionTypes.h"
 #include "Weapons/EquipmentComponent.h"
+
+DEFINE_LOG_CATEGORY_STATIC(LogFireOnceAbility, All, All);
 
 void UGameplayAbility_FireOnce::FireShot()
 {
@@ -39,13 +42,33 @@ void UGameplayAbility_FireOnce::FireShot()
 		}
 
 		auto PlayerCharacter = Cast<APlayerCharacter>(GetActorInfo().AvatarActor);
-		if (PlayerCharacter)
+		if (!PlayerCharacter)
 		{
-			auto EquipmentComponent = PlayerCharacter->GetEquipmentComponent();
-			if (EquipmentComponent)
-			{
-				EquipmentComponent->AddSpread(0.1f); // todo: magic number. maybe we can even not to pass a parameter
-			}
+			UE_LOG(LogFireOnceAbility, Error, TEXT("%s ability tried to activate on non-APlayerCharacter actor"));
+			EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, true);
+			return;
+		}
+
+		auto EquipmentComponent = PlayerCharacter->GetEquipmentComponent();
+		if (EquipmentComponent)
+		{
+			EquipmentComponent->AddSpread(0.1f); // todo: magic number. maybe we can even not to pass a parameter
+		}
+
+		if (ThirdPersonFireMontage)
+		{
+			UAbilityTask_PlayMontageForMesh* PlayThirdPersonMontageTask = UAbilityTask_PlayMontageForMesh::PlayMontageForMeshAndWaitForEvent(
+				this, NAME_None, PlayerCharacter->GetMesh(), ThirdPersonFireMontage, FGameplayTagContainer(), 1.f, NAME_None, false);
+
+			PlayThirdPersonMontageTask->ReadyForActivation();
+		}
+
+		if (FirstPersonFireMontage)
+		{
+			UAbilityTask_PlayMontageForMesh* PlayFirstPersonMontageTask = UAbilityTask_PlayMontageForMesh::PlayMontageForMeshAndWaitForEvent(
+				this, NAME_None, PlayerCharacter->GetFirstPersonMesh(), FirstPersonFireMontage, FGameplayTagContainer(), 1.f, NAME_None, false);
+
+			PlayFirstPersonMontageTask->ReadyForActivation();
 		}
 
 		WaitTargetDataTask = UAbilityTask_WaitTargetDataUsingActor::WaitTargetDataWithReusableActor(

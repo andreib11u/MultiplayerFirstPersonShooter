@@ -3,14 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
-#include "Characters/PlayerCharacter.h"
-#include "Components/InteractionComponent.h"
 #include "GameplayAbilitySystem/Abilities/FPSGameplayAbility.h"
-#include "GameplayAbilitySystem/AbilityTasks/AbilityTask_Tick.h"
-#include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitTargetDataUsingActor.h"
+#include "UI/HUDWidget.h"
+#include "UI/HUD/InteractionWidget.h"
 #include "GA_Interact.generated.h"
 
+class UInteractionComponent;
+class UAbilityTask_WaitInputRelease;
+class UAbilityTask_Tick;
+class APlayerCharacter;
+class UAbilityTask_WaitTargetDataUsingActor;
 class AGameplayAbilityTargetActor;
 /**
  *
@@ -27,9 +29,8 @@ public:
 							   const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility) override;
 
 private:
-	UPROPERTY(EditAnywhere)
-	float InteractionLength = 100.f; // todo: replace with value from a character;
 	float TimeActive = 0.f;
+	float InteractionProgress = 0.f;
 
 	UPROPERTY()
 	UAbilityTask_WaitTargetDataUsingActor* WaitTargetDataTask;
@@ -44,14 +45,20 @@ private:
 	UPROPERTY()
 	UAbilityTask_WaitInputRelease* WaitInputReleaseTask;
 
+	TWeakObjectPtr<UAbilitySystemComponent> TargetAbilitySystemComponent;
+	TWeakObjectPtr<UInteractionWidget> InteractionWidget;
+
 	void SpawnTargetActor();
 	UFUNCTION()
 	void OnValidDataAcquired(const FGameplayAbilityTargetDataHandle& Data);
+	void SetInteractionProgress(float CurrentInteractionProgress);
 	UFUNCTION()
 	void InteractTick(float DeltaTime);
 	UFUNCTION()
 	void OnInputRelease(float TimeHeld);
-	void ActivateInteractionAbility();
 	UFUNCTION()
 	void OnFirstValidDataAcquired(const FGameplayAbilityTargetDataHandle& Data);
+
+	void ActivateInteractionAbility();
+	void FindInteractionWidget();
 };

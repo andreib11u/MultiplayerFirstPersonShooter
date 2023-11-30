@@ -77,6 +77,8 @@ private:
 	float CurrentSpread = 0.1f;
 	float TargetSpread = 0.1f;
 
+	int32 BlockedTagCount = 0;
+
 	void OnSpreadAdded(float AddedSpread);
-	void OnAimingTagChanged(FGameplayTag GameplayTag, int32 Count);
+	void OnBlockTagChanged(FGameplayTag GameplayTag, int32 Count);
 };

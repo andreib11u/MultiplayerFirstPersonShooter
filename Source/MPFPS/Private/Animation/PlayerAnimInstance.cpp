@@ -26,19 +26,24 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	if (PlayerCharacter)
+	if (!PlayerCharacter)
 	{
-		const FVector Velocity = PlayerCharacter->GetVelocity();
-		Speed = Velocity.Length();
-
-		bIsFalling = CharacterMovement->IsFalling();
-
-		MovementDirection = UKismetAnimationLibrary::CalculateDirection(Velocity, PlayerCharacter->GetActorRotation());
-
-		BaseRotationPitch = PlayerCharacter->GetBaseAimRotation().Pitch;
-		if (BaseRotationPitch > 180.f)
-		{
-			BaseRotationPitch -= 360.f;
-		}
+		return;
 	}
+
+	const FVector Velocity = PlayerCharacter->GetVelocity();
+	Speed = Velocity.Length();
+
+	bIsFalling = CharacterMovement->IsFalling();
+
+	MovementDirection = UKismetAnimationLibrary::CalculateDirection(Velocity, PlayerCharacter->GetActorRotation());
+
+	BaseRotationPitch = PlayerCharacter->GetBaseAimRotation().Pitch;
+	if (BaseRotationPitch > 180.f)
+	{
+		BaseRotationPitch -= 360.f;
+	}
+
+	RightFootEffectorLocation = FVector{-PlayerCharacter->GetRightFootIKOffset(), 0.f, 0.f};
+	LeftFootEffectorLocation = FVector{PlayerCharacter->GetLeftFootIKOffset(), 0.f, 0.f};
 }

@@ -35,6 +35,12 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	bool bIsFalling;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
+	FVector RightFootEffectorLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
+	FVector LeftFootEffectorLocation;
+
+
 	UPROPERTY()
 	APlayerCharacter* PlayerCharacter;
 	UPROPERTY()

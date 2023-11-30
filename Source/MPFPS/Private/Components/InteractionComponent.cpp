@@ -2,7 +2,6 @@
 
 
 #include "Components/InteractionComponent.h"
-
 #include "Types/CollisionTypes.h"
 
 void UInteractionComponent::PostInitProperties()

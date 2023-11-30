@@ -26,6 +26,9 @@ public:
 
 	virtual void GrantAbilities();
 
+	float GetRightFootIKOffset() const { return CurrentRightFootOffset; }
+	float GetLeftFootIKOffset() const { return CurrentLeftFootOffset; }
+
 	// IGenericTeamAgentInterface begin
 
 	virtual void SetGenericTeamId(const FGenericTeamId& TeamID) override;
@@ -36,6 +39,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayEffect> AttributeInitializationEffect;
@@ -47,7 +51,7 @@ protected:
 	void OnWalkSpeedChanged(const FOnAttributeChangeData& OnAttributeChangeData);
 	void OnCurrentHealthChanged(const FOnAttributeChangeData& OnAttributeChangeData);
 
-	virtual void Death();
+	virtual void OnZeroHealth();
 
 	bool bDissolve = false;
 
@@ -63,4 +67,17 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Team", meta = (AllowPrivateAccess = "true"))
 	EFPSTeam Team;
+
+	float IKTraceDistance;
+	float CurrentRightFootOffset;
+	float CurrentLeftFootOffset;
+
+	UPROPERTY(EditAnywhere, Category = "IK Setup")
+	FName RightFootSocket;
+	UPROPERTY(EditAnywhere, Category = "IK Setup")
+	FName LeftFootSocket;
+	UPROPERTY(EditAnywhere, Category = "IK Setup")
+	float IKInterpSpeed = 20.f;
+
+	float IKFootTrace(float TraceDistance, FName Bone);
 };

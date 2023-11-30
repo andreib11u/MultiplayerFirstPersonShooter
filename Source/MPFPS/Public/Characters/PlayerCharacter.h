@@ -8,6 +8,8 @@
 #include "Weapons/Weapon.h"
 #include "PlayerCharacter.generated.h"
 
+class UInteractionComponent;
+class USpringArmComponent;
 class UPlayerAttributeSet;
 class UFPSGameplayAbility;
 class UEquipmentComponent;
@@ -18,6 +20,8 @@ struct FInputActionValue;
 class UAbilitySystemComponent;
 class UCameraComponent;
 class USkeletalMeshComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCameraFullyMoved);
 
 /**
  *
@@ -38,11 +42,21 @@ public:
 
 	USkeletalMeshComponent* GetFirstPersonWeaponMesh() const { return FirstPersonWeaponMeshComponent; }
 	USkeletalMeshComponent* GetThirdPersonWeaponMesh() const { return ThirdPersonWeaponMeshComponent; }
+	USkeletalMeshComponent* GetFirstPersonMesh() { return FirstPersonMesh; }
+
+	float GetInteractionLength() const { return InteractionLength; }
+
+	UPROPERTY(EditAnywhere)
+	FOnCameraFullyMoved OnCameraFullyMoved;
+
+	void RecoveredFromDying();
 
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
+	void SetFirstPersonMeshVisibility();
+	void SetThirdPersonMeshVisibility();
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void Tick(float DeltaSeconds) override;
@@ -50,6 +64,9 @@ protected:
 	virtual void InitializeAttributes() override;
 
 	virtual void GrantAbilities() override;
+	virtual void OnZeroHealth() override;
+
+	virtual void OnReviving(FGameplayTag GameplayTag, int32 Count);
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -73,12 +90,32 @@ private:
 	USkeletalMeshComponent* FirstPersonWeaponMeshComponent;
 	UPROPERTY(EditAnywhere)
 	USkeletalMeshComponent* ThirdPersonWeaponMeshComponent;
+	UPROPERTY(EditAnywhere)
+	USpringArmComponent* ThirdPersonCameraBoom;
+	UPROPERTY(EditAnywhere)
+	UCameraComponent* ThirdPersonCamera;
+	UPROPERTY(EditAnywhere)
+	UInteractionComponent* ReviveInteraction;
 
+	UPROPERTY(EditAnywhere)
+	float InitialArmLengthTPCamera = 50.f;
+	UPROPERTY(EditAnywhere)
+	float TargetArmLengthTPCamera = 300.f;
+	UPROPERTY(EditAnywhere)
+	float MoveCameraSpeed = 200.f;
+
+	bool bMoveTPCamera = false;
+	bool bMoveCameraForward = false;
+
+	UPROPERTY(EditAnywhere)
+	float InteractionLength = 120.f;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayEffect> AimingEffect;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UFPSGameplayAbility> InitialWeaponAbility;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UGameplayEffect> ReviveEffect;
 
 	UFUNCTION()
 	void OnItemChanged(UEquippableItem* Item);
@@ -90,6 +127,8 @@ private:
 	void OnGameplayEffectAdded(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec,
 							   FActiveGameplayEffectHandle ActiveGameplayEffectHandle);
 	void OnGameplayEffectRemoved(const FActiveGameplayEffect& ActiveGameplayEffect);
+
+	void StartMovingTPCamera(bool bMoveForward);
 
 	// Input callbacks
 
