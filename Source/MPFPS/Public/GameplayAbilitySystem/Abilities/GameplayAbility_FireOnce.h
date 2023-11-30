@@ -21,7 +21,7 @@ public:
 	void SpawnTargetActor();
 
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
-	                             const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+								 const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
 	virtual bool CheckCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 						   FGameplayTagContainer* OptionalRelevantTags) const override;
@@ -29,7 +29,8 @@ public:
 	virtual bool CommitAbilityCost(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 								   const FGameplayAbilityActivationInfo ActivationInfo, FGameplayTagContainer* OptionalRelevantTags) override;
 
-	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+							const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
 private:
 	UFUNCTION()
@@ -47,6 +48,8 @@ private:
 	UAnimMontage* ThirdPersonFireMontage;
 	UPROPERTY(EditAnywhere)
 	UAnimMontage* FirstPersonFireMontage;
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* FirstPersonFireMontageAiming;
 
 	UPROPERTY(EditAnywhere, meta = (Categories = "GameplayCue"))
 	FGameplayTag ShotGameplayCue = FGameplayTag::RequestGameplayTag("GameplayCue.Shooting.BulletImpact");
@@ -64,6 +67,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	float TraceLength = 9999.f;
 
-
 	TWeakObjectPtr<AActor> LastDeadTarget;
+
+	void GiveRewardToInstigator(UAbilitySystemComponent* TargetAbilitySystemComponent);
 };

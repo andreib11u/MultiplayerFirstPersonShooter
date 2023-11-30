@@ -169,7 +169,7 @@ void APlayerCharacter::OnItemChanged(UEquippableItem* Item)
 {
 	if (Item)
 	{
-		FirstPersonWeaponMeshComponent->SetSkeletalMesh(Item->GetItemMesh());
+		FirstPersonWeaponMeshComponent->SetSkeletalMesh(Item->GetItemMeshFirstPerson());
 		FirstPersonWeaponMeshComponent->SetRelativeLocation(Item->FirstPersonLocation);
 		FirstPersonWeaponMeshComponent->SetRelativeRotation(Item->FirstPersonRotation);
 

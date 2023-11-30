@@ -36,6 +36,9 @@ public:
 
 	// IGenericTeamAgentInterface end
 
+	void SetLastDamageCauser(UAbilitySystemComponent* InLastDamageCauser);
+	float GetReward() const { return RewardForKillingThis; }
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
@@ -52,6 +55,12 @@ protected:
 	void OnCurrentHealthChanged(const FOnAttributeChangeData& OnAttributeChangeData);
 
 	virtual void OnZeroHealth();
+
+	TWeakObjectPtr<UAbilitySystemComponent> LastDamageCauser;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UGameplayEffect> RewardEffect;
+	UPROPERTY(EditAnywhere)
+	float RewardForKillingThis = 50.f;
 
 	bool bDissolve = false;
 

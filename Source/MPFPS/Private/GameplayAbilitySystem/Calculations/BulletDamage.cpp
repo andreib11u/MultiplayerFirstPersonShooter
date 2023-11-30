@@ -95,7 +95,6 @@ void UBulletDamage::Execute_Implementation(const FGameplayEffectCustomExecutionP
 		}
 	}
 
-	// friendly fire
 	CalculateFriendlyFireDamage(ExecutionParams, Spec, Damage);
 
 	OutExecutionOutput.AddOutputModifier(FGameplayModifierEvaluatedData(DamageStatics().CurrentHealthProperty, EGameplayModOp::Additive, -Damage));

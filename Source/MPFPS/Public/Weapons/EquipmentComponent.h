@@ -38,7 +38,7 @@ public:
 	void EquipItem(const int32 ItemIndex);
 	void EquipItem(UEquippableItem* Item);
 	UEquippableItem* GetCurrentItem() const { return CurrentItem; }
-	UWeapon* GetCurrentWeapon() const { return Cast<UWeapon>(CurrentItem); }
+	UWeapon* GetCurrentWeapon() const;
 
 	void AddWeapon(TSubclassOf<UEquippableItem> ItemClass);
 

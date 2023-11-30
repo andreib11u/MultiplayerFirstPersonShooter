@@ -63,10 +63,13 @@ void UGameplayAbility_FireOnce::FireShot()
 			PlayThirdPersonMontageTask->ReadyForActivation();
 		}
 
-		if (FirstPersonFireMontage)
+		if (FirstPersonFireMontage && FirstPersonFireMontageAiming)
 		{
+			bool bAiming = GetAbilitySystemComponentFromActorInfo()->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Weapon.State.Aiming"));
+			UAnimMontage* MontageToPlay = bAiming ? FirstPersonFireMontageAiming : FirstPersonFireMontage;
+
 			UAbilityTask_PlayMontageForMesh* PlayFirstPersonMontageTask = UAbilityTask_PlayMontageForMesh::PlayMontageForMeshAndWaitForEvent(
-				this, NAME_None, PlayerCharacter->GetFirstPersonMesh(), FirstPersonFireMontage, FGameplayTagContainer(), 1.f, NAME_None, false);
+				this, NAME_None, PlayerCharacter->GetFirstPersonMesh(), MontageToPlay, FGameplayTagContainer(), 1.f, NAME_None, false);
 
 			PlayFirstPersonMontageTask->ReadyForActivation();
 		}
@@ -150,6 +153,26 @@ void UGameplayAbility_FireOnce::EndAbility(const FGameplayAbilitySpecHandle Hand
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
+void UGameplayAbility_FireOnce::GiveRewardToInstigator(UAbilitySystemComponent* TargetAbilitySystemComponent)
+{
+	auto BaseAttributeSet = Cast<UBaseAttributeSet>(TargetAbilitySystemComponent->GetAttributeSet(UBaseAttributeSet::StaticClass()));
+	if (BaseAttributeSet->GetCurrentHealth() == 0.f && GetCurrentActorInfo()->IsNetAuthority() &&
+		TargetAbilitySystemComponent->GetAvatarActor() != LastDeadTarget)
+	{
+		LastDeadTarget = TargetAbilitySystemComponent->GetAvatarActor();
+
+		auto TargetCharacter = Cast<ABaseCharacter>(TargetAbilitySystemComponent->GetAvatarActor());
+		{
+			float Reward = TargetCharacter->GetReward();
+
+			FGameplayEffectSpecHandle AddMoneyEffectSpec = MakeOutgoingGameplayEffectSpec(AddMoneyEffect);
+			AddMoneyEffectSpec.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag("Value.Money"), Reward);
+
+			GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*AddMoneyEffectSpec.Data.Get());
+		}
+	}
+}
+
 void UGameplayAbility_FireOnce::OnValidDataAcquired(const FGameplayAbilityTargetDataHandle& Data)
 {
 	CommitAbilityCost(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), nullptr);
@@ -174,18 +197,7 @@ void UGameplayAbility_FireOnce::OnValidDataAcquired(const FGameplayAbilityTarget
 
 			TargetAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
 
-			// add money to owner if the target was killed by this ability
-			auto BaseAttributeSet = Cast<UBaseAttributeSet>(TargetAbilitySystemComponent->GetAttributeSet(UBaseAttributeSet::StaticClass()));
-			if (BaseAttributeSet->GetCurrentHealth() == 0.f && GetCurrentActorInfo()->IsNetAuthority() &&
-				TargetAbilitySystemComponent->GetAvatarActor() != LastDeadTarget)
-			{
-				LastDeadTarget = TargetAbilitySystemComponent->GetAvatarActor();
-
-				FGameplayEffectSpecHandle AddMoneyEffectSpec = MakeOutgoingGameplayEffectSpec(AddMoneyEffect);
-				AddMoneyEffectSpec.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag("Value.Money"), 50.f);
-
-				GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*AddMoneyEffectSpec.Data.Get());
-			}
+			GiveRewardToInstigator(TargetAbilitySystemComponent);
 		}
 
 		auto AbilitySystemComponent = Cast<UFPSAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo());

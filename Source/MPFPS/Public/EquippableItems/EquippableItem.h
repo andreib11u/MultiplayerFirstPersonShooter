@@ -20,10 +20,13 @@ public:
 
 	TSubclassOf<UGameplayAbility> GetAbility() const { return UseAbility; }
 	USkeletalMesh* GetItemMesh() const { return EquipMesh; }
+	USkeletalMesh* GetItemMeshFirstPerson() const { return EquipMeshFirstPerson; }
 
 private:
 	UPROPERTY(EditAnywhere)
 	USkeletalMesh* EquipMesh;
+	UPROPERTY(EditAnywhere)
+	USkeletalMesh* EquipMeshFirstPerson;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UGameplayAbility> UseAbility;

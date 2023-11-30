@@ -2,6 +2,7 @@
 
 #include "Characters/BaseCharacter.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystemGlobals.h"
 #include "AbilitySystemInterface.h"
 #include "AIController.h"
 #include "GameplayEffect.h"
@@ -93,6 +94,11 @@ FGenericTeamId ABaseCharacter::GetGenericTeamId() const
 	return static_cast<uint8>(Team);
 }
 
+void ABaseCharacter::SetLastDamageCauser(UAbilitySystemComponent* InLastDamageCauser)
+{
+	LastDamageCauser = InLastDamageCauser;
+}
+
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -151,6 +157,23 @@ void ABaseCharacter::OnZeroHealth()
 		}
 
 		AbilitySystemComponent->AddLooseGameplayTag(FGameplayTag::RequestGameplayTag("Character.State.Dead"));
+
+		if (HasAuthority())
+		{
+			const int32 Count = AbilitySystemComponent->GetGameplayTagCount(FGameplayTag::RequestGameplayTag("Character.State.Dead"));
+			if (Count == 1 && RewardEffect && LastDamageCauser.IsValid())
+			{
+				FGameplayEffectContextHandle Context = FGameplayEffectContextHandle(UAbilitySystemGlobals::Get().AllocGameplayEffectContext());
+				Context.AddInstigator(this, this);
+
+				UGameplayEffect* GameplayEffect = RewardEffect->GetDefaultObject<UGameplayEffect>();
+				FGameplayEffectSpec* NewSpec = new FGameplayEffectSpec(GameplayEffect, Context, 1.f);
+				const FGameplayEffectSpecHandle RewardEffectSpecHandle = FGameplayEffectSpecHandle(NewSpec);
+
+				RewardEffectSpecHandle.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag("Value.Money"), RewardForKillingThis);
+				LastDamageCauser->ApplyGameplayEffectSpecToSelf(*RewardEffectSpecHandle.Data);
+			}
+		}
 	}
 }
 

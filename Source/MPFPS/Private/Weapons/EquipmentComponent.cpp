@@ -120,6 +120,11 @@ void UEquipmentComponent::EquipItem(UEquippableItem* Item)
 	OnCurrentItemChanged.Broadcast(CurrentItem);
 }
 
+UWeapon* UEquipmentComponent::GetCurrentWeapon() const
+{
+	return Cast<UWeapon>(CurrentItem);
+}
+
 void UEquipmentComponent::AddWeapon(TSubclassOf<UEquippableItem> ItemClass)
 {
 	auto Item = NewObject<UEquippableItem>(this, *ItemClass);
