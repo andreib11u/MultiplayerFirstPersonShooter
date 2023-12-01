@@ -16,6 +16,7 @@ void UMoneyAdditionWidget::Init(int32 Money)
 void UMoneyAdditionWidget::AddMoney(int32 Money)
 {
 	MoneyText->SetText(FText::AsNumber(CurrentMoney + Money));
+	CurrentMoney += Money;
 
 	FTimerManager& TimerManager = GetWorld()->GetTimerManager();
 

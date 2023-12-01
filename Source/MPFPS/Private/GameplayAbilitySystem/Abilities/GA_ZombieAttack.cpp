@@ -72,6 +72,12 @@ void UGA_ZombieAttack::OnMontageCancelled(FGameplayTag EventTag, FGameplayEventD
 
 void UGA_ZombieAttack::OnValidDataAcquired(const FGameplayAbilityTargetDataHandle& Data)
 {
+	if (GetCurrentActorInfo()->AbilitySystemComponent->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Character.State.Dead")))
+	{
+		EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
+		return;
+	}
+
 	const FGameplayAbilityTargetData* TargetData = Data.Get(0);
 	if (TargetData)
 	{
@@ -94,8 +100,6 @@ void UGA_ZombieAttack::OnValidDataAcquired(const FGameplayAbilityTargetDataHandl
 			AbilitySystemComponent->ExecuteGameplayCue(GameplayCueTag, GameplayCueParameters);
 		}
 	}
-
-	//EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
 }
 
 void UGA_ZombieAttack::OnMontageCompleted(FGameplayTag EventTag, FGameplayEventData EventData)

@@ -1,7 +1,8 @@
 // Copyright Andrei Bondarenko 2023
 
-
 #include "AI/Services/BTService_ChangeTargetToClosest.h"
+
+#include "AbilitySystemComponent.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Characters/PlayerCharacter.h"
@@ -24,7 +25,20 @@ void UBTService_ChangeTargetToClosest::TickNode(UBehaviorTreeComponent& OwnerCom
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
-	const TArray<AActor*> PlayerCharacters = FindActorsSubsystem->FindAllActors(APlayerCharacter::StaticClass());
+	TArray<AActor*> PlayerCharacters = FindActorsSubsystem->FindAllActors(APlayerCharacter::StaticClass());
+
+	PlayerCharacters.RemoveAll(
+		[](AActor* PlayerCharacter)
+		{
+			if (!PlayerCharacter)
+			{
+				return true;
+			}
+
+			return CastChecked<APlayerCharacter>(PlayerCharacter)
+				->GetAbilitySystemComponent()
+				->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Character.State.Downed"));
+		});
 
 	if (PlayerCharacters.IsEmpty())
 	{
