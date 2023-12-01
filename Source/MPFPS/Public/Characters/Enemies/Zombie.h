@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Characters/AIControlledEnemy.h"
+#include "Subsystems/FindActorsOfClassSubsystem.h"
 #include "Zombie.generated.h"
 
 /**
@@ -16,6 +17,7 @@ class MPFPS_API AZombie : public AAIControlledEnemy
 public:
 	AZombie();
 
+	void PlaySound();
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -29,6 +31,7 @@ private:
 
 	FTimerHandle AudioTimerHandle;
 	FRandomStream RandomStream;
+	FDelegateHandle PlayerSpawnedDelegateHandle;
 
-	void PlaySound();
+	void OnPlayerSpawned(UClass* Class, AActor* Actor);
 };
