@@ -6,6 +6,7 @@
 #include "UI/FPSUserWidget.h"
 #include "MainMenuWidget.generated.h"
 
+class UUserSettingsWidget;
 class UFindSessionsWidget;
 class USessionsSubsystem;
 class UButton;
@@ -24,10 +25,14 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UButton* FindSessionsButton;
 	UPROPERTY(meta = (BindWidget))
+	UButton* SettingsButton;
+	UPROPERTY(meta = (BindWidget))
 	UButton* QuitButton;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UFindSessionsWidget> FindSessionsWidgetClass;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserSettingsWidget> UserSettingsWidgetClass;
 
 	UFUNCTION()
 	void OnSessionStarted(bool bSuccessful);
@@ -39,6 +44,8 @@ private:
 	void OnFindSessionsButtonClicked();
 	UFUNCTION()
 	void OnQuitButtonClicked();
+	UFUNCTION()
+	void OnSettingsButtonClicked();
 
 	USessionsSubsystem* GetSessionsSubsystem() const;
 };

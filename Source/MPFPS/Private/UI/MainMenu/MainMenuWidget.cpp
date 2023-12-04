@@ -2,12 +2,12 @@
 
 
 #include "UI/MainMenu/MainMenuWidget.h"
-
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Subsystems/SessionsSubsystem.h"
 #include "UI/MainMenu/FindSessionsWidget.h"
+#include "UI/MainMenu/Settings/UserSettingsWidget.h"
 
 void UMainMenuWidget::NativeOnInitialized()
 {
@@ -16,14 +16,13 @@ void UMainMenuWidget::NativeOnInitialized()
 	QuitButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnQuitButtonClicked);
 	CreateSessionButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnCreateSessionButtonClicked);
 	FindSessionsButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnFindSessionsButtonClicked);
+	SettingsButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnSettingsButtonClicked);
 }
 
 void UMainMenuWidget::OnSessionStarted(bool bSuccessful)
 {
 	if (bSuccessful)
 	{
-		// /Game/MPFPS/Maps/Map_Blank
-		// /Game/FirstPerson/Maps/FirstPersonMap
 		UGameplayStatics::OpenLevel(GetWorld(), "/Game/FirstPerson/Maps/FirstPersonMap", true, "listen"); // todo: make it a reference to a level
 	}
 	else
@@ -45,8 +44,6 @@ void UMainMenuWidget::OnSessionCreated(bool bSuccessful)
 		USessionsSubsystem* SessionsSubsystem = GetSessionsSubsystem();
 		if (SessionsSubsystem)
 		{
-			/*SessionsSubsystem->OnStartSessionCompleteEvent.AddDynamic(this, &UMainMenuWidget::OnSessionStarted);
-			SessionsSubsystem->StartSession();*/
 			OnSessionStarted(true);
 		}
 	}
@@ -110,4 +107,16 @@ void UMainMenuWidget::OnFindSessionsButtonClicked()
 void UMainMenuWidget::OnQuitButtonClicked()
 {
 	UKismetSystemLibrary::QuitGame(GetWorld(), GetOwningPlayer(), EQuitPreference::Quit, false);
+}
+
+void UMainMenuWidget::OnSettingsButtonClicked()
+{
+	auto SettingsWidget = CreateWidget<UUserSettingsWidget>(GetOwningPlayer(), *UserSettingsWidgetClass);
+	if (SettingsWidget)
+	{
+		SettingsWidget->AddToViewport();
+		SettingsWidget->SetParentMenu(this);
+
+		SetVisibility(ESlateVisibility::Collapsed);
+	}
 }
