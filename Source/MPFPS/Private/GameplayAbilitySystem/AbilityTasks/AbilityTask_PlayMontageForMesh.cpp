@@ -7,6 +7,8 @@
 #include "GameFramework/Character.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogPlayMontageForMeshTask, All, All);
+
 UAbilityTask_PlayMontageForMesh::UAbilityTask_PlayMontageForMesh(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
@@ -56,8 +58,6 @@ void UAbilityTask_PlayMontageForMesh::OnMontageBlendingOut(UAnimMontage* Montage
 
 void UAbilityTask_PlayMontageForMesh::OnAbilityCancelled()
 {
-	// TODO: Merge this fix back to engine, it was calling the wrong callback
-
 	if (StopPlayingMontage(OverrideBlendOutTimeForCancelAbility))
 	{
 		// Let the BP handle the interrupt as well
@@ -123,7 +123,7 @@ void UAbilityTask_PlayMontageForMesh::Activate()
 
 	if (Mesh == nullptr)
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s invalid Mesh"), *FString(__FUNCTION__));
+		UE_LOG(LogPlayMontageForMeshTask, Error, TEXT("%s invalid Mesh"), *FString(__FUNCTION__));
 		return;
 	}
 
@@ -171,17 +171,17 @@ void UAbilityTask_PlayMontageForMesh::Activate()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("UGSAbilityTask_PlayMontageForMeshAndWaitForEvent call to PlayMontage failed!"));
+			UE_LOG(LogPlayMontageForMeshTask, Warning, TEXT("UGSAbilityTask_PlayMontageForMeshAndWaitForEvent call to PlayMontage failed!"));
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UGSAbilityTask_PlayMontageForMeshAndWaitForEvent called on invalid AbilitySystemComponent"));
+		UE_LOG(LogPlayMontageForMeshTask, Warning, TEXT("UGSAbilityTask_PlayMontageForMeshAndWaitForEvent called on invalid AbilitySystemComponent"));
 	}
 
 	if (!bPlayedMontage)
 	{
-		UE_LOG(LogTemp, Warning,
+		UE_LOG(LogPlayMontageForMeshTask, Warning,
 			   TEXT("UGSAbilityTask_PlayMontageForMeshAndWaitForEvent called in Ability %s failed to play montage %s; Task Instance Name %s."),
 			   *Ability->GetName(), *GetNameSafe(MontageToPlay), *InstanceName.ToString());
 		if (ShouldBroadcastAbilityTaskDelegates())

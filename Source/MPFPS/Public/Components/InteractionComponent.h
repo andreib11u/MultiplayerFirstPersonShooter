@@ -8,7 +8,7 @@
 
 class UFPSGameplayAbility;
 /**
- *
+ * Something that the player can interact with
  */
 UCLASS(BlueprintType, Blueprintable, meta = (BlueprintSpawnableComponent))
 class MPFPS_API UInteractionComponent : public UBoxComponent
@@ -25,16 +25,18 @@ protected:
 	virtual void PostInitProperties() override;
 
 private:
+	/** Executes on a player when interaction happens */
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UFPSGameplayAbility> InteractionAbility;
 
-	/** Whether to instantly activate InteractionAbility on an interacting character or after ActivationTime */
+	/** Whether to instantly activate InteractionAbility or after ActivationTime */
 	UPROPERTY(EditAnywhere)
 	bool bInstant;
 
 	UPROPERTY(EditAnywhere, meta = (EditCondition = "!bInstant", EditConditionHides, Units = "s", ClampMin = "0"))
 	float ActivationTime = 1.f;
 
+	/** Showed when the player is looking at this component */
 	UPROPERTY(EditAnywhere)
 	FText InteractionText;
 };

@@ -10,6 +10,7 @@ class UUserSettingsWidget;
 class UFindSessionsWidget;
 class USessionsSubsystem;
 class UButton;
+
 /**
  *
  */

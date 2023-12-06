@@ -15,9 +15,6 @@ AFPSPlayerState::AFPSPlayerState()
 
 	AttributeSet = CreateDefaultSubobject<UPlayerAttributeSet>(TEXT("AttributeSet"));
 
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetCurrentHealthAttribute())
-		.AddUObject(this, &AFPSPlayerState::CurrentHealthChanged);
-
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 }
 
@@ -31,10 +28,3 @@ void AFPSPlayerState::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AFPSPlayerState::CurrentHealthChanged(const FOnAttributeChangeData& OnAttributeChangeData)
-{
-	if (OnAttributeChangeData.NewValue == 0.f)
-	{
-		// todo: ded
-	}
-}

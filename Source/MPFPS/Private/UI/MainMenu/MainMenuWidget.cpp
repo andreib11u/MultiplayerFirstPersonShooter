@@ -23,7 +23,7 @@ void UMainMenuWidget::OnSessionStarted(bool bSuccessful)
 {
 	if (bSuccessful)
 	{
-		UGameplayStatics::OpenLevel(GetWorld(), "/Game/FirstPerson/Maps/FirstPersonMap", true, "listen"); // todo: make it a reference to a level
+		UGameplayStatics::OpenLevel(GetWorld(), "/Game/Underground/Maps/Light_Level", true, "listen");
 	}
 	else
 	{

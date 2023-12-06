@@ -24,12 +24,6 @@ void ATargetActor_BoxCollision::Configure(const FVector& InStartTrace, const FVe
 
 TArray<FHitResult> ATargetActor_BoxCollision::PerformTrace()
 {
-	/*const FVector StartTrace = Character->GetMesh()->GetSocketLocation("Mouth");
-	FVector EndTrace = StartTrace;
-	EndTrace = Character->GetMesh()->GetSocketRotation("Mouth").Vector() * 20.f + EndTrace;*/
-
-	/*TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(Character);*/
 	TArray<FHitResult> Results;
 
 	const ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(CollisionChannel);

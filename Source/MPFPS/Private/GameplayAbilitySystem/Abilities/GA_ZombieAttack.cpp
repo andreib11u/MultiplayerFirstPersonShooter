@@ -20,7 +20,7 @@ void UGA_ZombieAttack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 {
 	if (AttackMontages.IsEmpty())
 	{
-		UE_LOG(LogTemp, Error, TEXT("AttackMontages is empty in %s"), *GetName())
+		UE_LOG(LogZombieBiteAbility, Error, TEXT("AttackMontages is empty in %s"), *GetName())
 		Cancel();
 		return;
 	}

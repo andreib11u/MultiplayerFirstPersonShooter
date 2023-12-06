@@ -15,9 +15,6 @@ APawn* AFPSGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, 
 	APawn* Pawn = Super::SpawnDefaultPawnFor_Implementation(NewPlayer, StartSpot);
 
 	auto PlayerController = Cast<AFPSPlayerController>(NewPlayer);
-	/*int32 Team = PlayerController->GetTeam();
-	auto Character = Cast<APlayerCharacter>(Pawn);
-	Character->SetTeam(Team);*/
 
 	return Pawn;
 }

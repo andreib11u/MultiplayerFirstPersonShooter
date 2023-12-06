@@ -49,7 +49,7 @@ void AAIControlledEnemy::BeginPlay()
 		auto AttributeSet = AbilitySystemComponent->GetAttributeSet<UBaseAttributeSet>();
 		if (AttributeSet)
 		{
-			if (AttributeSet->GetCurrentHealth() <= 0.f) // todo: check for a tag instead
+			if (AttributeSet->GetCurrentHealth() <= 0.f)
 			{
 				Destroy(true);
 			}

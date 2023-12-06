@@ -10,15 +10,15 @@
 class APlayerCharacter;
 class UAbilityTask_WaitCameraMoved;
 class UAbilityTask_WaitTargetDataUsingActor;
+
 /**
- *
+ * Revive a downed player
  */
 UCLASS()
 class MPFPS_API UGA_Revive : public UFPSGameplayAbility
 {
 	GENERATED_BODY()
 public:
-	UGA_Revive();
 	void ConfigureTargetActor();
 	void SpawnTargetActor();
 

@@ -9,7 +9,6 @@
 #include "Settings/FPSSessionSettings.h"
 #include "Weapons/EquipmentComponent.h"
 
-// Declare the attributes to capture and define how we want to capture them from the Source and Target.
 struct FDamageStatics
 {
 	DECLARE_ATTRIBUTE_CAPTUREDEF(CurrentHealth);

@@ -12,7 +12,6 @@
 #include "GameplayAbilitySystem/Abilities/FPSGameplayAbility.h"
 #include "GameplayFramework/FPSPlayerState.h"
 #include "Input/InputDataAsset.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "Subsystems/FindActorsOfClassSubsystem.h"
@@ -103,26 +102,26 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	if (InputActions->PrimaryAction)
 	{
-		EnhancedInputComponent->BindAction(InputActions->PrimaryAction, ETriggerEvent::Started, this, &APlayerCharacter::PrimaryActionPressed);
-		EnhancedInputComponent->BindAction(InputActions->PrimaryAction, ETriggerEvent::Completed, this, &APlayerCharacter::PrimaryActionReleased);
+		EnhancedInputComponent->BindAction(InputActions->PrimaryAction, ETriggerEvent::Started, this, &APlayerCharacter::QueuedAbilityActionPressed, EAbilityInput::PrimaryAction);
+		EnhancedInputComponent->BindAction(InputActions->PrimaryAction, ETriggerEvent::Completed, this, &APlayerCharacter::QueuedAbilityActionReleased, EAbilityInput::PrimaryAction);
 	}
 
 	if (InputActions->SecondaryAction)
 	{
-		EnhancedInputComponent->BindAction(InputActions->SecondaryAction, ETriggerEvent::Started, this, &APlayerCharacter::SecondaryActionPressed);
-		EnhancedInputComponent->BindAction(InputActions->SecondaryAction, ETriggerEvent::Completed, this, &APlayerCharacter::SecondaryActionReleased);
+		EnhancedInputComponent->BindAction(InputActions->SecondaryAction, ETriggerEvent::Started, this, &APlayerCharacter::AbilityActionPressed, EAbilityInput::SecondaryAction);
+		EnhancedInputComponent->BindAction(InputActions->SecondaryAction, ETriggerEvent::Completed, this, &APlayerCharacter::AbilityActionReleased, EAbilityInput::SecondaryAction);
 	}
 
 	if (InputActions->Reload)
 	{
-		EnhancedInputComponent->BindAction(InputActions->Reload, ETriggerEvent::Started, this, &APlayerCharacter::ReloadPressed);
-		EnhancedInputComponent->BindAction(InputActions->Reload, ETriggerEvent::Completed, this, &APlayerCharacter::ReloadReleased);
+		EnhancedInputComponent->BindAction(InputActions->Reload, ETriggerEvent::Started, this, &APlayerCharacter::AbilityActionPressed, EAbilityInput::Reload);
+		EnhancedInputComponent->BindAction(InputActions->Reload, ETriggerEvent::Completed, this, &APlayerCharacter::AbilityActionReleased, EAbilityInput::Reload);
 	}
 
 	if (InputActions->Use)
 	{
-		EnhancedInputComponent->BindAction(InputActions->Use, ETriggerEvent::Started, this, &APlayerCharacter::UsePressed);
-		EnhancedInputComponent->BindAction(InputActions->Use, ETriggerEvent::Completed, this, &APlayerCharacter::UseReleased);
+		EnhancedInputComponent->BindAction(InputActions->Use, ETriggerEvent::Started, this, &APlayerCharacter::AbilityActionPressed, EAbilityInput::Interact);
+		EnhancedInputComponent->BindAction(InputActions->Use, ETriggerEvent::Completed, this, &APlayerCharacter::AbilityActionReleased, EAbilityInput::Interact);
 	}
 }
 
@@ -157,13 +156,6 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 
 	InitializeAttributes();
 }
-
-// void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-//{
-//	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-//
-//	DOREPLIFETIME(APlayerCharacter, CharacterAmmo);
-// }
 
 void APlayerCharacter::OnItemChanged(UEquippableItem* Item)
 {
@@ -289,7 +281,6 @@ void APlayerCharacter::ShowDebugSpreadCone(float HalfConeDeg)
 		const FVector EndTrace = StartTrace + Result * 9999.f;
 
 		TArray<AActor*> ActorsToIgnore;
-		/*ActorsToIgnore.Add(Character);*/
 		TArray<FHitResult> Results;
 
 		const ETraceTypeQuery TraceType = UEngineTypes::ConvertToTraceType(BULLET_TRACE_COLLISION);
@@ -356,10 +347,8 @@ void APlayerCharacter::RecoveredFromDying()
 	ReviveInteraction->SetCollisionResponseToChannel(INTERACTION_TRACE_COLLISION, ECR_Ignore);
 }
 
-void APlayerCharacter::Tick(float DeltaSeconds)
+void APlayerCharacter::MoveCameraWhenDowned(float DeltaSeconds)
 {
-	Super::Tick(DeltaSeconds);
-
 	if (bMoveTPCamera)
 	{
 		const float TargetArmLength = bMoveCameraForward ? InitialArmLengthTPCamera : TargetArmLengthTPCamera;
@@ -373,6 +362,13 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 			OnCameraFullyMoved.Broadcast();
 		}
 	}
+}
+
+void APlayerCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	MoveCameraWhenDowned(DeltaSeconds);
 }
 
 void APlayerCharacter::InitializeAttributes()
@@ -450,43 +446,23 @@ void APlayerCharacter::Move(const FInputActionValue& InputActionValue)
 	AddMovementInput(GetActorRightVector(), Value.X);
 	AddMovementInput(GetActorForwardVector(), Value.Y);
 }
-// todo: change on two functions with payload instead
-void APlayerCharacter::PrimaryActionPressed()
+
+void APlayerCharacter::QueuedAbilityActionPressed(EAbilityInput AbilityInput)
 {
-	AbilitySystemComponent->AbilityLocalInputPressedQueued(static_cast<int32>(EAbilityInput::PrimaryAction));
+	AbilitySystemComponent->AbilityLocalInputPressedQueued(static_cast<int32>(AbilityInput));
 }
 
-void APlayerCharacter::PrimaryActionReleased()
+void APlayerCharacter::QueuedAbilityActionReleased(EAbilityInput AbilityInput)
 {
-	AbilitySystemComponent->AbilityLocalInputReleasedQueued(static_cast<int32>(EAbilityInput::PrimaryAction));
+	AbilitySystemComponent->AbilityLocalInputReleasedQueued(static_cast<int32>(AbilityInput));
 }
 
-void APlayerCharacter::SecondaryActionPressed()
+void APlayerCharacter::AbilityActionPressed(EAbilityInput AbilityInput)
 {
-	AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityInput::SecondaryAction));
+	AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(AbilityInput));
 }
 
-void APlayerCharacter::SecondaryActionReleased()
+void APlayerCharacter::AbilityActionReleased(EAbilityInput AbilityInput)
 {
-	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInput::SecondaryAction));
-}
-
-void APlayerCharacter::ReloadPressed()
-{
-	AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityInput::Reload));
-}
-
-void APlayerCharacter::ReloadReleased()
-{
-	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInput::Reload));
-}
-
-void APlayerCharacter::UsePressed()
-{
-	AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityInput::Interact));
-}
-
-void APlayerCharacter::UseReleased()
-{
-	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(EAbilityInput::Interact));
+	AbilitySystemComponent->AbilityLocalInputReleased(static_cast<int32>(AbilityInput));
 }

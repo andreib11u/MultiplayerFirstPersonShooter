@@ -37,7 +37,7 @@ private:
 	float ShotCooldown = 0.1f;
 
 	UPROPERTY()
-	class UGameplayAbility_FireOnce* SingleShotAbilityInstance;
+	class UGA_FireOnce* SingleShotAbilityInstance;
 	UPROPERTY()
 	class UAbilityTask_WaitDelay* WaitDelayTask;
 	UPROPERTY()
@@ -54,5 +54,5 @@ private:
 
 	FGameplayAbilitySpecHandle SingleShotAbilitySpecHandle;
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<UGameplayAbility_FireOnce> SingleShotAbilityClass;
+	TSubclassOf<UGA_FireOnce> SingleShotAbilityClass;
 };

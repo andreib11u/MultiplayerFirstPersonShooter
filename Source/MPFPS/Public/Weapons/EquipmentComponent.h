@@ -50,7 +50,7 @@ public:
 	void SpendAmmo(float Ammo);
 	void ReloadAmmo();
 
-	void AddSpread(float InSpread);
+	void AddSpread();
 	FOnSpreadAdded OnSpreadAdded;
 
 	void SetCurrentClipAmmo(float Ammo);

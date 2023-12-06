@@ -6,7 +6,7 @@
 #include "Weapons/EquipmentComponent.h"
 #include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
 #include "Abilities/Tasks/AbilityTask_WaitDelay.h"
-#include "GameplayAbilitySystem/Abilities/GameplayAbility_FireOnce.h"
+#include "GameplayAbilitySystem/Abilities/GA_FireOnce.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogShootAbility, All, All);
 
@@ -40,7 +40,7 @@ void UGA_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
 			return;
 		}
 
-		SingleShotAbilityInstance = Cast<UGameplayAbility_FireOnce>(SingleShotAbilitySpec->GetPrimaryInstance());
+		SingleShotAbilityInstance = Cast<UGA_FireOnce>(SingleShotAbilitySpec->GetPrimaryInstance());
 		SingleShotAbilitySpecHandle = SingleShotAbilitySpec->Handle;
 
 		if (Weapon->GetFireModeTag().MatchesTag(SemiAutoTag))

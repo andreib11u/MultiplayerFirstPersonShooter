@@ -41,6 +41,8 @@ public:
 	float AimSpread = 0.01;
 	UPROPERTY(EditAnywhere)
 	float Range = 9999.f;
+	UPROPERTY(EditAnywhere)
+	float SpreadPerShot = 0.1;
 };
 
 UENUM(BlueprintType)

@@ -8,7 +8,6 @@ void UDamageDirectionIndicatorWidget::CalculateTransform()
 	{
 		const FVector LookDirection = OriginActor->GetActorForwardVector();
 		FVector DamageDirection = DamageCauser->GetActorLocation() - OriginActor->GetActorLocation();
-		DamageDirection.Normalize(); // todo: test what if without normalization
 
 		const float AbsoluteLookAngle = FMath::Atan2(LookDirection.Y, LookDirection.X);
 		const float AbsoluteDamageAngle = FMath::Atan2(DamageDirection.Y, DamageDirection.X);

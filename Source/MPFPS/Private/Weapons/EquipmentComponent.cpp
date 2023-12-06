@@ -196,12 +196,12 @@ void UEquipmentComponent::ReloadAmmo()
 	}
 }
 
-void UEquipmentComponent::AddSpread(float InSpread)
+void UEquipmentComponent::AddSpread()
 {
 	if (!PlayerCharacterOwner->GetAbilitySystemComponent()->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Weapon.State.Aiming")))
 	{
-		AddedSpread = FMath::Clamp(AddedSpread + InSpread, 0.f, TargetMaxSpread);
-		OnSpreadAdded.ExecuteIfBound(InSpread);
+		AddedSpread = FMath::Clamp(AddedSpread + GetWeaponStats().SpreadPerShot, 0.f, TargetMaxSpread);
+		OnSpreadAdded.ExecuteIfBound(GetWeaponStats().SpreadPerShot);
 	}
 }
 

@@ -8,6 +8,7 @@
 #include "Weapons/Weapon.h"
 #include "PlayerCharacter.generated.h"
 
+enum class EAbilityInput;
 class UInteractionComponent;
 class USpringArmComponent;
 class UPlayerAttributeSet;
@@ -50,13 +51,13 @@ public:
 	FOnCameraFullyMoved OnCameraFullyMoved;
 
 	void RecoveredFromDying();
+	void SetFirstPersonMeshVisibility();
+	void SetThirdPersonMeshVisibility();
 
 protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
-	void SetFirstPersonMeshVisibility();
-	void SetThirdPersonMeshVisibility();
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual void Tick(float DeltaSeconds) override;
@@ -67,6 +68,8 @@ protected:
 	virtual void OnZeroHealth() override;
 
 	virtual void OnReviving(FGameplayTag GameplayTag, int32 Count);
+
+	void MoveCameraWhenDowned(float DeltaSeconds);
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -135,12 +138,8 @@ private:
 	void Look(const FInputActionValue& InputActionValue);
 	void Move(const FInputActionValue& InputActionValue);
 
-	void PrimaryActionPressed();
-	void PrimaryActionReleased();
-	void SecondaryActionPressed();
-	void SecondaryActionReleased();
-	void ReloadPressed();
-	void ReloadReleased();
-	void UsePressed();
-	void UseReleased();
+	void QueuedAbilityActionPressed(EAbilityInput AbilityInput);
+	void QueuedAbilityActionReleased(EAbilityInput AbilityInput);
+	void AbilityActionPressed(EAbilityInput AbilityInput);
+	void AbilityActionReleased(EAbilityInput AbilityInput);
 };

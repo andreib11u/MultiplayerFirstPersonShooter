@@ -24,7 +24,7 @@ public:
 	virtual void OnEquip(UEquipmentComponent* EquipmentComponent) override;
 
 protected:
-	virtual bool IsNameStableForNetworking() const override { return true; } // todo: remove
+	virtual bool IsNameStableForNetworking() const override { return true; }
 	virtual bool IsSupportedForNetworking() const override { return true; }
 
 public:

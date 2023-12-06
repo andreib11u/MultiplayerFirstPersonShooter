@@ -1,7 +1,6 @@
 // Copyright Andrei Bondarenko 2023
 
 #include "UI/HUD/CrosshairWidget.h"
-
 #include "Camera/CameraComponent.h"
 #include "Components/Border.h"
 #include "Components/CanvasPanelSlot.h"
@@ -11,6 +10,8 @@
 #include "MPFPS/MPFPS.h"
 #include "Types/CollisionTypes.h"
 #include "Weapons/EquipmentComponent.h"
+
+DECLARE_CYCLE_STAT(TEXT("FPSUI - Crosshair"), STAT_Crosshair, STATGROUP_FPSUI);
 
 void UCrosshairWidget::Init(UEquipmentComponent* Equipment)
 {
@@ -94,6 +95,8 @@ void UCrosshairWidget::UpdateColorWithTargetAttitude()
 
 void UCrosshairWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
+	SCOPE_CYCLE_COUNTER(STAT_Crosshair);
+
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
 	TargetSpread = EquipmentComponent->GetSpread();
@@ -107,8 +110,6 @@ void UCrosshairWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime
 
 void UCrosshairWidget::CalculateCrosshairPosition()
 {
-	// todo cycle stat
-
 	const FGeometry& Geometry = GetCachedGeometry();
 	auto LocalSize = Geometry.GetLocalSize();
 

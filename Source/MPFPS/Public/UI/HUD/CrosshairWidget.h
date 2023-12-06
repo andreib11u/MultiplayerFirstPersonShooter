@@ -12,6 +12,9 @@ class UImage;
 class UEquipmentComponent;
 class UBorder;
 class UFPSAbilitySystemComponent;
+
+DECLARE_STATS_GROUP(TEXT("FPSUI"), STATGROUP_FPSUI, STATCAT_Advanced);
+
 /**
  *
  */

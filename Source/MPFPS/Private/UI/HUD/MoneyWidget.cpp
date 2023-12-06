@@ -2,7 +2,6 @@
 
 
 #include "UI/HUD/MoneyWidget.h"
-
 #include "GameplayEffectExtension.h"
 #include "Components/Overlay.h"
 #include "Components/TextBlock.h"
@@ -13,7 +12,7 @@
 
 void UMoneyWidget::OnMoneyChanged(const FOnAttributeChangeData& OnAttributeChangeData)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Oldvalue: %f, NewValue: %f"), OnAttributeChangeData.OldValue, OnAttributeChangeData.NewValue)
+	UE_LOG(LogUI, Warning, TEXT("Oldvalue: %f, NewValue: %f"), OnAttributeChangeData.OldValue, OnAttributeChangeData.NewValue)
 
 	const float ValueAdded = OnAttributeChangeData.NewValue - OnAttributeChangeData.OldValue;
 

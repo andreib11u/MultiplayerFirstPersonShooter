@@ -6,17 +6,11 @@
 #include "Camera/CameraComponent.h"
 #include "Characters/PlayerCharacter.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_ServerWaitForClientData.h"
-#include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitCameraMoved.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitTargetDataUsingActor.h"
 #include "GameplayAbilitySystem/TargetActors/TargetActor_LineTrace.h"
-#include "GameplayAbilitySystem/TargetActors/TargetActor_LineTraceServer.h"
 #include "Types/CollisionTypes.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogReviveAbility, All, All);
-
-UGA_Revive::UGA_Revive()
-{
-}
 
 void UGA_Revive::ConfigureTargetActor()
 {

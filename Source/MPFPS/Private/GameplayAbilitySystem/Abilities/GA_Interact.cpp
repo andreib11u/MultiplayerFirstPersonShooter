@@ -188,7 +188,6 @@ void UGA_Interact::ActivateInteractionAbility()
 	if (InteractionAbility)
 	{
 		bool bActivated = TargetAbilitySystemComponent->TryActivateAbilityByClass(InteractionAbility);
-		UE_LOG(LogTemp, Warning, TEXT("Activated: %i"), bActivated)
 
 		EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, false);
 	}

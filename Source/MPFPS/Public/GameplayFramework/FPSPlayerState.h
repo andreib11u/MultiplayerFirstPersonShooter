@@ -34,5 +34,4 @@ private:
 	UPROPERTY()
 	UPlayerAttributeSet* AttributeSet;
 
-	void CurrentHealthChanged(const FOnAttributeChangeData& OnAttributeChangeData);
 };

@@ -7,6 +7,8 @@
 #include "GameFramework/Character.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogPlayMontageTask, All, All);
+
 UAbilityTask_PlayMontage::UAbilityTask_PlayMontage(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
@@ -56,8 +58,6 @@ void UAbilityTask_PlayMontage::OnMontageBlendingOut(UAnimMontage* Montage, bool 
 
 void UAbilityTask_PlayMontage::OnAbilityCancelled()
 {
-	// TODO: Merge this fix back to engine, it was calling the wrong callback
-
 	if (StopPlayingMontage())
 	{
 		// Let the BP handle the interrupt as well
@@ -160,17 +160,17 @@ void UAbilityTask_PlayMontage::Activate()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("UGSAbilityTask_PlayMontageAndWaitForEvent call to PlayMontage failed!"));
+			UE_LOG(LogPlayMontageTask, Warning, TEXT("UGSAbilityTask_PlayMontageAndWaitForEvent call to PlayMontage failed!"));
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UGSAbilityTask_PlayMontageAndWaitForEvent called on invalid AbilitySystemComponent"));
+		UE_LOG(LogPlayMontageTask, Warning, TEXT("UGSAbilityTask_PlayMontageAndWaitForEvent called on invalid AbilitySystemComponent"));
 	}
 
 	if (!bPlayedMontage)
 	{
-		UE_LOG(LogTemp, Warning,
+		UE_LOG(LogPlayMontageTask, Warning,
 			   TEXT("UGSAbilityTask_PlayMontageAndWaitForEvent called in Ability %s failed to play montage %s; Task Instance Name %s."),
 			   *Ability->GetName(), *GetNameSafe(MontageToPlay), *InstanceName.ToString());
 		if (ShouldBroadcastAbilityTaskDelegates())
