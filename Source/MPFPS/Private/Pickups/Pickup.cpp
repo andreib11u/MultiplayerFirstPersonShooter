@@ -1,13 +1,13 @@
 // Copyright Andrei Bondarenko 2023
 
 #include "Pickups/Pickup.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "Components/SphereComponent.h"
 
 void APickup::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 							 bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (auto OverlappedPlayerCharacter = Cast<APlayerCharacter>(OtherActor))
+	if (auto OverlappedPlayerCharacter = Cast<AShootingCharacter>(OtherActor))
 	{
 		OnPickup(OverlappedPlayerCharacter);
 		Destroy();
@@ -53,6 +53,6 @@ void APickup::Tick(float DeltaTime)
 	}
 }
 
-void APickup::OnPickup(APlayerCharacter* PlayerCharacter)
+void APickup::OnPickup(AShootingCharacter* PlayerCharacter)
 {
 }

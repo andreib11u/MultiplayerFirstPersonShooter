@@ -5,7 +5,7 @@
 #include "AbilitySystemComponent.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "Subsystems/FindActorsOfClassSubsystem.h"
 
 UBTService_ChangeTargetToClosest::UBTService_ChangeTargetToClosest()
@@ -25,7 +25,7 @@ void UBTService_ChangeTargetToClosest::TickNode(UBehaviorTreeComponent& OwnerCom
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
-	TArray<AActor*> PlayerCharacters = FindActorsSubsystem->FindAllActors(APlayerCharacter::StaticClass());
+	TArray<AActor*> PlayerCharacters = FindActorsSubsystem->FindAllActors(AShootingCharacter::StaticClass());
 
 	PlayerCharacters.RemoveAll(
 		[](AActor* PlayerCharacter)
@@ -35,7 +35,7 @@ void UBTService_ChangeTargetToClosest::TickNode(UBehaviorTreeComponent& OwnerCom
 				return true;
 			}
 
-			return CastChecked<APlayerCharacter>(PlayerCharacter)
+			return CastChecked<AShootingCharacter>(PlayerCharacter)
 				->GetAbilitySystemComponent()
 				->HasMatchingGameplayTag(FGameplayTag::RequestGameplayTag("Character.State.Downed"));
 		});

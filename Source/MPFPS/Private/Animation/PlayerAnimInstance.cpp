@@ -1,7 +1,7 @@
 // Copyright Andrei Bondarenko 2023
 
 #include "Animation/PlayerAnimInstance.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "KismetAnimationLibrary.h"
@@ -16,7 +16,7 @@ void UPlayerAnimInstance::NativeInitializeAnimation()
 		return;
 	}
 
-	PlayerCharacter = Cast<APlayerCharacter>(PawnOwner);
+	PlayerCharacter = Cast<AShootingCharacter>(PawnOwner);
 	check(PlayerCharacter);
 
 	CharacterMovement = PlayerCharacter->GetCharacterMovement();

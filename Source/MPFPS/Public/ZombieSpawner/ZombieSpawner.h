@@ -17,6 +17,7 @@ class MPFPS_API AZombieSpawner : public AActor
 public:
 	AZombieSpawner();
 
+	void SpawnZombieAt(AZombieSpawn* Spawn);
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;

@@ -24,7 +24,7 @@ void UCrosshairWidget::Init(UEquipmentComponent* Equipment)
 	EquipmentComponent = Equipment;
 	EquipmentComponent->OnSpreadAdded.BindUObject(this, &UCrosshairWidget::OnSpreadAdded);
 
-	PlayerCharacter = GetOwningPlayer()->GetPawn<APlayerCharacter>();
+	PlayerCharacter = GetOwningPlayer()->GetPawn<AShootingCharacter>();
 	check(PlayerCharacter);
 
 	SetTargetSpread(EquipmentComponent->GetSpread());

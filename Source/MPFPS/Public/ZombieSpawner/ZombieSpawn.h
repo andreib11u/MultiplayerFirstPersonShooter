@@ -7,7 +7,7 @@
 #include "ZombieSpawn.generated.h"
 
 class UBoxComponent;
-class APlayerCharacter;
+class AShootingCharacter;
 
 UCLASS()
 class MPFPS_API AZombieSpawn : public AActor
@@ -26,7 +26,7 @@ protected:
 
 private:
 	UPROPERTY()
-	TArray<APlayerCharacter*> Players;
+	TArray<AShootingCharacter*> Players;
 
 	UPROPERTY(EditAnywhere)
 	USceneComponent* SpawnLocation;

@@ -1,7 +1,7 @@
 // Copyright Andrei Bondarenko 2023
 
 #include "UI/HUDWidget.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
@@ -19,7 +19,7 @@ void UHUDWidget::Init(UFPSAbilitySystemComponent* AbilitySystemComponent)
 	HealthBarWidget->Init(AbilitySystemComponent);
 	MoneyWidget->Init(AbilitySystemComponent);
 
-	CharacterOwner = Cast<APlayerCharacter>(AbilitySystemComponent->GetAvatarActor());
+	CharacterOwner = Cast<AShootingCharacter>(AbilitySystemComponent->GetAvatarActor());
 	check(CharacterOwner);
 
 	InteractionWidget->Init(CharacterOwner);

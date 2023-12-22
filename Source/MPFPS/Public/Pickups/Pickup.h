@@ -7,7 +7,7 @@
 #include "Pickup.generated.h"
 
 class USphereComponent;
-class APlayerCharacter;
+class AShootingCharacter;
 
 UCLASS()
 class MPFPS_API APickup : public AActor
@@ -21,7 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void OnPickup(APlayerCharacter* PlayerCharacter);
+	virtual void OnPickup(AShootingCharacter* PlayerCharacter);
 
 private:
 	UPROPERTY(EditAnywhere)

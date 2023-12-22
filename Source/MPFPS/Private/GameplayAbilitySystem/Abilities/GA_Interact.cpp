@@ -5,7 +5,7 @@
 #include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
 #include "Camera/CameraComponent.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "Components/InteractionComponent.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_Tick.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitTargetDataUsingActor.h"
@@ -46,7 +46,7 @@ void UGA_Interact::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 {
 	TimeActive = 0.f;
 
-	PlayerCharacter = Cast<APlayerCharacter>(ActorInfo->AvatarActor);
+	PlayerCharacter = Cast<AShootingCharacter>(ActorInfo->AvatarActor);
 	if (!PlayerCharacter.IsValid())
 	{
 		UE_LOG(LogInteractAbility, Error, TEXT("Interact ability tried to activate on non-PlayerCharacter actor"));

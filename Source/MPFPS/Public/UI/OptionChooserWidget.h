@@ -12,7 +12,7 @@ class UButton;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnOptionIndexChanged, int32, OptionIndex);
 
 /**
- *
+ * Chooses one option with left and right buttons
  */
 UCLASS()
 class MPFPS_API UOptionChooserWidget : public UFPSUserWidget
@@ -23,11 +23,12 @@ public:
 	FOnOptionIndexChanged OnOptionIndexChanged;
 
 	void SetOptionIndex(int32 Index, bool bBroadcast = true);
+	int32 GetOptionIndex() const { return CurrentIndex; }
 
+	void SetOptions(const TArray<FText>& InOptions) { Options = InOptions; }
+	virtual TArray<FText> GetOptions() const { return Options; }
 protected:
 	virtual void NativeOnInitialized() override;
-
-	virtual TArray<FText> GetOptions() const { return Options; }
 private:
 	UPROPERTY(meta = (BindWidget))
 	UButton* LeftButton;

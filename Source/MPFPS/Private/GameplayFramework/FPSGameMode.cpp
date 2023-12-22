@@ -3,24 +3,13 @@
 
 #include "GameplayFramework/FPSGameMode.h"
 #include "EngineUtils.h"
-#include "Characters/PlayerCharacter.h"
 #include "GameFramework/PlayerStart.h"
-#include "GameplayFramework/FPSPlayerController.h"
 #include "Settings/FPSSettings.h"
-
-static int32 PlayerIndex = 0;
-
-APawn* AFPSGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)
-{
-	APawn* Pawn = Super::SpawnDefaultPawnFor_Implementation(NewPlayer, StartSpot);
-
-	auto PlayerController = Cast<AFPSPlayerController>(NewPlayer);
-
-	return Pawn;
-}
 
 AActor* AFPSGameMode::ChoosePlayerStart_Implementation(AController* Player)
 {
+	static int32 PlayerIndex = 0;
+
 	TArray<APlayerStart*> PlayerStarts;
 	for (TActorIterator<APlayerStart> It(GetWorld(), APlayerStart::StaticClass()); It; ++It)
 	{

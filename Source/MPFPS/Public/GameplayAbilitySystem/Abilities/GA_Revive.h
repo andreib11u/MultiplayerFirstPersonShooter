@@ -7,7 +7,7 @@
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_ServerWaitForClientData.h"
 #include "GA_Revive.generated.h"
 
-class APlayerCharacter;
+class AShootingCharacter;
 class UAbilityTask_WaitCameraMoved;
 class UAbilityTask_WaitTargetDataUsingActor;
 
@@ -32,7 +32,7 @@ private:
 	UPROPERTY()
 	UAbilityTask_WaitTargetDataUsingActor* WaitTargetDataTask;
 
-	TWeakObjectPtr<APlayerCharacter> ReviverCharacter;
+	TWeakObjectPtr<AShootingCharacter> ReviverCharacter;
 	UPROPERTY()
 	UAbilityTask_WaitCameraMoved* WaitCameraMovedTask;
 	TWeakObjectPtr<UAbilitySystemComponent> TargetAbilitySystemComponent;

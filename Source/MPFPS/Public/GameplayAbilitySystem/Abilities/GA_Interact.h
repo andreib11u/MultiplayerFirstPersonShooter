@@ -11,7 +11,7 @@
 class UInteractionComponent;
 class UAbilityTask_WaitInputRelease;
 class UAbilityTask_Tick;
-class APlayerCharacter;
+class AShootingCharacter;
 class UAbilityTask_WaitTargetDataUsingActor;
 class AGameplayAbilityTargetActor;
 /**
@@ -37,7 +37,7 @@ private:
 	UPROPERTY()
 	AGameplayAbilityTargetActor* TargetActor;
 
-	TWeakObjectPtr<APlayerCharacter> PlayerCharacter;
+	TWeakObjectPtr<AShootingCharacter> PlayerCharacter;
 	UPROPERTY()
 	UAbilityTask_Tick* TickTask;
 

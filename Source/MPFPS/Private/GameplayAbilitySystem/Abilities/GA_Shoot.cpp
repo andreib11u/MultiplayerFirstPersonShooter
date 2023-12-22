@@ -2,7 +2,7 @@
 
 #include "GameplayAbilitySystem/Abilities/GA_Shoot.h"
 #include "AbilitySystemComponent.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "Weapons/EquipmentComponent.h"
 #include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
 #include "Abilities/Tasks/AbilityTask_WaitDelay.h"
@@ -13,7 +13,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogShootAbility, All, All);
 void UGA_Shoot::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 								const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	if (auto PlayerCharacter = Cast<APlayerCharacter>(ActorInfo->AvatarActor))
+	if (auto PlayerCharacter = Cast<AShootingCharacter>(ActorInfo->AvatarActor))
 	{
 		auto Weapon = Cast<UWeapon>(PlayerCharacter->GetEquipmentComponent()->GetCurrentItem());
 		if (!Weapon)

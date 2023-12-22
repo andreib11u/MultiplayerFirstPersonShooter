@@ -4,7 +4,7 @@
 #include "AbilitySystemComponent.h"
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
 #include "Camera/CameraComponent.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_ServerWaitForClientData.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitTargetDataUsingActor.h"
 #include "GameplayAbilitySystem/TargetActors/TargetActor_LineTrace.h"
@@ -43,7 +43,7 @@ void UGA_Revive::SpawnTargetActor()
 void UGA_Revive::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 								 const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	ReviverCharacter = Cast<APlayerCharacter>(ActorInfo->AvatarActor);
+	ReviverCharacter = Cast<AShootingCharacter>(ActorInfo->AvatarActor);
 	if (!ReviverCharacter.IsValid())
 	{
 		UE_LOG(LogReviveAbility, Error, TEXT("Revive ability tried to activate on non-PlayerCharacter actor"));

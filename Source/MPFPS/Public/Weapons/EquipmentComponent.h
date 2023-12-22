@@ -10,7 +10,7 @@
 #include "EquipmentComponent.generated.h"
 
 class UCharacterMovementComponent;
-class APlayerCharacter;
+class AShootingCharacter;
 class UAbilitySystemComponent;
 class UEquippableItem;
 
@@ -107,7 +107,7 @@ private:
 	UPROPERTY()
 	UAbilitySystemComponent* AbilitySystemComponent;
 	UPROPERTY()
-	APlayerCharacter* PlayerCharacterOwner;
+	AShootingCharacter* PlayerCharacterOwner;
 	UPROPERTY()
 	UCharacterMovementComponent* OwnerMovement;
 	UPROPERTY()

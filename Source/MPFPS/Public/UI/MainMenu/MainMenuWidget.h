@@ -6,6 +6,7 @@
 #include "UI/FPSUserWidget.h"
 #include "MainMenuWidget.generated.h"
 
+class UCreateSessionWidget;
 class UUserSettingsWidget;
 class UFindSessionsWidget;
 class USessionsSubsystem;
@@ -34,11 +35,9 @@ private:
 	TSubclassOf<UFindSessionsWidget> FindSessionsWidgetClass;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserSettingsWidget> UserSettingsWidgetClass;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UCreateSessionWidget> CreateSessionWidgetClass;
 
-	UFUNCTION()
-	void OnSessionStarted(bool bSuccessful);
-	UFUNCTION()
-	void OnSessionCreated(bool bSuccessful);
 	UFUNCTION()
 	void OnCreateSessionButtonClicked();
 	UFUNCTION()
@@ -47,6 +46,4 @@ private:
 	void OnQuitButtonClicked();
 	UFUNCTION()
 	void OnSettingsButtonClicked();
-
-	USessionsSubsystem* GetSessionsSubsystem() const;
 };

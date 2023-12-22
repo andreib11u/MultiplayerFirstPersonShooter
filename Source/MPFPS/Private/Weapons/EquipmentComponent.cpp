@@ -2,7 +2,7 @@
 
 #include "Weapons/EquipmentComponent.h"
 
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Types/FPSGameplayAbilityTypes.h"
@@ -158,8 +158,8 @@ void UEquipmentComponent::BeginPlay()
 
 	OnCurrentItemChanged.Broadcast(CurrentItem);
 
-	PlayerCharacterOwner = Cast<APlayerCharacter>(GetOwner());
-	checkf(PlayerCharacterOwner, TEXT("EquipmentComponent attached not to a APlayerCharacter"))
+	PlayerCharacterOwner = Cast<AShootingCharacter>(GetOwner());
+	checkf(PlayerCharacterOwner, TEXT("EquipmentComponent attached not to a AShootingCharacter"))
 
 		OwnerMovement = PlayerCharacterOwner->GetCharacterMovement();
 }

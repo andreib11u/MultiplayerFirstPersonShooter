@@ -1,7 +1,7 @@
 // Copyright Andrei Bondarenko 2023
 
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitCameraMoved.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 
 UAbilityTask_WaitCameraMoved::UAbilityTask_WaitCameraMoved()
 {
@@ -9,7 +9,7 @@ UAbilityTask_WaitCameraMoved::UAbilityTask_WaitCameraMoved()
 }
 
 UAbilityTask_WaitCameraMoved* UAbilityTask_WaitCameraMoved::WaitCameraMoved(UGameplayAbility* OwningAbility, FName TaskInstanceName,
-																			APlayerCharacter* PlayerCharacter)
+																			AShootingCharacter* PlayerCharacter)
 {
 	UAbilityTask_WaitCameraMoved* NewTask = NewAbilityTask<UAbilityTask_WaitCameraMoved>(OwningAbility, TaskInstanceName);
 	NewTask->Character = PlayerCharacter;

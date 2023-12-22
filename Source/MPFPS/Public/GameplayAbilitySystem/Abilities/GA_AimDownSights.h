@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "GameplayAbilitySystem/Abilities/FPSGameplayAbility.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitChangeFOV.h"
 #include "GA_AimDownSights.generated.h"
@@ -41,7 +41,7 @@ private:
 	UPROPERTY()
 	UAbilityTask_WaitInputRelease* WaitInputReleaseTask;
 	UPROPERTY()
-	APlayerCharacter* OwnerCharacter;
+	AShootingCharacter* OwnerCharacter;
 	UPROPERTY()
 	FActiveGameplayEffectHandle ActiveAimingEffectSpec;
 

@@ -69,12 +69,32 @@ public:
 	}
 };
 
+USTRUCT(BlueprintType)
+struct FMapOptions
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly)
+	TSoftObjectPtr<UWorld> Map = nullptr;
+	UPROPERTY(EditAnywhere)
+	FText MapName = FText();
+	UPROPERTY(EditAnywhere)
+	TArray<FName> AvailableModes = { "Deathmatch", "Co-op" };
+	UPROPERTY(EditAnywhere)
+	TSoftObjectPtr<UTexture2D> Image = nullptr;
+
+	FMapOptions() = default;
+	FMapOptions(const FMapOptions& Other) = default;
+	FMapOptions& operator=(const FMapOptions& Other) = default;
+
+	static TMap<FName, FText> GetLocalizedModeNames();
+};
+
 USTRUCT()
 struct FWeaponStateAnimations
 {
 	GENERATED_BODY()
 public:
-	//UPROPERTY(EditAnywhere)
-
+	// UPROPERTY(EditAnywhere)
 };
-

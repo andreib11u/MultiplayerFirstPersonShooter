@@ -8,7 +8,7 @@
 
 class UAimOffsetBlendSpace1D;
 class UCharacterMovementComponent;
-class APlayerCharacter;
+class AShootingCharacter;
 /**
  * 
  */
@@ -42,7 +42,7 @@ private:
 
 
 	UPROPERTY()
-	APlayerCharacter* PlayerCharacter;
+	AShootingCharacter* PlayerCharacter;
 	UPROPERTY()
 	UCharacterMovementComponent* CharacterMovement;
 };

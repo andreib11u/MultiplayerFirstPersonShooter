@@ -3,7 +3,7 @@
 #include "GameplayAbilitySystem/Calculations/BulletDamage.h"
 
 #include "Characters/BaseCharacter.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "GameplayAbilitySystem/AttributeSets/BaseAttributeSet.h"
 #include "GameplayFramework/FPSGameState.h"
 #include "Settings/FPSSessionSettings.h"

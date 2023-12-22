@@ -1,7 +1,7 @@
 // Copyright Andrei Bondarenko 2023
 
 #include "GameplayAbilitySystem/Abilities/GA_GiveWeapon.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_PlayMontageForMesh.h"
 #include "Weapons/EquipmentComponent.h"
 
@@ -15,7 +15,7 @@ UGA_GiveWeapon::UGA_GiveWeapon()
 void UGA_GiveWeapon::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
                                      const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	if (auto PlayerCharacter = Cast<APlayerCharacter>(ActorInfo->AvatarActor))
+	if (auto PlayerCharacter = Cast<AShootingCharacter>(ActorInfo->AvatarActor))
 	{
 		CommitAbilityCost(Handle, ActorInfo, ActivationInfo);
 		PlayerCharacter->GetEquipmentComponent()->AddWeapon(Weapon);

@@ -15,7 +15,7 @@ class MPFPS_API AWeaponPickup : public APickup
 {
 	GENERATED_BODY()
 public:
-	virtual void OnPickup(APlayerCharacter* PlayerCharacter) override;
+	virtual void OnPickup(AShootingCharacter* PlayerCharacter) override;
 
 private:
 	UPROPERTY(EditAnywhere)

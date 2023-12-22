@@ -3,14 +3,14 @@
 #include "AI/Services/BTService_PerceivePlayer.h"
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "Subsystems/FindActorsOfClassSubsystem.h"
 
 void UBTService_PerceivePlayer::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 
-	const TArray<AActor*> PlayerCharacters = FindActorsSubsystem->FindAllActors(APlayerCharacter::StaticClass());
+	const TArray<AActor*> PlayerCharacters = FindActorsSubsystem->FindAllActors(AShootingCharacter::StaticClass());
 	for (AActor* PlayerCharacter : PlayerCharacters)
 	{
 		// check line of sight angle with seeing distance

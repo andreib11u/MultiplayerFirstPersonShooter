@@ -2,14 +2,14 @@
 
 #include "UI/HUD/InteractionWidget.h"
 #include "Camera/CameraComponent.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "Components/InteractionComponent.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Types/CollisionTypes.h"
 
-void UInteractionWidget::Init(APlayerCharacter* InPlayerCharacter)
+void UInteractionWidget::Init(AShootingCharacter* InPlayerCharacter)
 {
 	PlayerCharacter = InPlayerCharacter;
 }

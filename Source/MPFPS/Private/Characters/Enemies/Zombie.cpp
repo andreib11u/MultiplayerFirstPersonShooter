@@ -5,7 +5,7 @@
 
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "Components/AudioComponent.h"
 #include "GameplayAbilitySystem/AttributeSets/BaseAttributeSet.h"
 #include "Kismet/GameplayStatics.h"
@@ -33,7 +33,7 @@ void AZombie::BeginPlay()
 	auto AIController = GetController<AAIController>();
 	if (AIController)
 	{
-		TArray<AActor*> Players = FindActorsSubsystem->FindAllActors(APlayerCharacter::StaticClass());
+		TArray<AActor*> Players = FindActorsSubsystem->FindAllActors(AShootingCharacter::StaticClass());
 		if (!Players.IsEmpty())
 		{
 			AIController->GetBlackboardComponent()->SetValueAsObject("TargetEnemy", Players[0]);
@@ -70,7 +70,7 @@ void AZombie::PlaySound()
 
 void AZombie::OnPlayerSpawned(UClass* Class, AActor* Actor)
 {
-	if (Class == APlayerCharacter::StaticClass())
+	if (Class == AShootingCharacter::StaticClass())
 	{
 		auto FindActorsSubsystem = GetWorld()->GetSubsystem<UFindActorsOfClassSubsystem>();
 		if (!FindActorsSubsystem)

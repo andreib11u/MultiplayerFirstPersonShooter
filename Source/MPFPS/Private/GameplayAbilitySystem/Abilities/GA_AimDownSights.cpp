@@ -3,7 +3,7 @@
 #include "GameplayAbilitySystem/Abilities/GA_AimDownSights.h"
 #include "AbilitySystemComponent.h"
 #include "Abilities/Tasks/AbilityTask_WaitInputRelease.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitChangeFOV.h"
 #include "Weapons/EquipmentComponent.h"
 #include "Camera/CameraComponent.h"
@@ -13,11 +13,11 @@ DEFINE_LOG_CATEGORY_STATIC(LogAimDownSightsAbility, All, All);
 void UGA_AimDownSights::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 										const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	OwnerCharacter = Cast<APlayerCharacter>(ActorInfo->AvatarActor);
+	OwnerCharacter = Cast<AShootingCharacter>(ActorInfo->AvatarActor);
 	if (!OwnerCharacter)
 	{
 		CancelAbility(Handle, ActorInfo, ActivationInfo, true);
-		UE_LOG(LogAimDownSightsAbility, Error, TEXT("AimDownSights ability activated on non-APlayerCharacter actor"))
+		UE_LOG(LogAimDownSightsAbility, Error, TEXT("AimDownSights ability activated on non-AShootingCharacter actor"))
 		return;
 	}
 

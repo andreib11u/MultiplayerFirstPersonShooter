@@ -2,10 +2,10 @@
 
 
 #include "Pickups/WeaponPickup.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "Weapons/EquipmentComponent.h"
 
-void AWeaponPickup::OnPickup(APlayerCharacter* PlayerCharacter)
+void AWeaponPickup::OnPickup(AShootingCharacter* PlayerCharacter)
 {
 	Super::OnPickup(PlayerCharacter);
 

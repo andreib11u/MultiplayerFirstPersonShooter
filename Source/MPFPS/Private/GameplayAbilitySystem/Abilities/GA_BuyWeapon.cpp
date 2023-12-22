@@ -2,7 +2,7 @@
 
 #include "GameplayAbilitySystem/Abilities/GA_BuyWeapon.h"
 #include "AbilitySystemComponent.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "GameplayAbilitySystem/AttributeSets/PlayerAttributeSet.h"
 #include "Weapons/EquipmentComponent.h"
 

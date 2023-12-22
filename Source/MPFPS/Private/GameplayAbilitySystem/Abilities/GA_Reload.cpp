@@ -1,7 +1,7 @@
 // Copyright Andrei Bondarenko 2023
 
 #include "GameplayAbilitySystem/Abilities/GA_Reload.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_PlayMontageForMesh.h"
 #include "Weapons/EquipmentComponent.h"
 #include "Weapons/Weapon.h"
@@ -11,7 +11,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogReloadAbility, All, All);
 void UGA_Reload::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 								 const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	auto PlayerCharacter = Cast<APlayerCharacter>(GetAvatarActorFromActorInfo());
+	auto PlayerCharacter = Cast<AShootingCharacter>(GetAvatarActorFromActorInfo());
 	if (!PlayerCharacter)
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);

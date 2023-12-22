@@ -7,7 +7,7 @@
 #include "UI/FPSUserWidget.h"
 #include "InteractionWidget.generated.h"
 
-class APlayerCharacter;
+class AShootingCharacter;
 class UTextBlock;
 class UProgressBar;
 /**
@@ -18,7 +18,7 @@ class MPFPS_API UInteractionWidget : public UFPSUserWidget
 {
 	GENERATED_BODY()
 public:
-	void Init(APlayerCharacter* InPlayerCharacter);
+	void Init(AShootingCharacter* InPlayerCharacter);
 	void ShowInteraction(const FText& InInteractionText);
 	void HideInteraction();
 
@@ -35,7 +35,7 @@ private:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* InteractionText;
 
-	TWeakObjectPtr<APlayerCharacter> PlayerCharacter;
+	TWeakObjectPtr<AShootingCharacter> PlayerCharacter;
 	TWeakObjectPtr<UInteractionComponent> InteractionComponent;
 
 	UPROPERTY(EditAnywhere)

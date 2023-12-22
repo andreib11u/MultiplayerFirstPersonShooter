@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "GameplayAbilitySystem/Abilities/FPSGameplayAbility.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_ServerWaitForClientData.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitTargetDataUsingActor.h"
@@ -34,7 +34,7 @@ private:
 	UPROPERTY()
 	AGameplayAbilityTargetActor* TargetActor = nullptr;
 
-	TWeakObjectPtr<APlayerCharacter> PlayerCharacter;
+	TWeakObjectPtr<AShootingCharacter> PlayerCharacter;
 	UPROPERTY()
 	UAbilityTask_ServerWaitForClientData* ServerWaitForClientDataTask;
 	UPROPERTY()

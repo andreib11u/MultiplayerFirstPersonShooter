@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Subsystems/SessionsSubsystem.h"
+#include "UI/MainMenu/CreateSessionWidget.h"
 #include "UI/MainMenu/FindSessionsWidget.h"
 #include "UI/MainMenu/Settings/UserSettingsWidget.h"
 
@@ -19,78 +20,17 @@ void UMainMenuWidget::NativeOnInitialized()
 	SettingsButton->OnClicked.AddDynamic(this, &UMainMenuWidget::OnSettingsButtonClicked);
 }
 
-void UMainMenuWidget::OnSessionStarted(bool bSuccessful)
-{
-	if (bSuccessful)
-	{
-		UGameplayStatics::OpenLevel(GetWorld(), "/Game/Underground/Maps/Light_Level", true, "listen");
-	}
-	else
-	{
-		if (GEngine)
-		{
-			const FString OnScreenMessage = FString::Printf(TEXT("Couldn't successfully start a session"));
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, OnScreenMessage);
-		}
-
-		CreateSessionButton->SetIsEnabled(true);
-	}
-}
-
-void UMainMenuWidget::OnSessionCreated(bool bSuccessful)
-{
-	if (bSuccessful)
-	{
-		USessionsSubsystem* SessionsSubsystem = GetSessionsSubsystem();
-		if (SessionsSubsystem)
-		{
-			OnSessionStarted(true);
-		}
-	}
-	else
-	{
-		if (GEngine)
-		{
-			const FString OnScreenMessage = FString::Printf(TEXT("Couldn't successfully create a session"));
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, OnScreenMessage);
-		}
-
-		CreateSessionButton->SetIsEnabled(true);
-	}
-}
-
-USessionsSubsystem* UMainMenuWidget::GetSessionsSubsystem() const
-{
-	UGameInstance* GameInstance = GetGameInstance();
-	if (!GameInstance)
-	{
-		return nullptr;
-	}
-
-	auto SessionsSubsystem = GameInstance->GetSubsystem<USessionsSubsystem>();
-	if (!SessionsSubsystem)
-	{
-		return nullptr;
-	}
-
-	return SessionsSubsystem;
-}
-
 void UMainMenuWidget::OnCreateSessionButtonClicked()
 {
-	USessionsSubsystem* SessionsSubsystem = GetSessionsSubsystem();
-	if (!SessionsSubsystem)
+	auto CreateSessionWidget = CreateWidget<UCreateSessionWidget>(GetOwningPlayer(), *CreateSessionWidgetClass);
+	if (CreateSessionWidget)
 	{
-		return;
+		CreateSessionWidget->AddToViewport();
+		CreateSessionWidget->SetParentMenu(this);
+
+		SetVisibility(ESlateVisibility::Collapsed);
 	}
-
-	SessionsSubsystem->OnCreateSessionCompleteEvent.AddDynamic(this, &UMainMenuWidget::OnSessionCreated);
-	SessionsSubsystem->CreateSession(8, true);
-
-	CreateSessionButton->SetIsEnabled(false);
 }
-
-
 
 void UMainMenuWidget::OnFindSessionsButtonClicked()
 {

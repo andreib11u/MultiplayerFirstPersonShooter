@@ -1,7 +1,7 @@
 // Copyright Andrei Bondarenko 2023
 
 #include "GameplayAbilitySystem/GameplayCues/GameplayCue_BulletImpact.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Weapons/EquipmentComponent.h"
@@ -11,7 +11,7 @@ bool UGameplayCue_BulletImpact::OnExecute_Implementation(AActor* MyTarget, const
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	PlayerController->ClientStartCameraShake(CameraShake);
 
-	auto PlayerCharacter = Cast<APlayerCharacter>(Parameters.GetEffectCauser());
+	auto PlayerCharacter = Cast<AShootingCharacter>(Parameters.GetEffectCauser());
 	if (PlayerCharacter)
 	{
 		auto Weapon = Cast<UWeapon>(PlayerCharacter->GetEquipmentComponent()->GetCurrentItem());

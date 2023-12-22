@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffectTypes.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "UI/FPSUserWidget.h"
 #include "CrosshairWidget.generated.h"
 
@@ -62,7 +62,7 @@ private:
 	FLinearColor CurrentCrosshairColor;
 
 	UPROPERTY()
-	APlayerCharacter* PlayerCharacter;
+	AShootingCharacter* PlayerCharacter;
 
 	void CalculateCrosshairPosition();
 

@@ -3,7 +3,7 @@
 #include "ZombieSpawner/ZombieSpawner.h"
 #include "ZombieSpawner/ZombieSpawn.h"
 #include "EngineUtils.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "Characters/Enemies/Zombie.h"
 #include "Subsystems/FindActorsOfClassSubsystem.h"
 
@@ -33,6 +33,22 @@ void AZombieSpawner::BeginPlay()
 	}
 }
 
+void AZombieSpawner::SpawnZombieAt(AZombieSpawn* Spawn)
+{
+	const FVector SpawnLocation = Spawn->GetActorLocation();
+	const FRotator SpawnRotation = Spawn->GetActorRotation();
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	auto SpawnedActor = GetWorld()->SpawnActor(ZombieToSpawn, &SpawnLocation, &SpawnRotation, Params);
+
+	if (SpawnedActor)
+	{
+		NumberOfZombiesToSpawn--;
+		SpawnLocations.Swap(SpawnLocations.IndexOfByKey(Spawn), SpawnLocations.Num() - 1);
+	}
+}
+
 void AZombieSpawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -57,11 +73,7 @@ void AZombieSpawner::Tick(float DeltaTime)
 		{
 			if (Spawn->CanSpawn())
 			{
-				const FVector SpawnLocation = Spawn->GetActorLocation();
-				const FRotator SpawnRotation = Spawn->GetActorRotation();
-				GetWorld()->SpawnActor(ZombieToSpawn, &SpawnLocation, &SpawnRotation);
-				NumberOfZombiesToSpawn--;
-				SpawnLocations.Swap(SpawnLocations.IndexOfByKey(Spawn), SpawnLocations.Num() - 1);
+				SpawnZombieAt(Spawn);
 				break;
 			}
 		}

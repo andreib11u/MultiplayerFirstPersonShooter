@@ -5,7 +5,7 @@
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
 #include "Actors/Door.h"
 #include "Camera/CameraComponent.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_ServerWaitForClientData.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_WaitTargetDataUsingActor.h"
 #include "GameplayAbilitySystem/AttributeSets/PlayerAttributeSet.h"
@@ -45,7 +45,7 @@ void UGA_OpenDoor::SpawnTargetActor()
 void UGA_OpenDoor::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
 								   const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
-	PlayerCharacter = Cast<APlayerCharacter>(ActorInfo->AvatarActor);
+	PlayerCharacter = Cast<AShootingCharacter>(ActorInfo->AvatarActor);
 	if (!PlayerCharacter.IsValid())
 	{
 		UE_LOG(LogOpenDoorAbility, Error, TEXT("%s ability tried to activate on non-PlayerCharacter actor"), *GetName());

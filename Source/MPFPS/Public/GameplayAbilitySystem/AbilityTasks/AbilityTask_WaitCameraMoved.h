@@ -6,7 +6,7 @@
 #include "Abilities/Tasks/AbilityTask.h"
 #include "AbilityTask_WaitCameraMoved.generated.h"
 
-class APlayerCharacter;
+class AShootingCharacter;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCameraMoved);
 
 /**
@@ -24,12 +24,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks",
 			  meta = (HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
-	static UAbilityTask_WaitCameraMoved* WaitCameraMoved(UGameplayAbility* OwningAbility, FName TaskInstanceName, APlayerCharacter* PlayerCharacter);
+	static UAbilityTask_WaitCameraMoved* WaitCameraMoved(UGameplayAbility* OwningAbility, FName TaskInstanceName, AShootingCharacter* PlayerCharacter);
 
 	virtual void Activate() override;
 
 private:
-	TWeakObjectPtr<APlayerCharacter> Character;
+	TWeakObjectPtr<AShootingCharacter> Character;
 
 	UFUNCTION()
 	void CameraMoved();

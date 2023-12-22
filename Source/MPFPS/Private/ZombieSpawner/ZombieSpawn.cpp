@@ -1,7 +1,7 @@
 // Copyright Andrei Bondarenko 2023
 
 #include "ZombieSpawner/ZombieSpawn.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Subsystems/FindActorsOfClassSubsystem.h"
 #include "Components/BillboardComponent.h"
@@ -34,11 +34,11 @@ void AZombieSpawn::BeginPlay()
 	auto FindActorsSubsystem = GetWorld()->GetSubsystem<UFindActorsOfClassSubsystem>();
 	if (FindActorsSubsystem)
 	{
-		TArray<AActor*> FoundPlayers = FindActorsSubsystem->FindAllActors(APlayerCharacter::StaticClass());
+		TArray<AActor*> FoundPlayers = FindActorsSubsystem->FindAllActors(AShootingCharacter::StaticClass());
 
 		for (AActor* FoundPlayer : FoundPlayers)
 		{
-			Players.Add(CastChecked<APlayerCharacter>(FoundPlayer));
+			Players.Add(CastChecked<AShootingCharacter>(FoundPlayer));
 		}
 
 		FindActorsSubsystem->OnNewFindableActorAdded.AddUObject(this, &AZombieSpawn::OnNewPlayerAdded);
@@ -85,16 +85,16 @@ void AZombieSpawn::Tick(float DeltaTime)
 
 void AZombieSpawn::OnNewPlayerAdded(UClass* Class, AActor* Actor)
 {
-	if (Class == APlayerCharacter::StaticClass())
+	if (Class == AShootingCharacter::StaticClass())
 	{
-		Players.Add(CastChecked<APlayerCharacter>(Actor));
+		Players.Add(CastChecked<AShootingCharacter>(Actor));
 	}
 }
 
 void AZombieSpawn::OnNewPlayerRemoved(UClass* Class, AActor* Actor)
 {
-	if (Class == APlayerCharacter::StaticClass())
+	if (Class == AShootingCharacter::StaticClass())
 	{
-		Players.Remove(CastChecked<APlayerCharacter>(Actor));
+		Players.Remove(CastChecked<AShootingCharacter>(Actor));
 	}
 }

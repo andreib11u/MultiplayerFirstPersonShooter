@@ -5,7 +5,7 @@
 #include "AbilitySystemInterface.h"
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
 #include "Camera/CameraComponent.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "GameplayAbilitySystem/FPSAbilitySystemComponent.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_PlayMontageForMesh.h"
 #include "GameplayAbilitySystem/AbilityTasks/AbilityTask_ServerWaitForClientData.h"
@@ -29,7 +29,7 @@ void UGA_FireOnce::FireShot()
 		auto LineTraceActor = Cast<ATargetActor_LineTrace>(TargetActor);
 		if (LineTraceActor)
 		{
-			auto Character = Cast<APlayerCharacter>(GetSourceObject(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()));
+			auto Character = Cast<AShootingCharacter>(GetSourceObject(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()));
 			check(Character);
 
 			const FVector StartTrace = Character->GetFirstPersonCamera()->GetComponentLocation();
@@ -41,10 +41,10 @@ void UGA_FireOnce::FireShot()
 			LineTraceActor->Configure(StartTrace, EndTrace, BULLET_TRACE_COLLISION);
 		}
 
-		auto PlayerCharacter = Cast<APlayerCharacter>(GetActorInfo().AvatarActor);
+		auto PlayerCharacter = Cast<AShootingCharacter>(GetActorInfo().AvatarActor);
 		if (!PlayerCharacter)
 		{
-			UE_LOG(LogFireOnceAbility, Error, TEXT("%s ability tried to activate on non-APlayerCharacter actor"));
+			UE_LOG(LogFireOnceAbility, Error, TEXT("%s ability tried to activate on non-AShootingCharacter actor"));
 			EndAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), true, true);
 			return;
 		}

@@ -10,7 +10,7 @@
 class UInteractionWidget;
 class UMoneyWidget;
 class UCrosshairWidget;
-class APlayerCharacter;
+class AShootingCharacter;
 class UCanvasPanel;
 class UDamageDirectionIndicatorWidget;
 class UAmmoWidget;
@@ -57,7 +57,7 @@ private:
 	void OnItemChanged(UEquippableItem* CurrentItem);
 
 	UPROPERTY()
-	APlayerCharacter* CharacterOwner;
+	AShootingCharacter* CharacterOwner;
 
 	void DisplayDamageDirectionIndicators();
 };

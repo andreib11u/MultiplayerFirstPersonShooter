@@ -1,7 +1,7 @@
 // Copyright Andrei Bondarenko 2023
 
 #include "GameplayAbilitySystem/GameplayCues/GameplayCue_ZombieHit.h"
-#include "Characters/PlayerCharacter.h"
+#include "Characters/ShootingCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/FPSHUD.h"
 #include "UI/HUDWidget.h"
@@ -13,7 +13,7 @@ void UGameplayCue_ZombieHit::AddDamageDirectionToPlayer(AActor* MyTarget, AActor
 		return;
 	}
 
-	auto PlayerTarget = Cast<APlayerCharacter>(MyTarget);
+	auto PlayerTarget = Cast<AShootingCharacter>(MyTarget);
 	if (!PlayerTarget)
 	{
 		return;
